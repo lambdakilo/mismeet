@@ -202,6 +202,15 @@ android/gradlew -p android installDebug && adb shell am start -n app.mismeet.and
 adb logcat --pid="$(adb shell pidof -s app.mismeet.android)"
 ```
 
+### Relay integration test
+
+Publishes a location event and a relay list under throwaway keys to the default public relays
+and reads them back. Skipped unless the variable is set, so the verify command stays offline.
+
+```bash
+MISMEET_RELAY_TESTS=1 android/gradlew -p android :protocol:test --tests 'app.mismeet.protocol.RelayIntegrationTest'
+```
+
 ### Instrumented tests on the phone
 
 ```bash

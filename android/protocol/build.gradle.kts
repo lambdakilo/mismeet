@@ -22,6 +22,7 @@ dependencies {
     implementation(libs.nostr.sdk.jvm)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.core)
 }
 
 tasks.test {
