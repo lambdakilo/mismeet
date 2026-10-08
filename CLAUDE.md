@@ -22,8 +22,9 @@ follows it, and a protocol change edits the spec first, in the same change.
   that publishes on a fixed timer, never from the fused provider. Under
   `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`, `identity/` (a Keystore
   wrapped secret key), `store/` (JSON state in the files directory), `nostr/`, `location/`
-  (the provider and the foreground service), `ui/`. There is no map view yet; a contact row
-  opens the position in whatever map app handles `geo:` URIs.
+  (the provider, the foreground service and the boot receiver), `ui/`. The map tab draws
+  OpenStreetMap tiles through osmdroid, which needs the package name as user agent; a contact
+  row also opens the position in whatever map app handles `geo:` URIs.
 
 ## Shared rules
 

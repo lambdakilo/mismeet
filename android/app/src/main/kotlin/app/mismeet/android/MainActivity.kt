@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mismeet.android.ui.ContactsScreen
+import app.mismeet.android.ui.MapScreen
 import app.mismeet.android.ui.MeScreen
 
 class MainActivity : ComponentActivity() {
@@ -54,6 +56,12 @@ private fun MismeetScreen(model: AppModel) {
                 NavigationBarItem(
                     selected = tab == 1,
                     onClick = { tab = 1 },
+                    icon = { Icon(Icons.Filled.Place, contentDescription = null) },
+                    label = { Text("Map") },
+                )
+                NavigationBarItem(
+                    selected = tab == 2,
+                    onClick = { tab = 2 },
                     icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
                     label = { Text("Me") },
                 )
@@ -62,6 +70,7 @@ private fun MismeetScreen(model: AppModel) {
     ) { padding ->
         when (tab) {
             0 -> ContactsScreen(model, Modifier.padding(padding))
+            1 -> MapScreen(model, Modifier.padding(padding))
             else -> MeScreen(model, Modifier.padding(padding))
         }
     }

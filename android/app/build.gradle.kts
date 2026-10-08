@@ -47,5 +47,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.core)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.osmdroid.android)
     testImplementation(libs.junit)
 }
