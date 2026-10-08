@@ -38,16 +38,27 @@ yet. Invites are scanned as QR codes or pasted as text.
 
 ### Set up once: iOS
 
-1. Sign in to Xcode with the Apple ID under Xcode > Settings > Accounts. That creates the
-   personal team; the first device build then creates the development certificate and profile.
-   Find the team id, the ten characters in parentheses at the end of the identity name, and
-   write it to `ios/.team-id` (git-ignored, one line):
+1. Sign in to Xcode with the Apple ID under Xcode > Settings > Apple Accounts. Signing in
+   alone creates nothing: a free account gets its personal team, certificate and profile only
+   once a project asks for them, so `security find-identity` shows no identity yet.
+
+2. Generate the project and open it in Xcode:
 
    ```bash
-   security find-identity -v -p codesigning
+   xcodegen generate --spec ios/project.yml && open ios/Mismeet.xcodeproj
    ```
 
-2. On the iPhone, enable Settings > Privacy & Security > Developer Mode, connect it by USB and
+   Select the Mismeet target, then Signing & Capabilities, and pick the team named after you
+   with "(Personal Team)". Xcode registers the app id and creates the development certificate
+   and profile. Do the same for the MismeetTests target. Xcode writes the team id into the
+   generated project; copy it to `ios/.team-id` (git-ignored, one line), which the command
+   line builds read, since the next `xcodegen generate` discards the project's copy:
+
+   ```bash
+   grep -m1 -oE 'DEVELOPMENT_TEAM = [A-Z0-9]{10}' ios/Mismeet.xcodeproj/project.pbxproj | cut -d' ' -f3 | tee ios/.team-id
+   ```
+
+3. On the iPhone, enable Settings > Privacy & Security > Developer Mode, connect it by USB and
    trust the Mac. List it, then write its identifier (the first column) to `ios/.device-id`
    (git-ignored, one line):
 
