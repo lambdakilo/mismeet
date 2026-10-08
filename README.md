@@ -97,25 +97,40 @@ iOS, after cloning and after every edit to `ios/project.yml`:
 xcodegen generate --spec ios/project.yml
 ```
 
-Build for the simulator:
+Build for the simulator (`xcrun simctl list devices available` lists the simulators; the
+generic destination builds without booting one):
 
 ```bash
-set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS Simulator' -derivedDataPath ios/build build | xcbeautify
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build build | xcbeautify
 ```
 
-Unit tests (`xcrun simctl list devices available` lists the simulators):
+Unit tests:
 
 ```bash
 set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build test | xcbeautify
 ```
 
-Build for the device:
+Run on the simulator: boot one, show it, build for it as above, then install and launch:
 
 ```bash
-set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS' -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
+xcrun simctl bootstatus "iPhone 17" -b && open -a Simulator
 ```
 
-Install and launch on the device (add `--console` to the launch to stream its output):
+```bash
+xcrun simctl install booted ios/build/Build/Products/Debug-iphonesimulator/Mismeet.app && xcrun simctl launch booted app.mismeet.ios
+```
+
+Build for the connected iPhone. The destination names the phone on purpose: a free team has
+no registered devices, and only a build for a specific device registers it and creates the
+provisioning profile; a `generic/platform=iOS` build fails with "no devices".
+
+```bash
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination "platform=iOS,id=$(cat ios/.device-id)" -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
+```
+
+Install and launch on the device (add `--console` to the launch to stream its output). The
+first launch is refused until the phone trusts the personal team: Settings > General > VPN &
+Device Management, tap the developer app entry, Trust. After that, launching works.
 
 ```bash
 xcrun devicectl device install app --device "$(cat ios/.device-id)" ios/build/Build/Products/Debug-iphoneos/Mismeet.app && xcrun devicectl device process launch --device "$(cat ios/.device-id)" --terminate-existing app.mismeet.ios

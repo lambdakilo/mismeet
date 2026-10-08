@@ -68,7 +68,17 @@ xcodegen generate --spec ios/project.yml
 Build for the simulator:
 
 ```bash
-set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS Simulator' -derivedDataPath ios/build build | xcbeautify
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build build | xcbeautify
+```
+
+Run on the simulator after that build:
+
+```bash
+xcrun simctl bootstatus "iPhone 17" -b && open -a Simulator
+```
+
+```bash
+xcrun simctl install booted ios/build/Build/Products/Debug-iphonesimulator/Mismeet.app && xcrun simctl launch booted app.mismeet.ios
 ```
 
 Unit tests (iPhone 17 is one of the installed simulators; `xcrun simctl list devices available`
@@ -78,13 +88,17 @@ lists them):
 set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build test | xcbeautify
 ```
 
-Build for the device:
+Build for the connected iPhone. The destination names the phone on purpose: a free team has
+no registered devices, and only a build for a specific device registers it and creates the
+provisioning profile; a `generic/platform=iOS` build fails with "no devices".
 
 ```bash
-set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS' -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination "platform=iOS,id=$(cat ios/.device-id)" -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
 ```
 
-Install and launch on the device:
+Install and launch on the device. The first launch on a phone is refused until the user has
+trusted the personal team under Settings > General > VPN & Device Management; that cannot be
+done from the Mac, so report it and stop.
 
 ```bash
 xcrun devicectl device install app --device "$(cat ios/.device-id)" ios/build/Build/Products/Debug-iphoneos/Mismeet.app && xcrun devicectl device process launch --device "$(cat ios/.device-id)" --terminate-existing app.mismeet.ios
