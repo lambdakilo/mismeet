@@ -1,7 +1,7 @@
 import Foundation
 
 /// The plaintext of one entry, spec section 5.2.
-struct LocationPayload: Equatable, Sendable {
+struct LocationPayload: Equatable, Sendable, Codable {
     var fixTime: UInt64
     var latitude: Double
     var longitude: Double

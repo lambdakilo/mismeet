@@ -9,7 +9,9 @@ social graph never appears in plaintext.
 ## Status
 
 The protocol is specified and both apps build with the protocol core and its conformance
-tests. There is no user interface, location or relay code yet.
+tests, a device key, local contact and relay storage, relay publishing and fetching, location
+monitoring and a first set of screens. Neither app has been exercised end to end on a phone
+yet. Invites are pasted as text (no QR scanning yet), and the Android app has no map view.
 
 ## Files
 

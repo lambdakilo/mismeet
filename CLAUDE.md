@@ -10,12 +10,20 @@ follows it, and a protocol change edits the spec first, in the same change.
 - `ios/`: Swift and SwiftUI app. XcodeGen generates `ios/Mismeet.xcodeproj` from
   `ios/project.yml`. Never edit the `.pbxproj`; change `project.yml` and regenerate. Deployment
   target iOS 18. Location comes from significant location change monitoring with the "Always"
-  permission, and the app publishes on each wakeup.
+  permission, and the app publishes on each wakeup. Under `ios/Mismeet/`: `Protocol/` (the
+  wire format, mirrored in Kotlin), `App/` (the model and the app delegate that starts
+  monitoring on a background launch), `Identity/` (Keychain), `Store/` (JSON state in
+  Application Support), `Nostr/` (one short-lived client per publish or fetch), `Location/`,
+  `UI/`.
 - `android/`: Kotlin, built with the Gradle wrapper checked into `android/`. Two modules:
   `app` (the Android app, Compose) and `protocol` (a plain JVM library holding the protocol core
   and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 34. No Google Play Services
-  dependency: location comes from the platform `LocationManager` inside a foreground service,
-  never from the fused provider.
+  dependency: location comes from the platform `LocationManager` inside a foreground service
+  that publishes on a fixed timer, never from the fused provider. Under
+  `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`, `identity/` (a Keystore
+  wrapped secret key), `store/` (JSON state in the files directory), `nostr/`, `location/`
+  (the provider and the foreground service), `ui/`. There is no map view yet; a contact row
+  opens the position in whatever map app handles `geo:` URIs.
 
 ## Shared rules
 
@@ -213,6 +221,9 @@ android/gradlew -p android connectedDebugAndroidTest
 - The Nostr Dev Kit AAR ships native libraries for every ABI; the phone is arm64-v8a. A native
   crash at startup on GrapheneOS is most likely its hardened memory allocator: check the
   per-app exploit protection compatibility mode before debugging anything else, and report it.
+- AndroidX is pinned to the last versions that compile against API 36; the newer ones demand
+  compileSdk 37 and lint flags the pins as outdated. Compose material icons are a separate
+  dependency, `material-icons-core`, not pulled in by material3.
 
 ## Verify after edits
 

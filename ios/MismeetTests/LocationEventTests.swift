@@ -99,7 +99,6 @@ final class LocationEventTests: XCTestCase {
     }
 
     func testReaderRejectsBadEvents() throws {
-        let contact = publisher.publicKey()
         let content = LocationEventBuilder.content(entries: [])
         func rejection(_ event: Event, contact: PublicKey? = nil, now: UInt64? = nil) -> LocationEventRejection? {
             do {

@@ -1,6 +1,7 @@
 package app.mismeet.protocol
 
 import kotlin.math.abs
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -9,6 +10,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.doubleOrNull
 
 /** The plaintext of one entry, spec section 5.2. */
+@Serializable
 data class LocationPayload(
     val fixTime: Long,
     val latitude: Double,
