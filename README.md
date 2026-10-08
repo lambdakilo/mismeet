@@ -8,7 +8,8 @@ social graph never appears in plaintext.
 
 ## Status
 
-The protocol is specified. No app code exists yet.
+The protocol is specified and both apps build with the protocol core and its conformance
+tests. There is no user interface, location or relay code yet.
 
 ## Files
 
@@ -16,8 +17,8 @@ The protocol is specified. No app code exists yet.
   expiration, relay handling, the contact model, client behaviour and the threat model.
 - [`CLAUDE.md`](CLAUDE.md): the build, test, install and log commands for both platforms, and
   the rules the code follows.
-- `ios/`: the Swift and SwiftUI app, to come.
-- `android/`: the Kotlin app, to come.
+- `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
+- `android/`: the Kotlin app and the `protocol` module it builds on.
 - [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
   see below.
 

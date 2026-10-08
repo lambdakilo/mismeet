@@ -1,0 +1,10 @@
+.DS_Store
+ios/Mismeet.xcodeproj/
+ios/build/
+ios/.team-id
+ios/.device-id
+android/local.properties
+android/.gradle/
+android/.kotlin/
+android/build/
+android/*/build/

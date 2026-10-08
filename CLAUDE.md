@@ -11,9 +11,11 @@ follows it, and a protocol change edits the spec first, in the same change.
   `ios/project.yml`. Never edit the `.pbxproj`; change `project.yml` and regenerate. Deployment
   target iOS 18. Location comes from significant location change monitoring with the "Always"
   permission, and the app publishes on each wakeup.
-- `android/`: Kotlin app built with the Gradle wrapper checked into `android/`. `compileSdk` and
-  `targetSdk` are 36. No Google Play Services dependency: location comes from the platform
-  `LocationManager` inside a foreground service, never from the fused provider.
+- `android/`: Kotlin, built with the Gradle wrapper checked into `android/`. Two modules:
+  `app` (the Android app, Compose) and `protocol` (a plain JVM library holding the protocol core
+  and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 34. No Google Play Services
+  dependency: location comes from the platform `LocationManager` inside a foreground service,
+  never from the fused provider.
 
 ## Shared rules
 
@@ -23,10 +25,15 @@ follows it, and a protocol change edits the spec first, in the same change.
   - iOS: Swift package product `NostrSDK` from `https://github.com/nostrdevkit/nostr-sdk-swift`,
     pinned to an exact version in `project.yml`.
   - Android: `org.nostrdevkit:nostr-sdk:0.45.1` from Maven Central, Kotlin package
-    `org.nostrdevkit.sdk`.
-- Protocol constants (kind, `d` tag, expiration, buckets, timeouts) live in one constants file
-  per platform and match the table in the spec, section 10. The conformance checklist in
-  section 12 is a unit test on each platform.
+    `org.nostrdevkit.sdk`. The `protocol` module compiles and tests against the JVM flavour
+    `org.nostrdevkit:nostr-sdk-jvm`, which carries macOS native libraries, so its tests run on
+    this Mac; the `app` module excludes that jar and uses the Android AAR, which has the same
+    API.
+- Protocol constants (kind, `d` tag, expiration, buckets, timeouts) live in
+  `ios/Mismeet/Protocol/ProtocolConstants.swift` and
+  `android/protocol/src/main/kotlin/app/mismeet/protocol/ProtocolConstants.kt` and match the
+  table in the spec, section 10. The conformance checklist in section 12 is a unit test on each
+  platform, under `ios/MismeetTests` and `android/protocol/src/test`.
 - Nothing but kinds `31122` and `10002` is ever published. No profile, no contact list, no DMs.
 - Never log a secret key, a decrypted payload or a contact's public key above debug level.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
@@ -126,7 +133,7 @@ drive with the iPhone.
 
 - Free Apple ID: provisioning profiles expire after seven days, so rebuild and reinstall weekly.
   At most ten app ids can be registered per seven days, so do not churn the bundle identifier.
-- Background location needs `UIBackgroundModes` with `location` and the three location usage
+- Background location needs `UIBackgroundModes` with `location` and the two location usage
   strings in `Info.plist`, defined in `project.yml`. It is not an entitlement, so it works with
   the free team.
 - Always pass `-derivedDataPath ios/build`, so the app path in the install command stays valid.
@@ -169,8 +176,10 @@ android/gradlew -p android assembleDebug
 
 ### Lint and unit tests
 
+Runs lint on the app and the unit tests of both modules.
+
 ```bash
-android/gradlew -p android lint testDebugUnitTest
+android/gradlew -p android lint test
 ```
 
 ### Install and launch on the phone
@@ -214,6 +223,6 @@ Run before saying a change is done, not only before committing:
 
 ## Git-ignored paths
 
-When scaffolding, create `.gitignore` with: `ios/Mismeet.xcodeproj/` (generated), `ios/build/`,
-`ios/.team-id`, `ios/.device-id`, `android/local.properties`, `android/.gradle/`,
-`android/build/`, `android/app/build/`, `.DS_Store`.
+`.gitignore` covers the generated Xcode project, build output, the Gradle caches and the
+local-only files named above (`ios/.team-id`, `ios/.device-id`, `android/local.properties`).
+Anything else that is generated or machine-specific goes there too, never into a commit.

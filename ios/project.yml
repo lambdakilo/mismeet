@@ -1,0 +1,61 @@
+name: Mismeet
+options:
+  bundleIdPrefix: app.mismeet
+  deploymentTarget:
+    iOS: "18.0"
+  xcodeVersion: "27.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+packages:
+  NostrSDK:
+    url: https://github.com/nostrdevkit/nostr-sdk-swift
+    exactVersion: 0.45.1
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+targets:
+  Mismeet:
+    type: application
+    platform: iOS
+    sources:
+      - path: Mismeet
+    dependencies:
+      - package: NostrSDK
+    info:
+      path: Mismeet/Info.plist
+      properties:
+        CFBundleDisplayName: Mismeet
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIBackgroundModes: [location]
+        NSLocationWhenInUseUsageDescription: Mismeet shows your location to the contacts you choose.
+        NSLocationAlwaysAndWhenInUseUsageDescription: Mismeet keeps your contacts updated also while the app is not open.
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.mismeet.ios
+  MismeetTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: MismeetTests
+    dependencies:
+      - target: Mismeet
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Mismeet:
+    build:
+      targets:
+        Mismeet: all
+        MismeetTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MismeetTests
