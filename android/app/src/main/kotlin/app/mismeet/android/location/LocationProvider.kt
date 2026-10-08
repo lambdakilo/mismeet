@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.CancellationSignal
+import android.os.PowerManager
 import app.mismeet.protocol.LocationFix
 import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -23,7 +25,12 @@ object LocationProvider {
         context.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
 
     fun hasNotificationPermission(context: Context): Boolean =
-        context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
+    /** Stock Android 12 stops a foreground service it considers wasteful unless the app is exempted. */
+    fun isIgnoringBatteryOptimizations(context: Context): Boolean =
+        context.getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(context.packageName) ?: true
 
     @SuppressLint("MissingPermission")
     suspend fun currentFix(context: Context): LocationFix? {

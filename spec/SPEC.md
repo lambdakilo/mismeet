@@ -3,7 +3,7 @@
 Version 1, draft for review, 2026-10-07.
 
 Mismeet is a location sharing app in the style of Find My, built on Nostr, for iOS and
-GrapheneOS. Each phone publishes its own location to Nostr relays as one addressable event,
+Android. Each phone publishes its own location to Nostr relays as one addressable event,
 encrypted so that only approved contacts can read it. Contacts fetch the latest event when they
 want to see where someone is. There is no server of our own, no push service and no bridge.
 

@@ -1,6 +1,6 @@
 # Mismeet
 
-Nostr-based location sharing for iOS and GrapheneOS, in the style of Find My, with no server of
+Nostr-based location sharing for iOS and Android, in the style of Find My, with no server of
 its own. The protocol lives in [spec/SPEC.md](spec/SPEC.md) and is the source of truth: app code
 follows it, and a protocol change edits the spec first, in the same change.
 
@@ -17,14 +17,14 @@ follows it, and a protocol change edits the spec first, in the same change.
   `UI/`.
 - `android/`: Kotlin, built with the Gradle wrapper checked into `android/`. Two modules:
   `app` (the Android app, Compose) and `protocol` (a plain JVM library holding the protocol core
-  and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 34. No Google Play Services
-  dependency: location comes from the platform `LocationManager` inside a foreground service
-  that publishes on a fixed timer, never from the fused provider. Under
-  `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`, `identity/` (a Keystore
-  wrapped secret key), `store/` (JSON state in the files directory), `nostr/`, `location/`
-  (the provider, the foreground service and the boot receiver), `ui/`. The map tab draws
-  OpenStreetMap tiles through osmdroid, which needs the package name as user agent; a contact
-  row also opens the position in whatever map app handles `geo:` URIs.
+  and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 31 so that stock Android 12
+  phones run it. No Google Play Services dependency: location comes from the platform
+  `LocationManager` inside a foreground service that publishes on a fixed timer, never from the
+  fused provider. Under `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`,
+  `identity/` (a Keystore wrapped secret key), `store/` (JSON state in the files directory),
+  `nostr/`, `location/` (the provider, the foreground service and the boot receiver), `ui/`.
+  The map tab draws OpenStreetMap tiles through osmdroid, which needs the package name as user
+  agent; a contact row also opens the position in whatever map app handles `geo:` URIs.
 
 ## Shared rules
 
@@ -49,62 +49,42 @@ follows it, and a protocol change edits the spec first, in the same change.
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
 
-## iOS
+## Building and running
 
-Prerequisites on this Mac: Xcode 27 with the iOS 27 SDK, `xcodegen` 2.46 and `xcbeautify` 3.2
-from Homebrew. The test device is an iPhone XR on iOS 18, signed with a free Apple ID personal
-team, so there is no push, no app group and no other special entitlement.
+The prerequisites and the one-time setup (Apple ID and team id, device identifier, SDK path,
+`adb`, developer options on the phones) are in README.md under Development, written for
+people; they do not belong here. The commands below assume that setup is done, so that
+`ios/.team-id`, `ios/.device-id` and `android/local.properties` exist. The README lists the
+same commands for people: change both together.
 
-### Set up once
+### iOS
 
-1. Sign in to Xcode with the Apple ID under Xcode > Settings > Accounts. That creates the
-   personal team. The first device build with `-allowProvisioningUpdates` then creates the
-   development certificate and profile. Find the team id, the ten characters in parentheses at
-   the end of the identity name:
-
-   ```bash
-   security find-identity -v -p codesigning
-   ```
-
-   Write it to `ios/.team-id` (git-ignored, one line).
-
-2. On the iPhone, enable Settings > Privacy & Security > Developer Mode, connect it by USB and
-   trust the Mac. List it, then write its identifier (the first column) to `ios/.device-id`
-   (git-ignored, one line):
-
-   ```bash
-   xcrun devicectl list devices
-   ```
-
-### Generate the project
-
-After cloning and after every edit to `ios/project.yml`:
+Generate the project after cloning and after every edit to `ios/project.yml`:
 
 ```bash
 xcodegen generate --spec ios/project.yml
 ```
 
-### Build for the simulator
+Build for the simulator:
 
 ```bash
 set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS Simulator' -derivedDataPath ios/build build | xcbeautify
 ```
 
-### Unit tests
-
-iPhone 17 is one of the installed simulators; `xcrun simctl list devices available` lists them.
+Unit tests (iPhone 17 is one of the installed simulators; `xcrun simctl list devices available`
+lists them):
 
 ```bash
 set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build test | xcbeautify
 ```
 
-### Build for the device
+Build for the device:
 
 ```bash
 set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS' -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
 ```
 
-### Install and launch on the device
+Install and launch on the device:
 
 ```bash
 xcrun devicectl device install app --device "$(cat ios/.device-id)" ios/build/Build/Products/Debug-iphoneos/Mismeet.app && xcrun devicectl device process launch --device "$(cat ios/.device-id)" --terminate-existing app.mismeet.ios
@@ -113,122 +93,88 @@ xcrun devicectl device install app --device "$(cat ios/.device-id)" ios/build/Bu
 Add `--console` to the launch command to stream the app's stdout until Ctrl-C. Leave it out
 when testing background wakeups, so the app runs detached as it would for a user.
 
-### Logs
-
 Device logs: Console.app, select the iPhone, filter on process `Mismeet`. Simulator logs:
 
 ```bash
 xcrun simctl spawn booted log stream --level debug --predicate 'subsystem == "app.mismeet.ios"'
 ```
 
-### Simulated movement
-
-Set one position on the booted simulator:
+Simulated movement, one position or a built-in scenario (`xcrun simctl location booted list`
+names them):
 
 ```bash
 xcrun simctl location booted set 60.1699,24.9384
 ```
 
-Or run one of the built-in scenarios (`xcrun simctl location booted list` names them):
-
 ```bash
 xcrun simctl location booted run "Freeway Drive"
 ```
 
-Significant location change delivery on the simulator is unreliable; the real test is a walk or
-drive with the iPhone.
-
-### Gotchas
-
-- Free Apple ID: provisioning profiles expire after seven days, so rebuild and reinstall weekly.
-  At most ten app ids can be registered per seven days, so do not churn the bundle identifier.
+- Significant location change delivery on the simulator is unreliable; the real test is a walk
+  or drive with the iPhone.
 - Background location needs `UIBackgroundModes` with `location` and the two location usage
   strings in `Info.plist`, defined in `project.yml`. It is not an entitlement, so it works with
   the free team.
 - Always pass `-derivedDataPath ios/build`, so the app path in the install command stays valid.
+- The free team's profile lasts seven days and at most ten app ids can be registered per seven
+  days, so never churn the bundle identifier.
 
-## Android
+### Android
 
-Prerequisites on this Mac: Temurin JDK 21 (what `java` on the PATH resolves to), and the Android
-command line tools from Homebrew at `/opt/homebrew/share/android-commandlinetools`, with
-`platforms;android-36`, `build-tools;36.0.0` and `platform-tools` installed. Build with the
-checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK 27, which the
-Android Gradle Plugin does not support); the wrapper pins the version the plugin supports.
-
-### Set up once
-
-Point Gradle at the SDK (`android/local.properties` is git-ignored):
-
-```bash
-printf 'sdk.dir=/opt/homebrew/share/android-commandlinetools\n' > android/local.properties
-```
-
-Put `adb` on the PATH:
-
-```bash
-ln -s /opt/homebrew/share/android-commandlinetools/platform-tools/adb /opt/homebrew/bin/adb
-```
-
-On the GrapheneOS phone: Settings > About phone, tap Build number seven times, then
-Settings > System > Developer options > USB debugging. Connect by USB, accept the fingerprint
-prompt on the phone, and check that the phone shows as `device`:
-
-```bash
-adb devices
-```
-
-### Build
+Build:
 
 ```bash
 android/gradlew -p android assembleDebug
 ```
 
-### Lint and unit tests
-
-Runs lint on the app and the unit tests of both modules.
+Lint and unit tests, the verify command; it runs lint on the app and the unit tests of both
+modules:
 
 ```bash
 android/gradlew -p android lint test
 ```
 
-### Install and launch on the phone
+Install and launch on the phone:
 
 ```bash
 android/gradlew -p android installDebug && adb shell am start -n app.mismeet.android/.MainActivity
 ```
 
-### Logs
+Logs:
 
 ```bash
 adb logcat --pid="$(adb shell pidof -s app.mismeet.android)"
 ```
 
-### Relay integration test
-
-Publishes a location event and a relay list under throwaway keys to the default public relays
-and reads them back. Skipped unless the variable is set, so the verify command stays offline.
+Relay integration test: publishes a location event and a relay list under throwaway keys to
+the default public relays and reads them back. Skipped unless the variable is set, so the
+verify command stays offline.
 
 ```bash
 MISMEET_RELAY_TESTS=1 android/gradlew -p android :protocol:test --tests 'app.mismeet.protocol.RelayIntegrationTest'
 ```
 
-### Instrumented tests on the phone
+Instrumented tests on the phone:
 
 ```bash
 android/gradlew -p android connectedDebugAndroidTest
 ```
 
-### Gotchas
-
+- Build with the checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK
+  27, which the Android Gradle Plugin does not support); the wrapper pins the version the plugin
+  supports.
 - GrapheneOS has no Google location services. The network location provider exists only when the
   user turns on GrapheneOS's own network location in Settings, so rely on `GPS_PROVIDER` and
   treat `NETWORK_PROVIDER` as optional.
+- `minSdk` is 31: `POST_NOTIFICATIONS` exists from API 33, so permission checks for it are gated
+  on the API level, and stock Android 12 needs the battery optimisation exemption the Me screen
+  offers or it stops the foreground service.
 - Background location is a foreground service with `foregroundServiceType="location"`. It needs
   `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`, `ACCESS_FINE_LOCATION`,
   `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION` and `POST_NOTIFICATIONS`. Android
   grants "while in use" first and "all the time" only from the app's settings page, so the app
   has to send the user there.
-- The Nostr Dev Kit AAR ships native libraries for every ABI; the phone is arm64-v8a. A native
+- The Nostr Dev Kit AAR ships native libraries for every ABI; the phones are arm64-v8a. A native
   crash at startup on GrapheneOS is most likely its hardened memory allocator: check the
   per-app exploit protection compatibility mode before debugging anything else, and report it.
 - AndroidX is pinned to the last versions that compile against API 36; the newer ones demand
@@ -241,6 +187,9 @@ Run before saying a change is done, not only before committing:
 
 - iOS: the simulator build and the unit tests above.
 - Android: the lint and unit test command above.
+
+Stop what was started: `android/gradlew -p android --stop` for the Gradle daemon and
+`xcrun simctl shutdown all` for simulators, so nothing keeps running when the turn ends.
 
 ## Git-ignored paths
 

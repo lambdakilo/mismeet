@@ -1,10 +1,11 @@
 # Mismeet
 
-Location sharing in the style of Find My, built on Nostr, for iOS and GrapheneOS. Each phone
+Location sharing in the style of Find My, built on Nostr, for iOS and Android. Each phone
 publishes its own location to Nostr relays as one addressable event, encrypted separately for
 each approved contact and carrying an expiration. Contacts fetch the latest event when they want
 to see where someone is. There is no server of its own, no push service and no bridge, and the
-social graph never appears in plaintext.
+social graph never appears in plaintext. The Android app has no Google Play Services dependency,
+so it runs on GrapheneOS as well as on stock Android.
 
 ## Status
 
@@ -17,12 +18,133 @@ yet. Invites are scanned as QR codes or pasted as text.
 
 - [`spec/SPEC.md`](spec/SPEC.md): the protocol: event kind and tags, encryption and padding,
   expiration, relay handling, the contact model, client behaviour and the threat model.
-- [`CLAUDE.md`](CLAUDE.md): the build, test, install and log commands for both platforms, and
-  the rules the code follows.
+- [`CLAUDE.md`](CLAUDE.md): the rules and the commands Claude Code follows in this repository.
 - `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
 - `android/`: the Kotlin app and the `protocol` module it builds on.
 - [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
   see below.
+
+## Development
+
+### Requirements
+
+- iOS: a Mac with Xcode 27 (the iOS 27 SDK; the deployment target is iOS 18), `xcodegen` and
+  `xcbeautify` from Homebrew, an Apple ID (a free one is enough: the app uses no push and no
+  special entitlement) and an iPhone on iOS 18 or later. The test device is an iPhone XR.
+- Android: a JDK 17 or later (Temurin 21 here), the Android command line tools with
+  `platforms;android-36`, `build-tools;36.0.0` and `platform-tools`, and a phone on Android 12
+  or later. The test devices are a phone on GrapheneOS and a Motorola Moto G200 5G on Android
+  12. Gradle comes from the checked-in wrapper; no Android Studio is needed.
+
+### Set up once: iOS
+
+1. Sign in to Xcode with the Apple ID under Xcode > Settings > Accounts. That creates the
+   personal team; the first device build then creates the development certificate and profile.
+   Find the team id, the ten characters in parentheses at the end of the identity name, and
+   write it to `ios/.team-id` (git-ignored, one line):
+
+   ```bash
+   security find-identity -v -p codesigning
+   ```
+
+2. On the iPhone, enable Settings > Privacy & Security > Developer Mode, connect it by USB and
+   trust the Mac. List it, then write its identifier (the first column) to `ios/.device-id`
+   (git-ignored, one line):
+
+   ```bash
+   xcrun devicectl list devices
+   ```
+
+### Set up once: Android
+
+1. Point Gradle at the SDK (`android/local.properties` is git-ignored); the path below is the
+   Homebrew one:
+
+   ```bash
+   printf 'sdk.dir=/opt/homebrew/share/android-commandlinetools\n' > android/local.properties
+   ```
+
+2. Put `adb` on the PATH:
+
+   ```bash
+   ln -s /opt/homebrew/share/android-commandlinetools/platform-tools/adb /opt/homebrew/bin/adb
+   ```
+
+3. On the phone: Settings > About phone, tap Build number seven times, then Settings > System >
+   Developer options > USB debugging. Connect by USB, accept the fingerprint prompt on the
+   phone, and check that it shows as `device`:
+
+   ```bash
+   adb devices
+   ```
+
+### Build, test and run
+
+iOS, after cloning and after every edit to `ios/project.yml`:
+
+```bash
+xcodegen generate --spec ios/project.yml
+```
+
+Build for the simulator:
+
+```bash
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS Simulator' -derivedDataPath ios/build build | xcbeautify
+```
+
+Unit tests (`xcrun simctl list devices available` lists the simulators):
+
+```bash
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath ios/build test | xcbeautify
+```
+
+Build for the device:
+
+```bash
+set -o pipefail && xcodebuild -project ios/Mismeet.xcodeproj -scheme Mismeet -destination 'generic/platform=iOS' -derivedDataPath ios/build -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat ios/.team-id)" build | xcbeautify
+```
+
+Install and launch on the device (add `--console` to the launch to stream its output):
+
+```bash
+xcrun devicectl device install app --device "$(cat ios/.device-id)" ios/build/Build/Products/Debug-iphoneos/Mismeet.app && xcrun devicectl device process launch --device "$(cat ios/.device-id)" --terminate-existing app.mismeet.ios
+```
+
+Android, build:
+
+```bash
+android/gradlew -p android assembleDebug
+```
+
+Lint and unit tests:
+
+```bash
+android/gradlew -p android lint test
+```
+
+Install and launch on the phone:
+
+```bash
+android/gradlew -p android installDebug && adb shell am start -n app.mismeet.android/.MainActivity
+```
+
+Logs:
+
+```bash
+adb logcat --pid="$(adb shell pidof -s app.mismeet.android)"
+```
+
+### Notes
+
+- Free Apple ID: the provisioning profile expires after seven days, so rebuild and reinstall
+  weekly, and at most ten app ids can be registered per seven days.
+- GrapheneOS has no Google location services: the app uses GPS, and the network provider only
+  when GrapheneOS's own network location is turned on in Settings.
+- Stock Android, and Android 12 in particular, stops background services it considers
+  wasteful. The Me screen offers the battery optimisation exemption; grant it, or the sharing
+  service will not survive the screen being off for long.
+- Android asks for location "while in use" first and "all the time" only from the app's
+  settings page; the Me screen walks through both.
 
 ## License
 

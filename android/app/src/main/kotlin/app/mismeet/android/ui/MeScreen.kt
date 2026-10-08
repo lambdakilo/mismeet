@@ -1,6 +1,9 @@
 package app.mismeet.android.ui
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.graphics.Bitmap
@@ -35,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.mismeet.android.AppModel
 import app.mismeet.android.location.LocationProvider
 import com.google.zxing.BarcodeFormat
@@ -51,6 +55,11 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     val foreground = remember(permissionVersion) { LocationProvider.hasForegroundPermission(context) }
     val background = remember(permissionVersion) { LocationProvider.hasBackgroundPermission(context) }
     val notifications = remember(permissionVersion) { LocationProvider.hasNotificationPermission(context) }
+    val unrestrictedBattery = remember(permissionVersion) { LocationProvider.isIgnoringBatteryOptimizations(context) }
+    LifecycleResumeEffect(Unit) {
+        permissionVersion++
+        onPauseOrDispose {}
+    }
     val inviteUri = remember(state.relays) { model.inviteUri() }
     val qr = remember(inviteUri) { qrBitmap(inviteUri) }
     var newRelay by remember { mutableStateOf("") }
@@ -75,6 +84,13 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
         }
         if (!notifications) {
             Button(onClick = { permissions.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS)) }) { Text("Allow notifications") }
+        }
+        if (!unrestrictedBattery) {
+            Button(onClick = {
+                context.startActivity(
+                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}")),
+                )
+            }) { Text("Allow unrestricted battery use") }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("Share in the background")
