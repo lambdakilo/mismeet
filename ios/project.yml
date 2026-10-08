@@ -33,6 +33,7 @@ targets:
         UIBackgroundModes: [location]
         NSLocationWhenInUseUsageDescription: Mismeet shows your location to the contacts you choose.
         NSLocationAlwaysAndWhenInUseUsageDescription: Mismeet keeps your contacts updated also while the app is not open.
+        NSCameraUsageDescription: Mismeet scans the invite QR code of a contact.
         ITSAppUsesNonExemptEncryption: false
     settings:
       base:

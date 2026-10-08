@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Mismeet scans the invite QR code of a contact.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Mismeet keeps your contacts updated also while the app is not open.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

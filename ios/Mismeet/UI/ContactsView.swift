@@ -79,6 +79,7 @@ struct AddContactView: View {
     @State private var invite = ""
     @State private var name = ""
     @State private var error: String?
+    @State private var scanning = false
 
     var body: some View {
         NavigationStack {
@@ -91,6 +92,9 @@ struct AddContactView: View {
                     Button("Paste") {
                         invite = UIPasteboard.general.string ?? ""
                     }
+                    if QRScannerView.isSupported {
+                        Button("Scan QR code") { scanning = true }
+                    }
                 }
                 Section("Name") {
                     TextField("How you call them", text: $name)
@@ -100,6 +104,22 @@ struct AddContactView: View {
                 }
             }
             .navigationTitle("Add contact")
+            .sheet(isPresented: $scanning) {
+                NavigationStack {
+                    QRScannerView { text in
+                        invite = text
+                        scanning = false
+                    }
+                    .ignoresSafeArea()
+                    .navigationTitle("Scan the invite")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { scanning = false }
+                        }
+                    }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

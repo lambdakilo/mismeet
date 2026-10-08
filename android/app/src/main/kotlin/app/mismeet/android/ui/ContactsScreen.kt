@@ -31,10 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.unit.dp
 import app.mismeet.android.AppModel
 import app.mismeet.android.store.Contact
 import app.mismeet.protocol.ProtocolConstants
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.delay
 
 @Composable
@@ -128,6 +131,9 @@ private fun AddContactDialog(onDismiss: () -> Unit, onAdd: (String, String) -> U
     var name by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val scanner = rememberLauncherForActivityResult(ScanContract()) { result ->
+        result.contents?.let { invite = it }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -141,10 +147,21 @@ private fun AddContactDialog(onDismiss: () -> Unit, onAdd: (String, String) -> U
                     placeholder = { Text("nostr:nprofile1…") },
                     minLines = 3,
                 )
-                TextButton(onClick = {
-                    invite = context.getSystemService(ClipboardManager::class.java)
-                        ?.primaryClip?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
-                }) { Text("Paste") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = {
+                        invite = context.getSystemService(ClipboardManager::class.java)
+                            ?.primaryClip?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
+                    }) { Text("Paste") }
+                    TextButton(onClick = {
+                        scanner.launch(
+                            ScanOptions()
+                                .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                                .setPrompt("Scan the invite")
+                                .setBeepEnabled(false)
+                                .setOrientationLocked(false),
+                        )
+                    }) { Text("Scan QR code") }
+                }
                 OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
