@@ -364,6 +364,9 @@ final class AppModel {
 
     private func log(_ text: String) {
         logger.info("\(text, privacy: .public)")
+        #if DEBUG
+        FileHandle.standardError.write(Data((text + "\n").utf8))
+        #endif
         log.append(LogLine(time: Date(), text: text))
         if log.count > 100 { log.removeFirst(log.count - 100) }
     }

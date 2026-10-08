@@ -14,6 +14,11 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.1.0"
+        // Both test phones and the Apple silicon emulator are arm64; the other ABIs would
+        // triple the APK through the bindings' native libraries.
+        ndk {
+            abiFilters += listOf("arm64-v8a")
+        }
     }
 
     buildFeatures {
