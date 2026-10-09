@@ -170,7 +170,30 @@ adb logcat --pid="$(adb shell pidof -s app.mismeet.android)"
   wasteful. The Me screen offers the battery optimisation exemption; grant it, or the sharing
   service will not survive the screen being off for long.
 - Android asks for location "while in use" first and "all the time" only from the app's
-  settings page; the Me screen walks through both.
+  settings page; the Me screen walks through both, but only once "Share my location" is on.
+  Off, which is the default, the phone only watches its contacts and needs no permission
+  beyond the camera for scanning a QR code.
+
+### First test between two phones
+
+The iPhone publishes and the Android phone watches. Each phone scans the other's invite once:
+the iPhone's scan tells it whom to encrypt for, the Android phone's scan tells it whose events
+to fetch.
+
+1. On the iPhone, open Me, tap "Allow location" and grant it, then "Allow location" again for
+   "Always". The log on the same screen shows "Relay list: accepted by N of 3 relays".
+2. On the Android phone, open Me: its invite QR code is on screen. On the iPhone, Contacts >
+   "+" > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
+   "Location: accepted by N of 3 relays" within a few seconds.
+3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
+   code", allow the camera, scan it, name the contact, Add. The row shows "Seen ... within N m"
+   after the next refresh, within a minute, or at once with Refresh. The Map tab shows the
+   position on OpenStreetMap, and "Open in map" hands it to any map app.
+4. Walk a few hundred metres with the iPhone, or drive. Significant location changes wake the
+   app and the Android row's "Seen" time moves. Pulling the Contacts list down on the iPhone
+   refreshes its own view; the "Publish now" button on its Me screen forces a publish.
+5. To check revocation, switch "Share my location" off for the contact on the iPhone: the next
+   refresh on the Android phone shows "no longer sharing", with the last position kept.
 
 ## License
 

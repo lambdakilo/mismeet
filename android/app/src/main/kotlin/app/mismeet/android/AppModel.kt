@@ -58,7 +58,7 @@ class AppModel private constructor(private val context: Context) {
     private val refreshing = Mutex()
 
     init {
-        if (_state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
+        if (_state.value.sharingEnabled && _state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
     }
 
     fun inviteUri(): String {
@@ -70,18 +70,38 @@ class AppModel private constructor(private val context: Context) {
 
     fun becameActive() {
         scope.launch { refresh() }
-        if (LocationProvider.hasForegroundPermission(context)) {
+        if (_state.value.sharingEnabled && LocationProvider.hasForegroundPermission(context)) {
             scope.launch { publishFresh(Trigger.FOREGROUND) }
-            if (_state.value.backgroundSharing) LocationService.start(context)
+            LocationService.start(context)
         }
     }
 
-    fun setBackgroundSharing(enabled: Boolean) {
-        update { it.copy(backgroundSharing = enabled) }
-        if (enabled && LocationProvider.hasForegroundPermission(context)) LocationService.start(context) else LocationService.stop(context)
+    fun refreshNow() {
+        scope.launch { refresh() }
+    }
+
+    /**
+     * Publishing is opt-in: off, the phone only watches its contacts, publishes nothing and needs
+     * no permission. On, it advertises its relays, asks for location and runs the service.
+     */
+    fun setSharingEnabled(enabled: Boolean) {
+        if (_state.value.sharingEnabled == enabled) return
+        update { it.copy(sharingEnabled = enabled) }
+        if (enabled) {
+            if (_state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
+            if (LocationProvider.hasForegroundPermission(context)) LocationService.start(context)
+        } else {
+            LocationService.stop(context)
+            recipientsChanged()
+        }
+    }
+
+    fun permissionsChanged() {
+        if (_state.value.sharingEnabled && LocationProvider.hasForegroundPermission(context)) LocationService.start(context)
     }
 
     fun publishNow() {
+        if (!_state.value.sharingEnabled) return
         if (!LocationProvider.hasForegroundPermission(context)) {
             log("Location permission is needed to publish")
             return
@@ -140,12 +160,12 @@ class AppModel private constructor(private val context: Context) {
             return
         }
         update { it.copy(relays = it.relays + value) }
-        scope.launch { publishRelayList() }
+        if (_state.value.sharingEnabled) scope.launch { publishRelayList() }
     }
 
     fun removeRelay(url: String) {
         update { it.copy(relays = it.relays - url) }
-        scope.launch { publishRelayList() }
+        if (_state.value.sharingEnabled) scope.launch { publishRelayList() }
     }
 
     // Publishing
@@ -186,7 +206,7 @@ class AppModel private constructor(private val context: Context) {
         scope.launch {
             val needsFreshFix = publishing.withLock {
                 val current = _state.value
-                val recipients = sharingRecipients()
+                val recipients = if (current.sharingEnabled) sharingRecipients() else emptyList()
                 if (current.lastPublishedCreatedAt == null) return@withLock recipients.isNotEmpty()
                 val now = System.currentTimeMillis()
                 val fix = current.lastFix
@@ -203,7 +223,9 @@ class AppModel private constructor(private val context: Context) {
                     false
                 }
             }
-            if (needsFreshFix && LocationProvider.hasForegroundPermission(context)) publishFresh(Trigger.CONTACTS_CHANGED)
+            if (needsFreshFix && _state.value.sharingEnabled && LocationProvider.hasForegroundPermission(context)) {
+                publishFresh(Trigger.CONTACTS_CHANGED)
+            }
         }
     }
 
@@ -233,7 +255,8 @@ class AppModel private constructor(private val context: Context) {
         }
     }
 
-    private fun sharingRecipients(): List<PublicKey> = _state.value.contacts.filter { it.share }.mapNotNull { it.publicKey() }
+    private fun sharingRecipients(): List<PublicKey> =
+        if (_state.value.sharingEnabled) _state.value.contacts.filter { it.share }.mapNotNull { it.publicKey() } else emptyList()
 
     private fun batteryLevel(): Double? {
         val percent = context.getSystemService(BatteryManager::class.java)

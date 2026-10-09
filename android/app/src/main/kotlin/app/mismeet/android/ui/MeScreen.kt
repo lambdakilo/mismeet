@@ -51,7 +51,10 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     val log by model.log.collectAsState()
     val context = LocalContext.current
     var permissionVersion by remember { mutableIntStateOf(0) }
-    val permissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionVersion++ }
+    val permissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        permissionVersion++
+        model.permissionsChanged()
+    }
     val foreground = remember(permissionVersion) { LocationProvider.hasForegroundPermission(context) }
     val background = remember(permissionVersion) { LocationProvider.hasBackgroundPermission(context) }
     val notifications = remember(permissionVersion) { LocationProvider.hasNotificationPermission(context) }
@@ -72,32 +75,39 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
             context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Mismeet invite", inviteUri))
         }) { Text("Copy invite") }
 
-        Text("Location", style = MaterialTheme.typography.titleMedium)
-        if (!foreground) {
-            Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) }) {
-                Text("Allow location")
-            }
-        } else if (!background) {
-            Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) }) {
-                Text("Allow location all the time")
-            }
-        }
-        if (!notifications) {
-            Button(onClick = { permissions.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS)) }) { Text("Allow notifications") }
-        }
-        if (!unrestrictedBattery) {
-            Button(onClick = {
-                context.startActivity(
-                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}")),
-                )
-            }) { Text("Allow unrestricted battery use") }
-        }
+        Text("Sharing from this phone", style = MaterialTheme.typography.titleMedium)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("Share in the background")
-            Switch(checked = state.backgroundSharing, onCheckedChange = { model.setBackgroundSharing(it) }, enabled = foreground)
+            Text("Share my location")
+            Switch(checked = state.sharingEnabled, onCheckedChange = { model.setSharingEnabled(it) })
         }
-        Button(onClick = { model.publishNow() }, enabled = foreground) { Text("Publish now") }
-        state.lastPublishedAt?.let { Text("Last published ${DateFormat.getTimeFormat(context).format(it)}", style = MaterialTheme.typography.bodySmall) }
+        if (!state.sharingEnabled) {
+            Text(
+                "Off: this phone only watches its contacts, publishes nothing and needs no location permission.",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        } else {
+            if (!foreground) {
+                Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) }) {
+                    Text("Allow location")
+                }
+            } else if (!background) {
+                Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) }) {
+                    Text("Allow location all the time")
+                }
+            }
+            if (!notifications) {
+                Button(onClick = { permissions.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS)) }) { Text("Allow notifications") }
+            }
+            if (!unrestrictedBattery) {
+                Button(onClick = {
+                    context.startActivity(
+                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}")),
+                    )
+                }) { Text("Allow unrestricted battery use") }
+            }
+            Button(onClick = { model.publishNow() }, enabled = foreground) { Text("Publish now") }
+            state.lastPublishedAt?.let { Text("Last published ${DateFormat.getTimeFormat(context).format(it)}", style = MaterialTheme.typography.bodySmall) }
+        }
 
         Text("Relays", style = MaterialTheme.typography.titleMedium)
         state.relays.forEach { relay ->

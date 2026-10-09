@@ -43,7 +43,7 @@ data class PersistedState(
     val lastPublishedAt: Long? = null,
     val lastFix: LocationFix? = null,
     val relayListPublishedAt: Long? = null,
-    val backgroundSharing: Boolean = false,
+    val sharingEnabled: Boolean = false,
 ) {
     companion object {
         val DEFAULT_RELAYS = listOf("wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net")

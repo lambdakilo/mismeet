@@ -56,7 +56,10 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
     Column(modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Text("Contacts", style = MaterialTheme.typography.headlineMedium)
-            Button(onClick = { showAdd = true }) { Text("Add") }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = { model.refreshNow() }) { Text("Refresh") }
+                Button(onClick = { showAdd = true }) { Text("Add") }
+            }
         }
         if (state.contacts.isEmpty()) {
             Text("Add a contact from the invite they sent you.", style = MaterialTheme.typography.bodyMedium)
@@ -65,7 +68,7 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
             items(state.contacts, key = { it.id }) { contact ->
                 ContactRow(
                     contact = contact,
-                    onShare = { model.setShare(contact.id, it) },
+                    onShare = if (state.sharingEnabled) ({ model.setShare(contact.id, it) }) else null,
                     onRemove = { model.removeContact(contact.id) },
                     onOpenMap = { openMap(context, contact) },
                 )
@@ -82,7 +85,7 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ContactRow(contact: Contact, onShare: (Boolean) -> Unit, onRemove: () -> Unit, onOpenMap: () -> Unit) {
+private fun ContactRow(contact: Contact, onShare: ((Boolean) -> Unit)?, onRemove: () -> Unit, onOpenMap: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -91,7 +94,7 @@ private fun ContactRow(contact: Contact, onShare: (Boolean) -> Unit, onRemove: (
                     Text(status(contact), style = MaterialTheme.typography.bodySmall)
                     Text(contact.npubPrefix(), style = MaterialTheme.typography.labelSmall)
                 }
-                Switch(checked = contact.share, onCheckedChange = onShare)
+                if (onShare != null) Switch(checked = contact.share, onCheckedChange = onShare)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (contact.lastPayload != null) TextButton(onClick = onOpenMap) { Text("Open in map") }

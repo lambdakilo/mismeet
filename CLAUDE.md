@@ -180,6 +180,11 @@ android/gradlew -p android connectedDebugAndroidTest
 - GrapheneOS has no Google location services. The network location provider exists only when the
   user turns on GrapheneOS's own network location in Settings, so rely on `GPS_PROVIDER` and
   treat `NETWORK_PROVIDER` as optional.
+- Publishing from Android is opt-in and off by default: the phone then only watches its
+  contacts, publishes nothing (not even its relay list) and asks for no permission; the QR
+  scanner asks for the camera when used. The "Share my location" switch on the Me screen turns
+  publishing on, and only then do the location, notification and battery prompts appear and
+  the foreground service run. Keep every publishing path behind `sharingEnabled`.
 - `minSdk` is 31: `POST_NOTIFICATIONS` exists from API 33, so permission checks for it are gated
   on the API level, and stock Android 12 needs the battery optimisation exemption the Me screen
   offers or it stops the foreground service.

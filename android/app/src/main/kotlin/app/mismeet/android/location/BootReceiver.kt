@@ -10,7 +10,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         val model = AppModel.get(context)
-        if (model.state.value.backgroundSharing &&
+        if (model.state.value.sharingEnabled &&
             LocationProvider.hasForegroundPermission(context) &&
             LocationProvider.hasBackgroundPermission(context)
         ) {
