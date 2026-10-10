@@ -294,6 +294,7 @@ class AppModel private constructor(private val context: Context) {
             val events = relays.fetch(targets)
             val nowSeconds = now / 1000
             var decoded = 0
+            var unchanged = 0
             val contacts = current.contacts.map { contact ->
                 val publicKey = contact.publicKey() ?: return@map contact
                 val own = events.filter { it.author().toHex() == contact.id }
@@ -305,7 +306,11 @@ class AppModel private constructor(private val context: Context) {
                     updated = updated.copy(relays = urls.ifEmpty { contact.relays }, relayListCheckedAt = now)
                 }
                 val locations = own.filter { it.kind().asU16() == ProtocolConstants.LOCATION_KIND }
-                val newest = LocationEventReader.newest(locations, nowSeconds, contact.lastCreatedAt) ?: return@map updated
+                val newest = LocationEventReader.newest(locations, nowSeconds, contact.lastCreatedAt)
+                if (newest == null) {
+                    if (locations.isNotEmpty()) unchanged++
+                    return@map updated
+                }
                 runCatching { LocationEventReader.read(newest, publicKey, keys, nowSeconds) }
                     .onFailure { log("Ignored an event from ${contact.name}: ${it.message}") }
                     .getOrNull()
@@ -321,7 +326,7 @@ class AppModel private constructor(private val context: Context) {
                 updated
             }
             update { it.copy(contacts = contacts) }
-            log("Refreshed: ${events.size} events from ${targets.size} relays, $decoded new locations")
+            log("Refreshed from ${targets.size} relays: $decoded new, $unchanged unchanged since last time, ${current.contacts.size - decoded - unchanged} without an event")
         }
     }
 

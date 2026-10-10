@@ -328,6 +328,7 @@ final class AppModel {
         let events = await relays.fetch(targets: targets)
         let nowSecs = UInt64(now.timeIntervalSince1970)
         var decoded = 0
+        var unchanged = 0
         for index in state.contacts.indices {
             guard let publicKey = state.contacts[index].publicKey else { continue }
             let own = events.filter { $0.author() == publicKey }
@@ -340,7 +341,10 @@ final class AppModel {
                 state.contacts[index].relayListCheckedAt = now
             }
             let locations = own.filter { $0.kind().asU16() == ProtocolConstants.locationKind }
-            guard let newest = LocationEventReader.newest(locations, now: nowSecs, cachedCreatedAt: state.contacts[index].lastCreatedAt) else { continue }
+            guard let newest = LocationEventReader.newest(locations, now: nowSecs, cachedCreatedAt: state.contacts[index].lastCreatedAt) else {
+                if !locations.isEmpty { unchanged += 1 }
+                continue
+            }
             do {
                 switch try LocationEventReader.read(event: newest, contact: publicKey, keys: keys, now: nowSecs) {
                 case .shared(let payload):
@@ -358,7 +362,7 @@ final class AppModel {
             }
         }
         save()
-        log("Refreshed: \(events.count) events from \(targets.count) relays, \(decoded) new locations")
+        log("Refreshed from \(targets.count) relays: \(decoded) new, \(unchanged) unchanged since last time, \(state.contacts.count - decoded - unchanged) without an event")
     }
 
     // MARK: Helpers
