@@ -21,6 +21,7 @@ yet. Invites are scanned as QR codes or pasted as text.
 - [`CLAUDE.md`](CLAUDE.md): the rules and the commands Claude Code follows in this repository.
 - `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
 - `android/`: the Kotlin app and the `protocol` module it builds on.
+- `design/`: the icon sketch and the script that turns it into both apps' icons.
 - [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
   see below.
 

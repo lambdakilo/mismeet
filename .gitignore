@@ -8,3 +8,4 @@ android/.gradle/
 android/.kotlin/
 android/build/
 android/*/build/
+design/.venv/

@@ -50,6 +50,13 @@ follows it, and a protocol change edits the spec first, in the same change.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
+- The app icon is generated from `design/icon-sketch.png` by `design/make-icon.py` into the
+  iOS asset catalog and the Android adaptive icon foreground; change the sketch or the script
+  and rerun it, never the PNGs by hand. It needs Pillow in a virtual environment:
+
+  ```bash
+  python3 -m venv design/.venv && design/.venv/bin/pip install pillow && design/.venv/bin/python design/make-icon.py
+  ```
 
 ## Building and running
 
