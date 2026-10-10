@@ -1,7 +1,9 @@
 package app.mismeet.android
 
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,11 +26,20 @@ import androidx.compose.ui.Modifier
 import app.mismeet.android.ui.ContactsScreen
 import app.mismeet.android.ui.MapScreen
 import app.mismeet.android.ui.MeScreen
+import app.mismeet.protocol.ProtocolConstants
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val model = AppModel.get(this)
+        // Test hook for debuggable builds: `adb shell am start ... --es invites "uri;uri"` adds contacts.
+        if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            intent.getStringExtra("invites")?.split(";")?.forEachIndexed { index, text ->
+                runCatching { model.addContact(text, "Test ${index + 1}") }
+            }
+        }
         setContent {
             MaterialTheme {
                 MismeetScreen(model)
@@ -44,20 +56,26 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MismeetScreen(model: AppModel) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            model.refresh()
+            delay(ProtocolConstants.FOREGROUND_FETCH_INTERVAL_SECONDS * 1000)
+        }
+    }
     Scaffold(
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     selected = tab == 0,
                     onClick = { tab = 0 },
-                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-                    label = { Text("Contacts") },
+                    icon = { Icon(Icons.Filled.Place, contentDescription = null) },
+                    label = { Text("Map") },
                 )
                 NavigationBarItem(
                     selected = tab == 1,
                     onClick = { tab = 1 },
-                    icon = { Icon(Icons.Filled.Place, contentDescription = null) },
-                    label = { Text("Map") },
+                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                    label = { Text("Contacts") },
                 )
                 NavigationBarItem(
                     selected = tab == 2,
@@ -68,10 +86,11 @@ private fun MismeetScreen(model: AppModel) {
             }
         },
     ) { padding ->
+        val content = Modifier.padding(padding)
         when (tab) {
-            0 -> ContactsScreen(model, Modifier.padding(padding))
-            1 -> MapScreen(model, Modifier.padding(padding))
-            else -> MeScreen(model, Modifier.padding(padding))
+            0 -> MapScreen(model, content)
+            1 -> ContactsScreen(model, content)
+            else -> MeScreen(model, content)
         }
     }
 }

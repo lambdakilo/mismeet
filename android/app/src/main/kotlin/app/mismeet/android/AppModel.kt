@@ -59,6 +59,7 @@ class AppModel private constructor(private val context: Context) {
 
     init {
         if (_state.value.sharingEnabled && _state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
+        log("Invite: ${inviteUri()}")
     }
 
     fun inviteUri(): String {

@@ -23,6 +23,15 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.zxing.core)
+}
+
+// Publishes a test location for one watching phone from a throwaway key kept under build/.
+tasks.register<JavaExec>("fakePublish") {
+    description = "Publishes a test location: -PfakeArgs=\"<reader invite> <lat> <lon> [relay ...]\""
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass = "app.mismeet.protocol.FakePublisherKt"
+    args = (project.findProperty("fakeArgs") as String?)?.trim()?.split(Regex("\\s+")) ?: emptyList()
 }
 
 tasks.test {

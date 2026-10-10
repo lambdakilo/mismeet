@@ -29,12 +29,6 @@ struct ContactsView: View {
             }
             .refreshable { await model.refresh() }
             .sheet(isPresented: $showingAdd) { AddContactView() }
-            .task {
-                while !Task.isCancelled {
-                    await model.refresh()
-                    try? await Task.sleep(for: .seconds(ProtocolConstants.foregroundFetchIntervalSeconds))
-                }
-            }
         }
     }
 }

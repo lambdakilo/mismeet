@@ -23,8 +23,10 @@ follows it, and a protocol change edits the spec first, in the same change.
   fused provider. Under `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`,
   `identity/` (a Keystore wrapped secret key), `store/` (JSON state in the files directory),
   `nostr/`, `location/` (the provider, the foreground service and the boot receiver), `ui/`.
-  The map tab draws OpenStreetMap tiles through osmdroid, which needs the package name as user
-  agent; a contact row also opens the position in whatever map app handles `geo:` URIs.
+  The map tab opens first, framed around everyone with a known position, and draws
+  OpenStreetMap tiles through osmdroid, which needs the package name as user agent and has to
+  be clipped inside Compose; a contact row also opens the position in whatever map app
+  handles `geo:` URIs.
 
 ## Shared rules
 
@@ -174,6 +176,38 @@ Instrumented tests on the phone:
 android/gradlew -p android connectedDebugAndroidTest
 ```
 
+Emulator (`mismeet`, API 36 without Google APIs, created as the README describes). Start it
+headless, wait for it, and it is the device for the install and launch commands:
+
+```bash
+nohup /opt/homebrew/share/android-commandlinetools/emulator/emulator -avd mismeet -no-window -no-audio -no-boot-anim -no-snapshot > /dev/null 2>&1 &
+```
+
+```bash
+adb wait-for-device shell 'while [ "$(getprop sys.boot_completed)" != 1 ]; do sleep 2; done'
+```
+
+Position, screenshot, and shutting it down:
+
+```bash
+adb emu geo fix 24.9384 60.1699
+```
+
+```bash
+adb exec-out screencap -p > emulator.png
+```
+
+```bash
+adb emu kill
+```
+
+Fake publisher and launch hooks for debug builds, as in the README: `:protocol:fakePublish`
+publishes a location for an invite from a key kept under `android/protocol/build/`
+(`MISMEET_FAKE_NAME` selects another key), and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
+simulator or the `invites` string extra on Android add contacts at launch, semicolon
+separated. The apps log their own invite at launch (`Invite: nostr:nprofile…`), readable with
+`adb logcat -d -s Mismeet:I` and, on the simulator, `log show --info` with the app's subsystem.
+
 - Build with the checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK
   27, which the Android Gradle Plugin does not support); the wrapper pins the version the plugin
   supports.
@@ -207,8 +241,9 @@ Run before saying a change is done, not only before committing:
 - iOS: the simulator build and the unit tests above.
 - Android: the lint and unit test command above.
 
-Stop what was started: `android/gradlew -p android --stop` for the Gradle daemon and
-`xcrun simctl shutdown all` for simulators, so nothing keeps running when the turn ends.
+Stop what was started: `android/gradlew -p android --stop` for the Gradle daemon,
+`xcrun simctl shutdown all` for simulators and `adb emu kill` for the emulator, so nothing
+keeps running when the turn ends.
 
 ## Git-ignored paths
 

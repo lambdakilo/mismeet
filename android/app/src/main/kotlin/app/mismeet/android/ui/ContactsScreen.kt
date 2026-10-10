@@ -22,7 +22,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,23 +34,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.unit.dp
 import app.mismeet.android.AppModel
 import app.mismeet.android.store.Contact
-import app.mismeet.protocol.ProtocolConstants
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
-import kotlinx.coroutines.delay
 
 @Composable
 fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     var showAdd by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            model.refresh()
-            delay(ProtocolConstants.FOREGROUND_FETCH_INTERVAL_SECONDS * 1000)
-        }
-    }
 
     Column(modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

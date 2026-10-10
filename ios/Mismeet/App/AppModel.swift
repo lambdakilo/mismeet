@@ -56,6 +56,15 @@ final class AppModel {
         if state.relayListPublishedAt == nil {
             Task { await publishRelayList() }
         }
+        #if DEBUG
+        // Test hook: `SIMCTL_CHILD_MISMEET_TEST_INVITES="uri;uri" xcrun simctl launch ...` adds contacts.
+        if let invites = ProcessInfo.processInfo.environment["MISMEET_TEST_INVITES"] {
+            for (index, text) in invites.split(separator: ";").enumerated() {
+                try? addContact(invite: String(text), name: "Test \(index + 1)")
+            }
+        }
+        #endif
+        log("Invite: \(inviteURI)")
     }
 
     var inviteURI: String {

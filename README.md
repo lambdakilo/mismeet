@@ -89,6 +89,70 @@ yet. Invites are scanned as QR codes or pasted as text.
    adb devices
    ```
 
+### Android emulator
+
+An emulator image without Google APIs, in line with the app's independence from Play Services.
+Install the emulator and the image once, and create a virtual device:
+
+```bash
+sdkmanager "emulator" "system-images;android-36;default;arm64-v8a"
+```
+
+```bash
+avdmanager create avd --name mismeet --package "system-images;android-36;default;arm64-v8a" --device pixel_7
+```
+
+Start it; it keeps running in that terminal, and `-no-window` runs it without a window:
+
+```bash
+/opt/homebrew/share/android-commandlinetools/emulator/emulator -avd mismeet
+```
+
+It then counts as the connected phone for the install and launch commands below. Set its
+position (longitude first) and take a screenshot:
+
+```bash
+adb emu geo fix 24.9384 60.1699
+```
+
+```bash
+adb exec-out screencap -p > emulator.png
+```
+
+### Testing without a second phone
+
+A fake publisher on the Mac stands in for the iPhone. The watching app prints its own invite
+at launch, `Invite: nostr:nprofile…`, to logcat on Android and to the simulator's log on iOS,
+and shows it on the Me screen:
+
+```bash
+adb logcat -d -s Mismeet:I
+```
+
+```bash
+xcrun simctl spawn booted log show --info --last 5m --predicate 'subsystem == "app.mismeet.ios"'
+```
+
+Publish a location for that invite; the tool prints the fake publisher's own invite and a QR
+code to add on the watching app, and keeps its key under `android/protocol/build/` so that
+later runs move the same contact. `MISMEET_FAKE_NAME=other` in the environment makes a second
+publisher, and several readers go comma-separated:
+
+```bash
+android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.1699 24.9384"
+```
+
+Debug builds also take contacts at launch, so the simulator and the emulator need no typing;
+the invites are separated by semicolons:
+
+```bash
+SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted app.mismeet.ios
+```
+
+```bash
+adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;<invite>'"
+```
+
 ### Build, test and run
 
 iOS, after cloning and after every edit to `ios/project.yml`:
@@ -187,8 +251,8 @@ to fetch.
    "Location: accepted by N of 3 relays" within a few seconds.
 3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
    code", allow the camera, scan it, name the contact, Add. The row shows "Seen ... within N m"
-   after the next refresh, within a minute, or at once with Refresh. The Map tab shows the
-   position on OpenStreetMap, and "Open in map" hands it to any map app.
+   after the next refresh, within a minute, or at once with Refresh. Both apps open on the map,
+   framed around everyone with a known position; "Everyone" frames them again after panning.
 4. Walk a few hundred metres with the iPhone, or drive. Significant location changes wake the
    app and the Android row's "Seen" time moves. Pulling the Contacts list down on the iPhone
    refreshes its own view; the "Publish now" button on its Me screen forces a publish.
