@@ -83,8 +83,12 @@ yet. Invites are scanned as QR codes or pasted as text.
    ```
 
 3. On the phone: Settings > About phone, tap Build number seven times, then Settings > System >
-   Developer options > USB debugging. Connect by USB, accept the fingerprint prompt on the
-   phone, and check that it shows as `device`:
+   Developer options > USB debugging. Connect by USB with a data cable (a charge-only cable
+   leaves the phone invisible), choose "File transfer" when the phone asks what the USB
+   connection is for, and accept the "Allow USB debugging?" prompt that shows the Mac's
+   fingerprint, ticking "Always allow from this computer". Check that the phone shows as
+   `device`; `unauthorized` means the prompt is still waiting on the phone, and an empty
+   list means the cable, the port or USB debugging:
 
    ```bash
    adb devices
