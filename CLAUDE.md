@@ -212,7 +212,10 @@ Fake publisher and launch hooks for debug builds, as in the README: `:protocol:f
 publishes a location for an invite from a key kept under `android/protocol/build/`
 (`MISMEET_FAKE_NAME` selects another key), and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
 simulator or the `invites` string extra on Android add contacts at launch, semicolon
-separated. The apps log their own invite at launch (`Invite: nostr:nprofile…`), readable with
+separated, and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
+simulator. The README's screenshots under `design/screenshots/` come from the simulator and
+the emulator with the two fake contacts, scaled to 600 px high with `sips -Z 600`; redo them
+after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile…`), readable with
 `adb logcat -d -s Mismeet:I` and, on the simulator, `log show --info` with the app's subsystem.
 
 - Build with the checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK

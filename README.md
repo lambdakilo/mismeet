@@ -7,6 +7,16 @@ to see where someone is. There is no server of its own, no push service and no b
 social graph never appears in plaintext. The Android app has no Google Play Services dependency,
 so it runs on GrapheneOS as well as on stock Android.
 
+## Screenshots
+
+Taken on the iPhone 17 simulator and the API 36 emulator with two fake contacts published from
+the Mac, as described under Testing without a second phone.
+
+| | Map | Contacts | Me |
+| --- | --- | --- | --- |
+| iOS | ![iOS map](design/screenshots/ios-map.png) | ![iOS contacts](design/screenshots/ios-contacts.png) | ![iOS Me screen](design/screenshots/ios-me.png) |
+| Android | ![Android map](design/screenshots/android-map.png) | ![Android contacts](design/screenshots/android-contacts.png) | ![Android Me screen](design/screenshots/android-me.png) |
+
 ## Status
 
 The protocol is specified and both apps build with the protocol core and its conformance
@@ -21,7 +31,8 @@ yet. Invites are scanned as QR codes or pasted as text.
 - [`CLAUDE.md`](CLAUDE.md): the rules and the commands Claude Code follows in this repository.
 - `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
 - `android/`: the Kotlin app and the `protocol` module it builds on.
-- `design/`: the icon sketch and the script that turns it into both apps' icons.
+- `design/`: the icon sketch, the script that turns it into both apps' icons, and the
+  screenshots above.
 - [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
   see below.
 
@@ -153,6 +164,9 @@ the invites are separated by semicolons:
 ```bash
 SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted app.mismeet.ios
 ```
+
+On the simulator, `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in the same way opens that
+tab instead of the map, which is how the screenshots above were taken.
 
 ```bash
 adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;<invite>'"
