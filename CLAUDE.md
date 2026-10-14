@@ -51,12 +51,29 @@ follows it, and a protocol change edits the spec first, in the same change.
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
 - The app icon is generated from `design/icon-sketch.png` by `design/make-icon.py` into the
-  iOS asset catalog and the Android adaptive icon foreground; change the sketch or the script
-  and rerun it, never the PNGs by hand. It needs Pillow in a virtual environment:
+  iOS asset catalog, the Android adaptive icon foreground and `design/icon-512.png`, the
+  Zapstore icon; change the sketch or the script and rerun it, never the PNGs by hand. It needs Pillow in a virtual environment:
 
   ```bash
   python3 -m venv design/.venv && design/.venv/bin/pip install pillow && design/.venv/bin/python design/make-icon.py
   ```
+
+## Releases
+
+- Android goes to Zapstore (not F-Droid) through `zapstore.yaml`; iOS to the App Store. The
+  publish and upload steps are the user's own, with their own Nostr key and Apple account:
+  prepare everything up to them, never run `zsp publish` or an App Store upload.
+- Every store build comes from an annotated tag `<platform>-<version>-<build>` made by
+  `scripts/release.sh tag`. `assembleRelease` and `scripts/release.sh archive-ios` refuse to
+  run unless the tree is clean and `HEAD` is that tag; `-PuntaggedRelease` skips the Android
+  check only for testing the signing setup. Versions live in `android/app/build.gradle.kts`
+  (`versionName`, `versionCode`) and `ios/project.yml` (`MARKETING_VERSION`,
+  `CURRENT_PROJECT_VERSION`); each release adds a `CHANGELOG.md` section, which Zapstore shows.
+- The release key never enters the repository: `android/keystore.properties` names it and is
+  git-ignored, as are `*.jks`, `*.keystore` and `*.p12`. Test signing with a throwaway key in
+  the scratchpad and delete the properties file afterwards.
+- Keep dependencies under licences that allow App Store distribution (MIT, Apache-2.0, BSD,
+  MPL-2.0). A GPL, LGPL or AGPL dependency without an equivalent exception would block it.
 
 ## Building and running
 
@@ -215,7 +232,7 @@ simulator or the `invites` string extra on Android add contacts at launch, semic
 separated, and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
 simulator. The README's screenshots under `design/screenshots/` come from the simulator and
 the emulator with the two fake contacts, scaled to 600 px high with `sips -Z 600`; redo them
-after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile…`), readable with
+after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile...`), readable with
 `adb logcat -d -s Mismeet:I` and, on the simulator, `log show --info` with the app's subsystem.
 
 - Build with the checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK

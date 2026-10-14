@@ -1,0 +1,45 @@
+# Zapstore listing for the Android app, read by zsp (https://github.com/zapstore/zsp).
+# The Zapstore relay fetches this file from the repository and whitelists the publisher when
+# pubkey matches the key the release is signed with, so it stays committed at the root.
+# Publishing steps are in README.md under Distribution.
+
+# The publisher's npub. Fill it in and commit before the first publish.
+# pubkey: npub1...
+
+repository: https://github.com/lambdakilo/mismeet
+release_source: ./android/app/build/outputs/apk/release/app-release.apk
+
+name: Mismeet
+summary: Find My style location sharing over Nostr, end-to-end encrypted, no server
+description: |
+  Mismeet shows where your contacts are, like Find My, without an account or a server of its
+  own. Each phone publishes its location to Nostr relays as one event, encrypted separately
+  for every contact it shares with and expiring after 24 hours. Relays see neither the
+  location nor who the recipients are.
+
+  On Android the app watches the contacts you add and needs no permission at all, apart from
+  the camera when you scan an invite QR code. Sharing your own location is a switch you turn
+  on yourself. No Google Play Services.
+tags:
+  - nostr
+  - location
+  - privacy
+  - maps
+license: AGPL-3.0-or-later
+website: https://github.com/lambdakilo/mismeet
+
+icon: ./design/icon-512.png
+images:
+  - ./design/screenshots/android-map.png
+  - ./design/screenshots/android-contacts.png
+  - ./design/screenshots/android-me.png
+
+release_notes: ./CHANGELOG.md
+
+supported_nips:
+  - "01"
+  - "19"
+  - "21"
+  - "40"
+  - "44"
+  - "65"

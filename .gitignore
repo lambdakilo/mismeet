@@ -9,3 +9,7 @@ android/.kotlin/
 android/build/
 android/*/build/
 design/.venv/
+android/keystore.properties
+*.jks
+*.keystore
+*.p12

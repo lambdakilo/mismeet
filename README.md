@@ -31,8 +31,12 @@ yet. Invites are scanned as QR codes or pasted as text.
 - [`CLAUDE.md`](CLAUDE.md): the rules and the commands Claude Code follows in this repository.
 - `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
 - `android/`: the Kotlin app and the `protocol` module it builds on.
-- `design/`: the icon sketch, the script that turns it into both apps' icons, and the
-  screenshots above.
+- `design/`: the icon sketch, the script that turns it into both apps' icons and the store
+  icon, and the screenshots above.
+- [`scripts/release.sh`](scripts/release.sh): tags store builds and checks that a release build
+  comes from its tag, see Distribution.
+- [`zapstore.yaml`](zapstore.yaml) and [`CHANGELOG.md`](CHANGELOG.md): the Zapstore listing and
+  the release notes it reads.
 - [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
   see below.
 
@@ -138,7 +142,7 @@ adb exec-out screencap -p > emulator.png
 ### Testing without a second phone
 
 A fake publisher on the Mac stands in for the iPhone. The watching app prints its own invite
-at launch, `Invite: nostr:nprofile…`, to logcat on Android and to the simulator's log on iOS,
+at launch, `Invite: nostr:nprofile...`, to logcat on Android and to the simulator's log on iOS,
 and shows it on the Me screen:
 
 ```bash
@@ -277,6 +281,116 @@ to fetch.
    refreshes its own view; the "Publish now" button on its Me screen forces a publish.
 5. To check revocation, switch "Share my location" off for the contact on the iPhone: the next
    refresh on the Android phone shows "no longer sharing", with the last position kept.
+
+## Distribution
+
+Android is published on [Zapstore](https://zapstore.dev), the Nostr app store, and not on
+F-Droid. iOS goes to the App Store. Anyone who would rather avoid the App Store builds and
+installs the iOS app from source, as under Development above; a free Apple ID is enough, and
+such a build runs for seven days before it needs reinstalling.
+
+### Store builds are tagged
+
+Every build that goes to a store is made from an annotated git tag named
+`<platform>-<version>-<build>`, such as `android-0.1.0-1` or `ios-0.1.0-1`, so the source of
+any published binary is exactly the tagged commit. The version and build number come from
+`versionName` and `versionCode` in `android/app/build.gradle.kts` and from
+`MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `ios/project.yml`. `scripts/release.sh`
+creates and pushes the tag, and the release builds refuse to run unless the tree is clean and
+`HEAD` is that tag. Each release also gets a section in [`CHANGELOG.md`](CHANGELOG.md).
+
+### Android on Zapstore
+
+Once, create the release key outside the repository and keep a backup: Zapstore links the
+key's certificate to the publisher's Nostr identity, and updates must carry the same
+signature, so a lost key means a new listing.
+
+```bash
+keytool -genkeypair -keystore ~/keys/mismeet-release.jks -storetype PKCS12 -alias mismeet -keyalg RSA -keysize 4096 -validity 10000
+```
+
+Point the build at it in `android/keystore.properties`, which git ignores, with the passwords
+`keytool` asked for:
+
+```bash
+cat > android/keystore.properties <<'PROPS'
+storeFile=/Users/you/keys/mismeet-release.jks
+storePassword=...
+keyAlias=mismeet
+keyPassword=...
+PROPS
+```
+
+Install `zsp`, Zapstore's publishing tool, with Go, or take a binary from its
+[releases](https://github.com/zapstore/zsp/releases):
+
+```bash
+go install github.com/zapstore/zsp@latest
+```
+
+Put the publishing npub into the `pubkey` line of [`zapstore.yaml`](zapstore.yaml), then
+commit and push it: the Zapstore relay reads that file from the repository to whitelist the
+publisher on the first release.
+
+For each release:
+
+1. Raise `versionCode` and `versionName` in `android/app/build.gradle.kts`, add the version's
+   section to `CHANGELOG.md`, commit and push to `main`.
+2. Tag the commit and push the tag:
+
+   ```bash
+   scripts/release.sh tag android
+   ```
+
+3. Build the signed APK from the tag:
+
+   ```bash
+   android/gradlew -p android assembleRelease
+   ```
+
+4. Publish with your own key. `SIGN_WITH=browser` signs through a NIP-07 browser extension; a
+   NIP-46 `bunker://` URL works as well. On the first publish `zsp` asks for the keystore to
+   link its certificate to your npub.
+
+   ```bash
+   SIGN_WITH=browser zsp publish --commit "$(git rev-parse HEAD)" zapstore.yaml
+   ```
+
+`android/gradlew -p android assembleRelease -PuntaggedRelease` skips the tag check to try out
+the signing setup; never publish what it builds.
+
+### iOS on the App Store
+
+Uploading needs a paid Apple Developer Program membership; the free personal team used for
+development cannot distribute. Write the paid team's id into `ios/.team-id`.
+
+For each release:
+
+1. Raise `MARKETING_VERSION` (or only `CURRENT_PROJECT_VERSION` for another build of the same
+   version) in `ios/project.yml`, add the version to `CHANGELOG.md`, commit and push to `main`.
+2. Tag the commit and push the tag:
+
+   ```bash
+   scripts/release.sh tag ios
+   ```
+
+3. Archive from the tag; the archive lands in `ios/build/`:
+
+   ```bash
+   scripts/release.sh archive-ios
+   ```
+
+4. Open Xcode > Window > Organizer, select the archive, and choose Distribute App > App Store
+   Connect.
+
+Before the first submission, App Store Connect asks for things the repository cannot answer:
+
+- A privacy policy URL, and the App Privacy answers.
+- Export compliance. The app encrypts locations end to end with NIP-44 (ChaCha20 and
+  secp256k1), so it uses encryption beyond the operating system's; the Info.plist leaves the
+  question open, and App Store Connect asks it on upload.
+- Review notes on why the app needs "Always" location: it publishes on significant location
+  changes while closed, to contacts the user chose.
 
 ## License
 

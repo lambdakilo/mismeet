@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -21,6 +23,26 @@ android {
         }
     }
 
+    // The release key stays out of git: android/keystore.properties names it, as the README
+    // describes. Without that file there is no release signing and the release build fails.
+    val keystoreFile = rootProject.file("keystore.properties")
+    if (keystoreFile.exists()) {
+        val keystore = Properties().apply { keystoreFile.inputStream().use(::load) }
+        signingConfigs {
+            create("release") {
+                storeFile = rootProject.file(keystore.getProperty("storeFile"))
+                storePassword = keystore.getProperty("storePassword")
+                keyAlias = keystore.getProperty("keyAlias")
+                keyPassword = keystore.getProperty("keyPassword")
+            }
+        }
+        buildTypes {
+            getByName("release") {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
     buildFeatures {
         compose = true
     }
@@ -33,6 +55,22 @@ android {
     lint {
         abortOnError = true
     }
+}
+
+// A store build must come from its tag, see scripts/release.sh. -PuntaggedRelease skips the
+// check for trying out the signing setup; such an APK must never be published.
+val checkReleaseTag by tasks.registering {
+    val script = rootProject.file("../scripts/release.sh")
+    val skip = providers.gradleProperty("untaggedRelease").isPresent
+    doLast {
+        if (skip) return@doLast
+        val process = ProcessBuilder(script.path, "check", "android").redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().readText().trim()
+        if (process.waitFor() != 0) throw GradleException(output)
+    }
+}
+tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }.configureEach {
+    dependsOn(checkReleaseTag)
 }
 
 dependencies {

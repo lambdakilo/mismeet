@@ -1,4 +1,5 @@
-"""Turns the icon sketch into the iOS app icon and the Android adaptive icon foreground.
+"""Turns the icon sketch into the iOS app icon, the Android adaptive icon foreground and the
+512 px store icon that zapstore.yaml lists.
 
 The sketch is magenta strokes on black. The strokes are thickened so they survive at 60 px,
 the pin is cropped square, and the stroke colour is sampled from the drawing.
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SKETCH = ROOT / "design" / "icon-sketch.png"
 IOS_ICON = ROOT / "ios" / "Mismeet" / "Assets.xcassets" / "AppIcon.appiconset" / "icon-1024.png"
 ANDROID_FOREGROUND = ROOT / "android" / "app" / "src" / "main" / "res" / "mipmap-xxxhdpi" / "ic_launcher_foreground.png"
+STORE_ICON = ROOT / "design" / "icon-512.png"
 
 
 def main() -> None:
@@ -42,7 +44,8 @@ def main() -> None:
     # 66 dp safe zone of the 108 dp layer, on a black background layer.
     render(1024, 0.78, True).save(IOS_ICON)
     render(432, 0.58, False).save(ANDROID_FOREGROUND)
-    print(f"stroke colour {color}, wrote {IOS_ICON.name} and {ANDROID_FOREGROUND.name}")
+    render(512, 0.78, True).save(STORE_ICON)
+    print(f"stroke colour {color}, wrote {IOS_ICON.name}, {ANDROID_FOREGROUND.name} and {STORE_ICON.name}")
 
 
 if __name__ == "__main__":
