@@ -169,8 +169,9 @@ the invites are separated by semicolons:
 SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted app.mismeet.ios
 ```
 
-On the simulator, `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in the same way opens that
-tab instead of the map, which is how the screenshots above were taken.
+An entry may carry a name, `Aino|<invite>`; without one the contact is named Test 1, Test 2 and
+so on. On the simulator, `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in the same way
+opens that tab instead of the map, which is how the screenshots above were taken.
 
 ```bash
 adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;<invite>'"
@@ -359,38 +360,71 @@ For each release:
 `android/gradlew -p android assembleRelease -PuntaggedRelease` skips the tag check to try out
 the signing setup; never publish what it builds.
 
-### iOS on the App Store
+### iOS on TestFlight and the App Store
 
 Uploading needs a paid Apple Developer Program membership; the free personal team used for
-development cannot distribute. Write the paid team's id into `ios/.team-id`.
+development cannot distribute. Every upload goes to App Store Connect, where it is a TestFlight
+build first. A release to the App Store submits one of those tested builds for review, so the
+binary users get is the one that was tested, and it is already tagged.
 
-For each release:
+Once, after the membership is active:
 
-1. Raise `MARKETING_VERSION` (or only `CURRENT_PROJECT_VERSION` for another build of the same
-   version) in `ios/project.yml`, add the version to `CHANGELOG.md`, commit and push to `main`.
+1. Open Xcode > Settings > Apple Accounts and select the account. The paid team shows next to
+   the personal one; activation can take up to two days after payment. Its ten-character team
+   id is under Membership details at <https://developer.apple.com/account>. Write it to
+   `ios/.team-id`, with your id in place of `ABCDE12345`:
+
+   ```bash
+   echo ABCDE12345 > ios/.team-id
+   ```
+
+2. Build for the connected iPhone with the device build command under Development. With the
+   paid team in `ios/.team-id`, that registers the bundle id `app.mismeet.ios` under it. If
+   Xcode answers that the id "is not available", the free personal team still holds it; a
+   free registration lapses after a while without builds, or the bundle id has to change.
+3. In App Store Connect (<https://appstoreconnect.apple.com>), open Apps, click "+" and then
+   New App. Choose iOS, the name Mismeet (names are unique on the store, so another may be
+   needed), the bundle id `app.mismeet.ios`, and the SKU `mismeet`.
+
+For each build:
+
+1. Raise `CURRENT_PROJECT_VERSION` in `ios/project.yml`, since every upload needs a new build
+   number, and `MARKETING_VERSION` too when it starts a new version. Add the version to
+   `CHANGELOG.md`, commit and push to `main`.
 2. Tag the commit and push the tag:
 
    ```bash
    scripts/release.sh tag ios
    ```
 
-3. Archive from the tag; the archive lands in `ios/build/`:
+3. Archive from the tag and upload it. Xcode creates the distribution certificate and the App
+   Store profile on the first run:
 
    ```bash
-   scripts/release.sh archive-ios
+   scripts/release.sh upload-ios
    ```
 
-4. Open Xcode > Window > Organizer, select the archive, and choose Distribute App > App Store
-   Connect.
+4. Wait until App Store Connect has processed the build, usually minutes, then open the app's
+   TestFlight tab. The first build asks the export compliance question there: the app
+   encrypts locations end to end with NIP-44 (ChaCha20 and secp256k1), beyond the operating
+   system's encryption, and the Info.plist leaves the answer to you.
+5. Under Internal Testing, add yourself as a tester. Install TestFlight from the App Store on
+   the iPhone and install the build from it. TestFlight builds expire after 90 days.
 
-Before the first submission, App Store Connect asks for things the repository cannot answer:
+To release a tested build on the App Store:
 
-- A privacy policy URL, and the App Privacy answers.
-- Export compliance. The app encrypts locations end to end with NIP-44 (ChaCha20 and
-  secp256k1), so it uses encryption beyond the operating system's; the Info.plist leaves the
-  question open, and App Store Connect asks it on upload.
-- Review notes on why the app needs "Always" location: it publishes on significant location
-  changes while closed, to contacts the user chose.
+1. In App Store Connect, open the app's version page under iOS App, creating the version if it
+   is not there. Upload the screenshots from `design/app-store/iphone-6.9` for the large
+   display and `design/app-store/iphone-6.3` for the medium one, and fill in the description,
+   keywords, the support URL (this repository works), a privacy policy URL, the App Privacy
+   answers, the age rating and the category.
+2. Under Build, choose the TestFlight build you tested.
+3. In App Review Information, explain the "Always" location: the app publishes on significant
+   location changes while closed, to the contacts the user chose. Then click Add for Review
+   and submit. Once approved, the version goes live when you release it.
+
+The screenshots come from the iPhone 18 Pro Max and iPhone 17 simulators with a fixed status
+bar and the contacts Aino and Eero published by the fake publisher.
 
 ## License
 

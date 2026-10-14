@@ -5,7 +5,9 @@
 #   scripts/release.sh version <android|ios>   print the tag the current version maps to
 #   scripts/release.sh tag <android|ios>       tag HEAD with it and push the tag to origin
 #   scripts/release.sh check <android|ios>     fail unless HEAD is that tag and the tree is clean
-#   scripts/release.sh archive-ios             check, then archive the iOS app for App Store upload
+#   scripts/release.sh archive-ios             check, then archive the iOS app
+#   scripts/release.sh upload-ios              check, archive and upload to App Store Connect, which
+#                                              offers the build in TestFlight and for App Store review
 set -euo pipefail
 
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
@@ -75,12 +77,41 @@ tag() {
 archive_ios() {
   local tag
   tag="$(check ios)"
-  set -o pipefail
-  xcodegen generate --spec "$root/ios/project.yml"
+  xcodegen generate --spec "$root/ios/project.yml" >/dev/null
   xcodebuild -project "$root/ios/Mismeet.xcodeproj" -scheme Mismeet -configuration Release \
     -destination 'generic/platform=iOS' -archivePath "$root/ios/build/$tag.xcarchive" \
-    -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat "$root/ios/.team-id")" archive | xcbeautify
-  echo "Archived $root/ios/build/$tag.xcarchive. Upload it from Xcode > Window > Organizer."
+    -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat "$root/ios/.team-id")" archive | xcbeautify >&2
+  echo "$root/ios/build/$tag.xcarchive"
+}
+
+upload_ios() {
+  local archive options
+  archive="$(archive_ios)"
+  options="$root/ios/build/ExportOptions.plist"
+  # manageAppVersionAndBuildNumber stays off so the uploaded build keeps the tagged numbers.
+  cat > "$options" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key>
+  <string>app-store-connect</string>
+  <key>destination</key>
+  <string>upload</string>
+  <key>teamID</key>
+  <string>$(cat "$root/ios/.team-id")</string>
+  <key>signingStyle</key>
+  <string>automatic</string>
+  <key>manageAppVersionAndBuildNumber</key>
+  <false/>
+  <key>uploadSymbols</key>
+  <true/>
+</dict>
+</plist>
+PLIST
+  xcodebuild -exportArchive -archivePath "$archive" -exportOptionsPlist "$options" \
+    -exportPath "$root/ios/build/export" -allowProvisioningUpdates | xcbeautify
+  echo "Uploaded $(basename "$archive" .xcarchive). It shows in App Store Connect > TestFlight once processed."
 }
 
 case "${1:-}" in
@@ -88,5 +119,6 @@ case "${1:-}" in
   tag) tag "${2:-}" ;;
   check) check "${2:-}" ;;
   archive-ios) archive_ios ;;
-  *) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+  upload-ios) upload_ios ;;
+  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

@@ -60,9 +60,13 @@ follows it, and a protocol change edits the spec first, in the same change.
 
 ## Releases
 
-- Android goes to Zapstore (not F-Droid) through `zapstore.yaml`; iOS to the App Store. The
-  publish and upload steps are the user's own, with their own Nostr key and Apple account:
-  prepare everything up to them, never run `zsp publish` or an App Store upload.
+- Android goes to Zapstore (not F-Droid) through `zapstore.yaml`; iOS to TestFlight and the
+  App Store through `scripts/release.sh upload-ios`, which archives from the tag and uploads
+  with the build numbers kept. The publish and upload steps are the user's own, with their own
+  Nostr key and Apple account: prepare everything up to them, never run `zsp publish` or
+  `upload-ios`. The App Store screenshots in `design/app-store/` are full size and RGB, at
+  sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622); redo them after a visible
+  change.
 - Every store build comes from an annotated tag `<platform>-<version>-<build>` made by
   `scripts/release.sh tag`. `assembleRelease` and `scripts/release.sh archive-ios` refuse to
   run unless the tree is clean and `HEAD` is that tag; `-PuntaggedRelease` skips the Android
@@ -229,7 +233,7 @@ Fake publisher and launch hooks for debug builds, as in the README: `:protocol:f
 publishes a location for an invite from a key kept under `android/protocol/build/`
 (`MISMEET_FAKE_NAME` selects another key), and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
 simulator or the `invites` string extra on Android add contacts at launch, semicolon
-separated, and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
+separated (`name|invite` names a contact on iOS), and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
 simulator. The README's screenshots under `design/screenshots/` come from the simulator and
 the emulator with the two fake contacts, scaled to 600 px high with `sips -Z 600`; redo them
 after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile...`), readable with

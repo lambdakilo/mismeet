@@ -57,10 +57,12 @@ final class AppModel {
             Task { await publishRelayList() }
         }
         #if DEBUG
-        // Test hook: `SIMCTL_CHILD_MISMEET_TEST_INVITES="uri;uri" xcrun simctl launch ...` adds contacts.
+        // Test hook: `SIMCTL_CHILD_MISMEET_TEST_INVITES="uri;name|uri" xcrun simctl launch ...` adds contacts.
         if let invites = ProcessInfo.processInfo.environment["MISMEET_TEST_INVITES"] {
-            for (index, text) in invites.split(separator: ";").enumerated() {
-                try? addContact(invite: String(text), name: "Test \(index + 1)")
+            for (index, entry) in invites.split(separator: ";").enumerated() {
+                let parts = entry.split(separator: "|", maxSplits: 1)
+                let name = parts.count == 2 ? String(parts[0]) : "Test \(index + 1)"
+                try? addContact(invite: String(parts[parts.count - 1]), name: name)
             }
         }
         #endif
