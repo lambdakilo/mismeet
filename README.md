@@ -322,11 +322,11 @@ keyPassword=...
 PROPS
 ```
 
-Install `zsp`, Zapstore's publishing tool, with Go, or take a binary from its
-[releases](https://github.com/zapstore/zsp/releases):
+Install `zsp`, Zapstore's publishing tool, with Go, which puts it in `~/go/bin`, or take a
+binary from its [releases](https://github.com/zapstore/zsp/releases):
 
 ```bash
-go install github.com/zapstore/zsp@latest
+brew install go && go install github.com/zapstore/zsp@latest
 ```
 
 Put the publishing npub into the `pubkey` line of [`zapstore.yaml`](zapstore.yaml), then
@@ -349,12 +349,15 @@ For each release:
    android/gradlew -p android assembleRelease
    ```
 
-4. Publish with your own key. `SIGN_WITH=browser` signs through a NIP-07 browser extension; a
-   NIP-46 `bunker://` URL works as well. On the first publish `zsp` asks for the keystore to
-   link its certificate to your npub.
+4. Publish with your own key. `SIGN_WITH=browser` signs through a NIP-07 browser extension
+   such as nos2x-fox: `zsp` serves a signing page on `http://localhost:17007/` and opens it in
+   the default browser. When the extension lives in another browser or Firefox profile, open
+   that address there and approve each event the extension asks about. A NIP-46 `bunker://`
+   URL works as well. On the first publish `zsp` asks for the keystore to link its
+   certificate to your npub.
 
    ```bash
-   SIGN_WITH=browser zsp publish --commit "$(git rev-parse HEAD)" zapstore.yaml
+   SIGN_WITH=browser ~/go/bin/zsp publish --commit "$(git rev-parse HEAD)" zapstore.yaml
    ```
 
 `android/gradlew -p android assembleRelease -PuntaggedRelease` skips the tag check to try out
