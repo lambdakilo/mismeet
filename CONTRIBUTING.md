@@ -33,7 +33,8 @@ git rebase --signoff origin/main
 ```
 
 The sign-off must name the commit's author. A CI job fails a pull request when any of its
-commits lacks one; run the same check before pushing:
+commits lacks one, and `main` accepts a pull request only when that job has passed. Run the
+same check before pushing:
 
 ```bash
 scripts/check-dco.sh origin/main..HEAD

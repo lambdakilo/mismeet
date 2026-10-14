@@ -83,7 +83,10 @@ follows it, and a protocol change edits the spec first, in the same change.
 - Every commit carries a Developer Certificate of Origin sign-off, as `CONTRIBUTING.md`
   requires: commit with `git commit -s`, which signs with the configured identity. The DCO
   workflow runs `scripts/check-dco.sh` over the new commits of every pull request and push to
-  `main`; commits before 5b23249 predate the rule and are never checked.
+  `main`; commits before 5b23249 predate the rule and are never checked. The repository
+  ruleset "main requires DCO sign-off" makes its `sign-off` job a required check on `main`;
+  the admin role bypasses it, which keeps the owner's direct pushes working, so CI checks
+  those only after the push.
 
 ## Building and running
 
