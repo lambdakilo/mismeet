@@ -32,7 +32,12 @@ To sign off commits already on your branch:
 git rebase --signoff origin/main
 ```
 
-Pull requests with a commit that is not signed off are not merged.
+The sign-off must name the commit's author. A CI job fails a pull request when any of its
+commits lacks one; run the same check before pushing:
+
+```bash
+scripts/check-dco.sh origin/main..HEAD
+```
 
 ```
 Developer Certificate of Origin

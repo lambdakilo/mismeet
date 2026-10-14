@@ -35,6 +35,9 @@ yet. Invites are scanned as QR codes or pasted as text.
   icon, and the screenshots above.
 - [`scripts/release.sh`](scripts/release.sh): tags store builds and checks that a release build
   comes from its tag, see Distribution.
+- [`scripts/check-dco.sh`](scripts/check-dco.sh) and
+  [`.github/workflows/dco.yml`](.github/workflows/dco.yml): the sign-off check CI runs on pull
+  requests and on pushes to `main`, see CONTRIBUTING.md.
 - [`zapstore.yaml`](zapstore.yaml) and [`CHANGELOG.md`](CHANGELOG.md): the Zapstore listing and
   the release notes it reads.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): the terms contributions come under and the sign-off

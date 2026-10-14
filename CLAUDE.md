@@ -81,7 +81,9 @@ follows it, and a protocol change edits the spec first, in the same change.
   (MIT, Apache-2.0, BSD, MPL-2.0). A GPL, LGPL or AGPL dependency without an equivalent
   exception would block it.
 - Every commit carries a Developer Certificate of Origin sign-off, as `CONTRIBUTING.md`
-  requires: commit with `git commit -s`, which signs with the configured identity.
+  requires: commit with `git commit -s`, which signs with the configured identity. The DCO
+  workflow runs `scripts/check-dco.sh` over the new commits of every pull request and push to
+  `main`; commits before 5b23249 predate the rule and are never checked.
 
 ## Building and running
 
