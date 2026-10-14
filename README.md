@@ -37,8 +37,11 @@ yet. Invites are scanned as QR codes or pasted as text.
   comes from its tag, see Distribution.
 - [`zapstore.yaml`](zapstore.yaml) and [`CHANGELOG.md`](CHANGELOG.md): the Zapstore listing and
   the release notes it reads.
-- [`LICENSE`](LICENSE) and [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts,
-  see below.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md): the terms contributions come under and the sign-off
+  every commit needs.
+- [`PRIVACY.md`](PRIVACY.md): the privacy policy the store listings link to.
+- [`LICENSE`](LICENSE), [`LICENSE-APP-STORE-EXCEPTION`](LICENSE-APP-STORE-EXCEPTION) and
+  [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts, see below.
 
 ## Development
 
@@ -419,8 +422,9 @@ To release a tested build on the App Store:
 1. In App Store Connect, open the app's version page under iOS App, creating the version if it
    is not there. Upload the screenshots from `design/app-store/iphone-6.9` for the large
    display and `design/app-store/iphone-6.3` for the medium one, and fill in the description,
-   keywords, the support URL (this repository works), a privacy policy URL, the App Privacy
-   answers, the age rating and the category.
+   keywords, the support URL (this repository works), the privacy policy URL
+   <https://github.com/lambdakilo/mismeet/blob/main/PRIVACY.md>, the App Privacy answers, the
+   age rating and the category.
 2. Under Build, choose the TestFlight build you tested.
 3. In App Review Information, explain the "Always" location: the app publishes on significant
    location changes while closed, to the contacts the user chose. Then click Add for Review
@@ -431,8 +435,20 @@ bar and the contacts Aino and Eero published by the fake publisher.
 
 ## License
 
-Prose, meaning `spec/SPEC.md`, `CLAUDE.md` and this README, is licensed under Creative Commons
-Attribution-ShareAlike 4.0 International. See [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0).
+Prose, meaning `spec/SPEC.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `PRIVACY.md`
+and this README, is licensed under Creative Commons Attribution-ShareAlike 4.0 International. See
+[`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0).
 
 Everything else is licensed under the GNU Affero General Public License, version 3 or (at your
-option) any later version. See [`LICENSE`](LICENSE).
+option) any later version, with an app store exception. See [`LICENSE`](LICENSE) and
+[`LICENSE-APP-STORE-EXCEPTION`](LICENSE-APP-STORE-EXCEPTION):
+
+> As an additional permission under section 7 of the GNU Affero General Public License,
+> version 3, you are allowed to distribute the software through an app store, including
+> Apple's App Store, even if that store has restrictive terms and conditions that are
+> incompatible with the AGPL, provided that the source is also available under the AGPL with
+> or without this permission through a channel without those restrictive terms and
+> conditions.
+
+Contributions come under the same terms, with a Developer Certificate of Origin sign-off on
+every commit and no contributor licence agreement. See [`CONTRIBUTING.md`](CONTRIBUTING.md).

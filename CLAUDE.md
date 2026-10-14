@@ -76,8 +76,12 @@ follows it, and a protocol change edits the spec first, in the same change.
 - The release key never enters the repository: `android/keystore.properties` names it and is
   git-ignored, as are `*.jks`, `*.keystore` and `*.p12`. Test signing with a throwaway key in
   the scratchpad and delete the properties file afterwards.
-- Keep dependencies under licences that allow App Store distribution (MIT, Apache-2.0, BSD,
-  MPL-2.0). A GPL, LGPL or AGPL dependency without an equivalent exception would block it.
+- Code is AGPL-3.0-or-later with the app store exception in `LICENSE-APP-STORE-EXCEPTION`,
+  prose CC BY-SA 4.0. Keep dependencies under licences that allow App Store distribution
+  (MIT, Apache-2.0, BSD, MPL-2.0). A GPL, LGPL or AGPL dependency without an equivalent
+  exception would block it.
+- Every commit carries a Developer Certificate of Origin sign-off, as `CONTRIBUTING.md`
+  requires: commit with `git commit -s`, which signs with the configured identity.
 
 ## Building and running
 
