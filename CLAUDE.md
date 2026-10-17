@@ -62,9 +62,10 @@ follows it, and a protocol change edits the spec first, in the same change.
 
 - Android goes to Zapstore (not F-Droid) through `zapstore.yaml`; iOS to TestFlight and the
   App Store through `scripts/release.sh upload-ios`, which archives from the tag and uploads
-  with the build numbers kept. The publish and upload steps are the user's own, with their own
-  Nostr key and Apple account: prepare everything up to them, never run `zsp publish` or
-  `upload-ios`. The App Store screenshots in `design/app-store/` are full size and RGB, at
+  with the build numbers kept. Publishing is the user's call: never run `zsp publish`, which
+  signs with the user's own Nostr key, and run `scripts/release.sh tag ios` and `upload-ios`
+  only when the user says go for that build. Xcode signs the upload with a cloud-managed
+  distribution certificate, so none is created on this Mac. The App Store screenshots in `design/app-store/` are full size and RGB, at
   sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622); redo them after a visible
   change.
 - Every store build comes from an annotated tag `<platform>-<version>-<build>` made by
