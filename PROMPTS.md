@@ -5,9 +5,17 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Add PROMPTS.md with the prompts behind every commit
+## Drop the sign-off from the PROMPTS.md abbreviations
 
 2026-10-17, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**3.** Quoted under [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
+
+**4.** Quoted under [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
+
+## Add PROMPTS.md with the prompts behind every commit
+
+2026-10-17, commit [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2), model claude-opus-5-5, effort xhigh.
 
 **3.**
 > not bad. list all my repos that i have used llms in that could use
@@ -266,5 +274,4 @@ so a change by hand is lost at the next commit.
 - nvm: never mind
 - qr: quick response code
 - repo: repository
-- Signed-off-by: Akira Taguchi <hoteldeltatango@pm.me>
 - sku: stock keeping unit
