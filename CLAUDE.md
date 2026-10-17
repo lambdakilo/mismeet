@@ -170,6 +170,9 @@ xcrun simctl location booted run "Freeway Drive"
   strings in `Info.plist`, defined in `project.yml`. It is not an entitlement, so it works with
   the free team.
 - Always pass `-derivedDataPath ios/build`, so the app path in the install command stays valid.
+- The app is iPhone only: `TARGETED_DEVICE_FAMILY` is `"1"` on the app target, because
+  XcodeGen's application preset sets `"1,2"` there and overrides the project setting. A build
+  that declares iPad makes App Store Connect demand 13-inch iPad screenshots.
 - The free team's profile lasts seven days and at most ten app ids can be registered per seven
   days, so never churn the bundle identifier.
 
