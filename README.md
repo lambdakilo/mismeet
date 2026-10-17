@@ -48,6 +48,8 @@ yet. Invites are scanned as QR codes or pasted as text.
 
 ## Development
 
+Run the commands in this section and the next from the root of your checkout.
+
 ### Requirements
 
 - iOS: a Mac with Xcode 27 (the iOS 27 SDK; the deployment target is iOS 18), `xcodegen` and
@@ -378,19 +380,19 @@ binary users get is the one that was tested, and it is already tagged.
 
 Once, after the membership is active:
 
-1. Open Xcode > Settings > Apple Accounts and select the account. The paid team shows next to
-   the personal one; activation can take up to two days after payment. Its ten-character team
-   id is under Membership details at <https://developer.apple.com/account>. Write it to
-   `ios/.team-id`, with your id in place of `ABCDE12345`:
+1. Find the team id under Membership details at <https://developer.apple.com/account> and
+   write it to `ios/.team-id`, with your id in place of `ABCDE12345`. An individual
+   membership can keep the id of the free personal team, and Xcode may go on calling it
+   Personal Team; activation can take up to two days after payment.
 
    ```bash
    echo ABCDE12345 > ios/.team-id
    ```
 
-2. Build for the connected iPhone with the device build command under Development. With the
-   paid team in `ios/.team-id`, that registers the bundle id `app.mismeet.ios` under it. If
-   Xcode answers that the id "is not available", the free personal team still holds it; a
-   free registration lapses after a while without builds, or the bundle id has to change.
+2. Build for the iPhone with the device build command under Development. That registers the
+   bundle id `app.mismeet.ios` under the team, and once the membership is active the
+   development profile it fetches lasts a year instead of seven days. If Xcode answers that
+   the id "is not available", another team holds it, and the bundle id has to change.
 3. In App Store Connect (<https://appstoreconnect.apple.com>), open Apps, click "+" and then
    New App. Choose iOS, the name Mismeet (names are unique on the store, so another may be
    needed), the bundle id `app.mismeet.ios`, and the SKU `mismeet`.
