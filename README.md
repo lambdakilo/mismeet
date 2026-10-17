@@ -43,6 +43,8 @@ yet. Invites are scanned as QR codes or pasted as text.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): the terms contributions come under and the sign-off
   every commit needs.
 - [`PRIVACY.md`](PRIVACY.md): the privacy policy the store listings link to.
+- [`PROMPTS.md`](PROMPTS.md): every prompt behind the commits, with its commit, generated from
+  the commit messages.
 - [`LICENSE`](LICENSE), [`LICENSE-APP-STORE-EXCEPTION`](LICENSE-APP-STORE-EXCEPTION) and
   [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0): the licence texts, see below.
 
@@ -442,8 +444,9 @@ bar and the contacts Aino and Eero published by the fake publisher.
 
 ## License
 
-Prose, meaning `spec/SPEC.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `PRIVACY.md`
-and this README, is licensed under Creative Commons Attribution-ShareAlike 4.0 International. See
+Prose, meaning `spec/SPEC.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `PRIVACY.md`,
+`PROMPTS.md` and this README, is licensed under Creative Commons Attribution-ShareAlike 4.0
+International. See
 [`LICENSE-CC-BY-SA-4.0`](LICENSE-CC-BY-SA-4.0).
 
 Everything else is licensed under the GNU Affero General Public License, version 3 or (at your
