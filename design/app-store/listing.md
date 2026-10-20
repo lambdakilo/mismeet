@@ -56,3 +56,32 @@ Location: the app asks for location while in use, then Always. With Always it pu
 
 To try it, use two devices. On each, open the Me tab to show the invite QR code. On the other, open Contacts, tap +, then Scan QR code, and add it. Within a minute each phone shows the other on the map. With one device, the Me tab shows the invite and the map shows your own position.
 ```
+
+## Answers to App Review's request for more information
+
+App Review asked for a screen recording and for the answers below, both in a reply and in the
+Notes field. The Notes field holds the App Review notes above followed by these answers.
+
+```text
+Purpose and audience
+Mismeet lets people share their location with the family members and friends they choose, and see theirs on a map. It is for people who want this without creating an account and without a company server that can read their movements. Each phone publishes its position to public Nostr relays, end-to-end encrypted separately for each chosen contact. The relays pass the data along but cannot read it, and every position expires after 24 hours.
+
+Setup and main features
+No account, login or sample files are needed.
+1. Open Mismeet and allow location access while using the app, then Always, so that the position updates in the background.
+2. To add a contact, open the Me tab on their device to show its invite QR code. On yours, open Contacts, tap +, tap Scan QR code, scan it, type a name and tap Add. Do the same the other way round to share in both directions.
+3. Within about a minute the Map tab shows the contact's position together with yours, and the Contacts tab shows how long ago it was seen. Each contact has a switch to stop sharing your location with them, and swiping a contact removes it.
+With a single device, the Me tab shows the invite and the map shows your own position. Seeing a contact needs a second device running Mismeet, as in the screen recording.
+
+External services
+- Public Nostr relays: relay.damus.io, nos.lol and relay.primal.net by default, changeable on the Me tab. They store the encrypted location events and the list of relays each user publishes to, and cannot read locations.
+- Apple MapKit for the map.
+- The open-source Nostr Dev Kit library (MIT licence) for the Nostr protocol and the encryption.
+Mismeet uses no authentication, payment, analytics, advertising or AI service, and has no server of its own.
+
+Regional differences
+The app works the same in every region where it is offered. It is not offered in France.
+
+Regulated industries and third-party material
+Not applicable. The app does not operate in a regulated industry and contains no protected third-party material. Its source code is public under the GNU Affero General Public License with an app store exception: https://github.com/lambdakilo/mismeet
+```

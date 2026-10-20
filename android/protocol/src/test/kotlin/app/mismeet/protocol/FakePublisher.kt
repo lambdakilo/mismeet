@@ -3,8 +3,10 @@ package app.mismeet.protocol
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
+import java.awt.image.BufferedImage
 import java.io.File
 import java.time.Duration
+import javax.imageio.ImageIO
 import kotlin.system.exitProcess
 import kotlinx.coroutines.runBlocking
 import org.nostrdevkit.sdk.AckPolicy
@@ -67,6 +69,19 @@ fun main(args: Array<String>) = runBlocking {
     println(invite)
     println()
     printQr(invite)
+    val png = File("build/$name-invite.png").absoluteFile
+    writeQrPng(invite, png)
+    println()
+    println("QR code to scan from the screen: $png")
+}
+
+private fun writeQrPng(text: String, file: File, scale: Int = 12) {
+    val matrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, mapOf(EncodeHintType.MARGIN to 4))
+    val image = BufferedImage(matrix.width * scale, matrix.height * scale, BufferedImage.TYPE_INT_RGB)
+    for (y in 0 until image.height) {
+        for (x in 0 until image.width) image.setRGB(x, y, if (matrix[x / scale, y / scale]) 0x000000 else 0xFFFFFF)
+    }
+    ImageIO.write(image, "png", file)
 }
 
 private fun printQr(text: String) {

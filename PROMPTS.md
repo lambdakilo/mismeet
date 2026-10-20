@@ -5,9 +5,20 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Prepare the App Review recording and answers
+
+2026-10-20, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**27.**
+> [pasted: App Review's request for more information about the app,
+> 30 lines]
+>
+> do i need to plugin my iphone for this via a cable? what parts can
+> you do for me?
+
 ## Drop the sign-off from the PROMPTS.md abbreviations
 
-2026-10-17, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [8456db7](https://github.com/lambdakilo/mismeet/commit/8456db72192d56497b2c20f27727f2be2a849c1f), model claude-opus-5-5, effort xhigh.
 
 **3.** Quoted under [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
 
