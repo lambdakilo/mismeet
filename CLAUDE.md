@@ -244,7 +244,8 @@ adb emu kill
 
 Fake publisher and launch hooks for debug builds, as in the README: `:protocol:fakePublish`
 publishes a location for an invite from a key kept under `android/protocol/build/`
-(`MISMEET_FAKE_NAME` selects another key), and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
+(`MISMEET_FAKE_NAME` selects another key, and `-` as the invite only creates the key) and writes
+the publisher's invite as `android/protocol/build/<name>-invite.png` for a phone to scan, and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
 simulator or the `invites` string extra on Android add contacts at launch, semicolon
 separated (`name|invite` names a contact on iOS), and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
 simulator. The README's screenshots under `design/screenshots/` come from the simulator and

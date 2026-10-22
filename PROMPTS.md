@@ -5,9 +5,21 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Let the fake publisher create its key and QR code without publishing
+
+2026-10-22, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**28.**
+> [a request about the global Claude Code rules left out] also ive
+> logged in continue
+> > Yes, send this (Recommended)
+
+**29.**
+> [a request about the global Claude Code rules left out]
+
 ## Prepare the App Review recording and answers
 
-2026-10-20, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-20, commit [0e6ca81](https://github.com/lambdakilo/mismeet/commit/0e6ca81d022da611bf59618ab025d9856f717b26), model claude-opus-5-5, effort xhigh.
 
 **27.**
 > [pasted: App Review's request for more information about the app,

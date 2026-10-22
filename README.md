@@ -166,7 +166,9 @@ xcrun simctl spawn booted log show --info --last 5m --predicate 'subsystem == "a
 Publish a location for that invite; the tool prints the fake publisher's own invite and a QR
 code to add on the watching app, and keeps its key under `android/protocol/build/` so that
 later runs move the same contact. `MISMEET_FAKE_NAME=other` in the environment makes a second
-publisher, and several readers go comma-separated:
+publisher, several readers go comma-separated, and `-` as the reader publishes nothing but
+creates the publisher's key and QR code, which it also writes as
+`android/protocol/build/<name>-invite.png` for a phone to scan off the screen:
 
 ```bash
 android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.1699 24.9384"
