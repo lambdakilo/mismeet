@@ -22,7 +22,8 @@ follows it, and a protocol change edits the spec first, in the same change.
   `LocationManager` inside a foreground service that publishes on a fixed timer, never from the
   fused provider. Under `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`,
   `identity/` (a Keystore wrapped secret key), `store/` (JSON state in the files directory),
-  `nostr/`, `location/` (the provider, the foreground service and the boot receiver), `ui/`.
+  `nostr/`, `location/` (the provider, the foreground service, the boot receiver and the road
+  cells for estimates), `ui/`.
   The map tab opens first, framed around everyone with a known position, and draws
   OpenStreetMap tiles through osmdroid, which needs the package name as user agent and has to
   be clipped inside Compose; a contact row also opens the position in whatever map app
@@ -251,7 +252,8 @@ adb exec-out screencap -p > emulator.png
 adb emu kill
 ```
 
-Fake publisher and launch hooks for debug builds, as in the README: `:protocol:fakePublish`
+Fake publisher and launch hooks for debug builds, as in the README (`MISMEET_FAKE_SPEED`,
+`MISMEET_FAKE_HEADING` and `MISMEET_FAKE_AGE` make the contact move): `:protocol:fakePublish`
 publishes a location for an invite from a key kept under `android/protocol/build/`
 (`MISMEET_FAKE_NAME` selects another key, and `-` as the invite only creates the key) and writes
 the publisher's invite as `android/protocol/build/<name>-invite.png` for a phone to scan, and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the

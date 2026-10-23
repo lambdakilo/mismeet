@@ -1,5 +1,6 @@
 import CoreLocation
 import Foundation
+import ImageIO
 import NostrSDK
 import Observation
 import OSLog
@@ -27,12 +28,14 @@ final class AppModel {
     private(set) var isPublishing = false
     let keys: Keys
     let npub: String
+    let roads = RoadData()
 
     private let store = StateStore()
     private let location = LocationService()
     private let relays = RelayService()
     private let logger = Logger(subsystem: "app.mismeet.ios", category: "model")
     private var pendingTrigger: PublishTrigger?
+    @ObservationIgnored private var photos: [String: (setAt: Date, image: UIImage)] = [:]
 
     private init() {
         state = store.load()
@@ -119,9 +122,65 @@ final class AppModel {
     }
 
     func removeContacts(at offsets: IndexSet) {
+        for contact in offsets.map({ state.contacts[$0] }) {
+            try? FileManager.default.removeItem(at: photoURL(contact.id))
+        }
         state.contacts.remove(atOffsets: offsets)
         save()
         recipientsChanged()
+    }
+
+    /// A picture for a contact, cropped square and kept on this phone only; it is never published.
+    func setPhoto(_ id: String, data: Data) {
+        let options = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: Self.photoSize * 3,
+        ] as CFDictionary
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else {
+            return log("Could not use that picture")
+        }
+        let side = min(thumbnail.width, thumbnail.height)
+        guard let square = thumbnail.cropping(to: CGRect(x: (thumbnail.width - side) / 2, y: (thumbnail.height - side) / 2, width: side, height: side)) else { return }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        let size = CGSize(width: Self.photoSize, height: Self.photoSize)
+        let scaled = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            UIImage(cgImage: square).draw(in: CGRect(origin: .zero, size: size))
+        }
+        guard let jpeg = scaled.jpegData(compressionQuality: 0.85),
+              let index = state.contacts.firstIndex(where: { $0.id == id }) else { return }
+        do {
+            try FileManager.default.createDirectory(at: photoURL(id).deletingLastPathComponent(), withIntermediateDirectories: true)
+            try jpeg.write(to: photoURL(id), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+        } catch {
+            return log("Could not save that picture: \(error)")
+        }
+        state.contacts[index].photoSetAt = Date()
+        save()
+    }
+
+    func removePhoto(_ id: String) {
+        try? FileManager.default.removeItem(at: photoURL(id))
+        guard let index = state.contacts.firstIndex(where: { $0.id == id }) else { return }
+        state.contacts[index].photoSetAt = nil
+        save()
+    }
+
+    func photo(for contact: Contact) -> UIImage? {
+        guard let setAt = contact.photoSetAt else { return nil }
+        if let cached = photos[contact.id], cached.setAt == setAt { return cached.image }
+        guard let image = UIImage(contentsOfFile: photoURL(contact.id).path) else { return nil }
+        photos[contact.id] = (setAt, image)
+        return image
+    }
+
+    private static let photoSize = 256
+
+    private func photoURL(_ id: String) -> URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Mismeet/photos/\(id).jpg")
     }
 
     func setShare(_ id: String, _ share: Bool) {

@@ -2,11 +2,16 @@ package app.mismeet.android
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.os.BatteryManager
 import android.util.Log
 import app.mismeet.android.identity.DeviceKeys
 import app.mismeet.android.location.LocationProvider
 import app.mismeet.android.location.LocationService
+import app.mismeet.android.location.RoadData
 import app.mismeet.android.nostr.RelayService
 import app.mismeet.android.store.Contact
 import app.mismeet.android.store.PersistedState
@@ -20,6 +25,10 @@ import app.mismeet.protocol.LocationReadResult
 import app.mismeet.protocol.ProtocolConstants
 import app.mismeet.protocol.RelayList
 import app.mismeet.protocol.RelayPlan
+import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -56,6 +65,8 @@ class AppModel private constructor(private val context: Context) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val publishing = Mutex()
     private val refreshing = Mutex()
+    private val photos = ConcurrentHashMap<String, Pair<Long, Bitmap>>()
+    val roads = RoadData(context)
 
     init {
         if (_state.value.sharingEnabled && _state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
@@ -131,8 +142,41 @@ class AppModel private constructor(private val context: Context) {
 
     fun removeContact(id: String) {
         update { it.copy(contacts = it.contacts.filterNot { contact -> contact.id == id }) }
+        photoFile(id).delete()
         recipientsChanged()
     }
+
+    /** A picture for a contact, cropped square and kept on this phone only; it is never published. */
+    fun setPhoto(id: String, uri: Uri) {
+        scope.launch(Dispatchers.IO) {
+            runCatching {
+                val decoded = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
+                    decoder.setTargetSampleSize(max(1, min(info.size.width, info.size.height) / PHOTO_SIZE))
+                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                }
+                val side = min(decoded.width, decoded.height)
+                val square = Bitmap.createBitmap(decoded, (decoded.width - side) / 2, (decoded.height - side) / 2, side, side)
+                val file = photoFile(id).apply { parentFile?.mkdirs() }
+                file.outputStream().use { Bitmap.createScaledBitmap(square, PHOTO_SIZE, PHOTO_SIZE, true).compress(Bitmap.CompressFormat.JPEG, 85, it) }
+            }.onSuccess {
+                val now = System.currentTimeMillis()
+                update { state -> state.copy(contacts = state.contacts.map { if (it.id == id) it.copy(photoSetAt = now) else it }) }
+            }.onFailure { log("Could not use that picture: ${it.message}") }
+        }
+    }
+
+    fun removePhoto(id: String) {
+        photoFile(id).delete()
+        update { state -> state.copy(contacts = state.contacts.map { if (it.id == id) it.copy(photoSetAt = null) else it }) }
+    }
+
+    fun photo(contact: Contact): Bitmap? {
+        val setAt = contact.photoSetAt ?: return null
+        photos[contact.id]?.takeIf { it.first == setAt }?.let { return it.second }
+        return BitmapFactory.decodeFile(photoFile(contact.id).path)?.also { photos[contact.id] = setAt to it }
+    }
+
+    private fun photoFile(id: String) = File(File(context.filesDir, "photos"), "$id.jpg")
 
     fun setShare(id: String, share: Boolean) {
         val current = _state.value
@@ -295,7 +339,7 @@ class AppModel private constructor(private val context: Context) {
             val nowSeconds = now / 1000
             var decoded = 0
             var unchanged = 0
-            val contacts = current.contacts.map { contact ->
+            val fetched = current.contacts.map { contact ->
                 val publicKey = contact.publicKey() ?: return@map contact
                 val own = events.filter { it.author().toHex() == contact.id }
                 var updated = contact
@@ -324,15 +368,33 @@ class AppModel private constructor(private val context: Context) {
                         }.copy(lastCreatedAt = newest.createdAt().asSecs().toLong(), lastEventId = newest.id().toHex())
                     }
                 updated
+            }.associateBy { it.id }
+            // Contacts added, removed, renamed or toggled during the fetch stay as they are now;
+            // only the fields read from the relays come from the fetch.
+            update { state ->
+                state.copy(contacts = state.contacts.map { live ->
+                    fetched[live.id]?.let {
+                        live.copy(
+                            relays = it.relays,
+                            relayListCheckedAt = it.relayListCheckedAt,
+                            sharing = it.sharing,
+                            lastPayload = it.lastPayload,
+                            lastSeenAt = it.lastSeenAt,
+                            lastCreatedAt = it.lastCreatedAt,
+                            lastEventId = it.lastEventId,
+                        )
+                    } ?: live
+                })
             }
-            update { it.copy(contacts = contacts) }
             log("Refreshed from ${targets.size} relays: $decoded new, $unchanged unchanged since last time, ${current.contacts.size - decoded - unchanged} without an event")
         }
     }
 
     // Helpers
 
-    private fun update(transform: (PersistedState) -> PersistedState) {
+    // Refreshes, publishes and the UI update from different threads; one at a time keeps the
+    // file in step with the newest state and the temporary file to one writer.
+    private fun update(transform: (PersistedState) -> PersistedState) = synchronized(store) {
         _state.update(transform)
         store.save(_state.value)
     }
@@ -349,5 +411,7 @@ class AppModel private constructor(private val context: Context) {
         fun get(context: Context): AppModel = instance ?: synchronized(this) {
             instance ?: AppModel(context.applicationContext).also { instance = it }
         }
+
+        private const val PHOTO_SIZE = 256
     }
 }

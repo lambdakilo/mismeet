@@ -22,7 +22,9 @@ the Mac, as described under Testing without a second phone.
 The protocol is specified and both apps build with the protocol core and its conformance
 tests, a device key, local contact and relay storage, relay publishing and fetching, location
 monitoring and a first set of screens. Neither app has been exercised end to end on a phone
-yet. Invites are scanned as QR codes or pasted as text.
+yet. Invites are scanned as QR codes or pasted as text. A contact can have a photo, kept on the
+phone, and the map shows a moving contact's likely position along the roads since the last
+fix, from OpenStreetMap data (spec section 8.6).
 
 ## Files
 
@@ -173,6 +175,14 @@ creates the publisher's key and QR code, which it also writes as
 
 ```bash
 android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.1699 24.9384"
+```
+
+`MISMEET_FAKE_SPEED` in metres per second, `MISMEET_FAKE_HEADING` in degrees and
+`MISMEET_FAKE_AGE` in seconds before now make a contact on the move, which the watching app
+then estimates along the roads, here a car going north-west on Mannerheimintie:
+
+```bash
+MISMEET_FAKE_SPEED=12 MISMEET_FAKE_HEADING=316 MISMEET_FAKE_AGE=120 android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.17106 24.93688"
 ```
 
 Debug builds also take contacts at launch, so the simulator and the emulator need no typing;

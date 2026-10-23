@@ -31,11 +31,19 @@ you publish, your IP address, roughly how many contacts you share with (rounded 
 32 or 64) and, when you fetch, which public keys you ask about. Section 9 of the
 [protocol specification](spec/SPEC.md) describes this in detail.
 
-## Maps and camera
+## Maps, roads and pictures
 
 On iOS the map comes from Apple Maps, under Apple's privacy policy. On Android it comes from
-OpenStreetMap's tile servers, which see your IP address and the map area you view. The camera
-is used only to scan invite QR codes; no image is stored or sent.
+OpenStreetMap's tile servers, which see your IP address and the map area you view.
+
+When a contact is moving, the app guesses where the road has taken them since their last
+position. For that it downloads the OpenStreetMap roads around them from the Overpass API at
+overpass-api.de, in fixed squares of about a kilometre that are never centred on anyone, and
+keeps them on the phone for 30 days. That server sees your IP address and those squares, much
+as map tiles of the same area would show, but no position.
+
+The camera is used only to scan invite QR codes; no image is stored or sent. A photo you choose
+for a contact is stored on your phone only and is never sent.
 
 ## Stopping and removing
 

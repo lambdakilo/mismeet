@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 struct ContactsView: View {
@@ -35,10 +36,20 @@ struct ContactsView: View {
 
 struct ContactRow: View {
     @Environment(AppModel.self) private var model
+    @State private var pickedPhoto: PhotosPickerItem?
     let contact: Contact
 
     var body: some View {
         HStack {
+            PhotosPicker(selection: $pickedPhoto, matching: .images) {
+                ContactAvatar(contact: contact)
+            }
+            .buttonStyle(.borderless)
+            .contextMenu {
+                if contact.photoSetAt != nil {
+                    Button("Remove photo", systemImage: "trash") { model.removePhoto(contact.id) }
+                }
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(contact.name).font(.headline)
                 Text(status).font(.subheadline).foregroundStyle(.secondary)
@@ -51,6 +62,15 @@ struct ContactRow: View {
             ))
             .labelsHidden()
         }
+        .onChange(of: pickedPhoto) { _, item in
+            guard let item else { return }
+            Task {
+                if let data = try? await item.loadTransferable(type: Data.self) {
+                    model.setPhoto(contact.id, data: data)
+                }
+                pickedPhoto = nil
+            }
+        }
     }
 
     private var status: String {
@@ -58,12 +78,24 @@ struct ContactRow: View {
             let fixed = Date(timeIntervalSince1970: TimeInterval(payload.fixTime))
             let age = RelativeDateTimeFormatter().localizedString(for: fixed, relativeTo: Date())
             let stale = contact.sharing == .notSharing ? ", no longer sharing" : ""
-            return "Seen \(age), within \(payload.accuracy) m\(stale)"
+            let moving = ContactRow.movement(of: payload).map { ", \($0)" } ?? ""
+            return "Seen \(age), within \(payload.accuracy) m\(moving)\(stale)"
         }
         switch contact.sharing {
         case .notSharing: return "Not sharing with you"
         case .sharing, .unknown: return "No location yet"
         }
+    }
+
+    /// How a contact was moving at the fix, such as "by bike at 18 km/h", or nil when it was not.
+    static func movement(of payload: LocationPayload) -> String? {
+        guard let speed = payload.speed, speed >= ProtocolConstants.estimateMinSpeed else { return nil }
+        let mode = switch TravelMode(speed: speed) {
+        case .foot: "on foot"
+        case .bike: "by bike"
+        case .car: "by car"
+        }
+        return "\(mode) at \(Int((speed * 3.6).rounded())) km/h"
     }
 }
 

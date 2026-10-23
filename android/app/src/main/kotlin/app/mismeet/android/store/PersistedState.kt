@@ -23,6 +23,7 @@ data class Contact(
     val lastEventId: String? = null,
     val lastSeenAt: Long? = null,
     val relayListCheckedAt: Long? = null,
+    val photoSetAt: Long? = null,
 ) {
     enum class SharingStatus { UNKNOWN, SHARING, NOT_SHARING }
 

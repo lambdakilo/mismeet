@@ -23,4 +23,13 @@ enum ProtocolConstants {
     static let rateLimitBackoffSeconds: TimeInterval = 300
     static let coordinateDecimals = 6
     static let revocationFillerLength = 100
+    static let estimateMinSpeed = 1.0
+    static let bikeSpeedFrom = 2.5
+    static let carSpeedFrom = 8.5
+    static let estimateSpanSeconds: Int64 = 300
+    static let estimateMaxFixAgeSeconds: Int64 = 900
+    static let roadSnapMetres = 50.0
+    static let roadSnapBearingDegrees = 60.0
+    static let roadCellsPerEstimate = 12
+    static let roadCellCacheSeconds: TimeInterval = 2_592_000
 }

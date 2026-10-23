@@ -24,4 +24,13 @@ object ProtocolConstants {
     const val RATE_LIMIT_BACKOFF_SECONDS = 300L
     const val COORDINATE_DECIMALS = 6
     const val REVOCATION_FILLER_LENGTH = 100
+    const val ESTIMATE_MIN_SPEED = 1.0
+    const val BIKE_SPEED_FROM = 2.5
+    const val CAR_SPEED_FROM = 8.5
+    const val ESTIMATE_SPAN_SECONDS = 300L
+    const val ESTIMATE_MAX_FIX_AGE_SECONDS = 900L
+    const val ROAD_SNAP_METRES = 50.0
+    const val ROAD_SNAP_BEARING_DEGREES = 60.0
+    const val ROAD_CELLS_PER_ESTIMATE = 12
+    const val ROAD_CELL_CACHE_SECONDS = 2_592_000L
 }

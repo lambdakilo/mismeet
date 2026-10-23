@@ -20,6 +20,8 @@ import org.nostrdevkit.sdk.SendEventTarget
  * build/, so the phone adds the publisher once and later runs update the same contact.
  * MISMEET_FAKE_NAME in the environment selects another key, for a second fake contact, and a
  * reader of - publishes nothing but still prints the publisher's invite and QR code.
+ * MISMEET_FAKE_SPEED (m/s), MISMEET_FAKE_HEADING (degrees) and MISMEET_FAKE_AGE (seconds the
+ * fix is backdated) make a moving contact, which the watching app estimates along the roads.
  * Run through the fakePublish Gradle task.
  */
 fun main(args: Array<String>) = runBlocking {
@@ -45,7 +47,15 @@ fun main(args: Array<String>) = runBlocking {
     val createdAtFile = File("build/$name.created-at")
     val previous = createdAtFile.takeIf { it.exists() }?.readText()?.trim()?.toLongOrNull()
     val now = System.currentTimeMillis() / 1000
-    val payload = LocationPayload(fixTime = now, latitude = latitude, longitude = longitude, accuracy = 15, battery = 0.8)
+    val payload = LocationPayload(
+        fixTime = now - (System.getenv("MISMEET_FAKE_AGE")?.toLongOrNull() ?: 0),
+        latitude = latitude,
+        longitude = longitude,
+        accuracy = 15,
+        speed = System.getenv("MISMEET_FAKE_SPEED")?.toDoubleOrNull(),
+        course = System.getenv("MISMEET_FAKE_HEADING")?.toIntOrNull(),
+        battery = 0.8,
+    )
     val location = LocationEventBuilder.build(payload, readers, keys, now, previous)
     val relayList = RelayList.event(relays, keys, now)
     val events = if (readers.isEmpty()) emptyList() else listOf(relayList, location)

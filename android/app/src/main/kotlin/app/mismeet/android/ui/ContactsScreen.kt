@@ -4,13 +4,18 @@ import android.content.ActivityNotFoundException
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.text.format.DateUtils
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -34,14 +39,29 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.unit.dp
 import app.mismeet.android.AppModel
 import app.mismeet.android.store.Contact
+import app.mismeet.protocol.LocationPayload
+import app.mismeet.protocol.ProtocolConstants
+import app.mismeet.protocol.TravelMode
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlin.math.roundToInt
 
 @Composable
 fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     var showAdd by remember { mutableStateOf(false) }
+    var photoFor by remember { mutableStateOf<Contact?>(null) }
+    var choosingFor by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        val id = choosingFor
+        choosingFor = null
+        if (uri != null && id != null) model.setPhoto(id, uri)
+    }
+    val choosePhoto = { id: String ->
+        choosingFor = id
+        picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
 
     Column(modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -58,12 +78,34 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
             items(state.contacts, key = { it.id }) { contact ->
                 ContactRow(
                     contact = contact,
+                    photo = model.photo(contact),
+                    onPhoto = { if (contact.photoSetAt == null) choosePhoto(contact.id) else photoFor = contact },
                     onShare = if (state.sharingEnabled) ({ model.setShare(contact.id, it) }) else null,
                     onRemove = { model.removeContact(contact.id) },
                     onOpenMap = { openMap(context, contact) },
                 )
             }
         }
+    }
+
+    photoFor?.let { contact ->
+        AlertDialog(
+            onDismissRequest = { photoFor = null },
+            title = { Text("Photo of ${contact.name}") },
+            text = { Text("The photo stays on this phone and shows on the map in place of the initial.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    photoFor = null
+                    choosePhoto(contact.id)
+                }) { Text("Choose another") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    photoFor = null
+                    model.removePhoto(contact.id)
+                }) { Text("Remove photo") }
+            },
+        )
     }
 
     if (showAdd) {
@@ -75,11 +117,19 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ContactRow(contact: Contact, onShare: ((Boolean) -> Unit)?, onRemove: () -> Unit, onOpenMap: () -> Unit) {
+private fun ContactRow(
+    contact: Contact,
+    photo: Bitmap?,
+    onPhoto: () -> Unit,
+    onShare: ((Boolean) -> Unit)?,
+    onRemove: () -> Unit,
+    onOpenMap: () -> Unit,
+) {
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Column {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Avatar(contact, photo, 48.dp, Modifier.size(48.dp).clickable(onClick = onPhoto))
+                Column(Modifier.weight(1f)) {
                     Text(contact.name, style = MaterialTheme.typography.titleMedium)
                     Text(status(contact), style = MaterialTheme.typography.bodySmall)
                     Text(contact.npubPrefix(), style = MaterialTheme.typography.labelSmall)
@@ -88,6 +138,7 @@ private fun ContactRow(contact: Contact, onShare: ((Boolean) -> Unit)?, onRemove
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (contact.lastPayload != null) TextButton(onClick = onOpenMap) { Text("Open in map") }
+                TextButton(onClick = onPhoto) { Text("Photo") }
                 TextButton(onClick = onRemove) { Text("Remove") }
             }
         }
@@ -99,12 +150,24 @@ private fun status(contact: Contact): String {
     if (payload != null) {
         val age = DateUtils.getRelativeTimeSpanString(payload.fixTime * 1000, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
         val stale = if (contact.sharing == Contact.SharingStatus.NOT_SHARING) ", no longer sharing" else ""
-        return "Seen $age, within ${payload.accuracy} m$stale"
+        val moving = movement(payload)?.let { ", $it" }.orEmpty()
+        return "Seen $age, within ${payload.accuracy} m$moving$stale"
     }
     return when (contact.sharing) {
         Contact.SharingStatus.NOT_SHARING -> "Not sharing with you"
         else -> "No location yet"
     }
+}
+
+/** How a contact was moving at the fix, such as "by bike at 18 km/h", or null when it was not. */
+fun movement(payload: LocationPayload): String? {
+    val speed = payload.speed?.takeIf { it >= ProtocolConstants.ESTIMATE_MIN_SPEED } ?: return null
+    val mode = when (TravelMode.of(speed)) {
+        TravelMode.FOOT -> "on foot"
+        TravelMode.BIKE -> "by bike"
+        TravelMode.CAR -> "by car"
+    }
+    return "$mode at ${(speed * 3.6).roundToInt()} km/h"
 }
 
 private fun openMap(context: Context, contact: Contact) {

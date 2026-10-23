@@ -354,6 +354,64 @@ Both roles use the device clock. Relays reject events whose `created_at` is far 
 the publisher logs the relay's `OK` message in that case. Expiration checks compare the tag
 against the device clock without tolerance.
 
+### 8.6 Estimated position
+
+Between fixes a reader shows where a moving contact probably is now, guessed along the roads
+from the last payload. The estimate is for display only: it is never published or cached as a
+payload, and it is drawn apart from the real position, which stays where the fix put it.
+
+A contact gets an estimate when its payload has `hdg` and an `spd` of at least 1 m/s, and its
+`ts` is at most 900 seconds old. The estimate covers `min(now - ts, 300)` seconds, so its
+length is `spd` times that span. The mode follows from `spd`: on foot below 2.5 m/s, by bike
+from 2.5 m/s, by car from 8.5 m/s.
+
+Road data are OpenStreetMap ways from the Overpass API, one grid cell at a time. A position's
+cell is `(floor(lat * 100), floor(lon * 50))`, so a cell spans 0.01 degrees of latitude and
+0.02 of longitude, and its bounding box is `(row / 100, col / 50, (row + 1) / 100, (col + 1) /
+50)` written with two decimals. The reader requests whole cells only, never an area centred
+on a contact, so the server learns the areas a map of them would show, not positions. The
+query for a cell is:
+
+```text
+[out:json][timeout:25];
+way["highway"~"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street|road|cycleway|path|track|footway|pedestrian)$"](south,west,north,east);
+out tags geom;
+```
+
+Cells are cached on the device for 30 days. Ways that share a coordinate, compared at 7
+decimals, are joined there.
+
+The ways a mode may use, by `highway` value:
+
+- car: `motorway`, `trunk`, `primary`, `secondary`, `tertiary`, their `_link` variants,
+  `unclassified`, `residential`, `living_street` and `road`. A way with `oneway` `yes`, `true`
+  or `1`, or with `junction` `roundabout` or `circular`, is used only in its drawn direction,
+  and one with `oneway` `-1` only against it.
+- bike: `cycleway`, `path`, `track`, `living_street`, `residential`, `unclassified`, `road`,
+  `tertiary`, `secondary`, `primary` and their `_link` variants, and `footway` or `pedestrian`
+  with `bicycle` `yes` or `designated`; never a way with `bicycle` `no`.
+- foot: `footway`, `pedestrian`, `path`, `track`, `cycleway`, `living_street`, `residential`,
+  `unclassified`, `road`, `tertiary`, `secondary`, `primary` and their `_link` variants;
+  never a way with `foot` `no`.
+
+Bike and foot use every way in both directions. Distances and bearings are taken on a plane
+around the fix: `x = (lon - lon_fix) * cos(lat_fix) * 111320` and `y = (lat - lat_fix) ×
+110574` metres, bearings in degrees clockwise from north. The reader then:
+
+1. Loads the cells of the fix and of the four points 50 m north, south, east and west of it.
+2. Snaps the fix to the nearest segment of a usable way, in a usable direction whose bearing
+   is within 60 degrees of `hdg`, at most 50 m away. Ties go to the smaller bearing
+   difference, then the lower way id. With no such segment there is no estimate.
+3. Travels from the snapped point along the segment. At each node it needs that node's cell,
+   loading it first, and takes the usable segment leaving the node that turns least from the
+   current bearing, never the one leading straight back. Ties go to the same way, then the
+   lower way id. With no segment left it stops at the node.
+4. Stops when it has travelled the estimate's length, or at a node whose cell it cannot load,
+   or after loading 12 cells for this estimate.
+
+The estimate is the point where it stopped and the path travelled to it. The reader shows the
+path as a dashed line and the point as a faded marker labelled as estimated.
+
 ## 9. Privacy and threat model
 
 What a relay operator, or anyone reading the relay, learns from the protocol:
@@ -379,6 +437,9 @@ Other properties:
   included them until it is replaced or expires (section 8.3).
 - A relay that sees both a publisher's event and a reader's query for that author links the
   two by IP address and time. Querying through Tor or a VPN is out of scope for version 1.
+- A reader that shows estimates (section 8.6) asks the Overpass API for the road cells around
+  contacts that move, which tells that server the reader's IP address and those cells, much
+  as map tiles of the same area would.
 - Device compromise, and keys extracted from an unlocked phone, are out of scope.
 
 ## 10. Constants and limits
@@ -405,6 +466,15 @@ Other properties:
 | Rate-limit backoff | 300 seconds |
 | Coordinate precision | 6 decimals |
 | Dummy filler length when no fix exists | 100 bytes |
+| Estimate minimum speed | 1 m/s |
+| Bike speed from | 2.5 m/s |
+| Car speed from | 8.5 m/s |
+| Estimate span | 300 seconds |
+| Estimate maximum fix age | 900 seconds |
+| Road snap distance | 50 m |
+| Road snap bearing tolerance | 60 degrees |
+| Road cells per estimate | 12 |
+| Road cell cache | 30 days |
 
 ## 11. Versioning
 
@@ -434,6 +504,8 @@ platform, and the protocol constants live in a single constants file per platfor
 9. Invites round-trip through `nostr:nprofile` with up to four relays, and `npub` input is
    accepted.
 10. Nothing is ever published except kinds `31122` and `10002`.
+11. An estimate follows section 8.6: the mode from `spd`, the ways each mode may use, the
+    snap, the least turn at each node, and the speed, span and age limits.
 
 ## 13. Deviations from NIPs and open questions for review
 

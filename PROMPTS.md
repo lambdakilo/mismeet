@@ -5,9 +5,23 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Prepare the Android app for Google Play
+## Add contact photos and road estimates, fix two Android races
 
 2026-10-23, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**3.**
+> can you make it so that people can set images to their contacts
+> instead of the other cursor thingy? can you also make it so that the
+> phone takes speed and maybe guesses what route im going to next like
+> it does on find my but using osm or apple maps? if the speed seems
+> like bike then use bike routes in osm etc and car if car road. fix
+> android contact refresh race
+> > OSM roads, on the phone (Recommended)
+> > Up to 5 minutes (Recommended)
+
+## Prepare the Android app for Google Play
+
+2026-10-23, commit [829010d](https://github.com/lambdakilo/mismeet/commit/829010dbe0a6eebb07b83b9bb12a41a5a0d956c3), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > lets publish to play store too
@@ -304,6 +318,7 @@ so a change by hand is lost at the next commit.
 - llms: large language models
 - npub: Nostr public key, bech32 encoded
 - nvm: never mind
+- osm: OpenStreetMap
 - qr: quick response code
 - repo: repository
 - sku: stock keeping unit

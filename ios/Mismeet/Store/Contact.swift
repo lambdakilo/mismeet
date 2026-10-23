@@ -18,6 +18,7 @@ struct Contact: Codable, Identifiable, Equatable {
     var lastEventId: String?
     var lastSeenAt: Date?
     var relayListCheckedAt: Date?
+    var photoSetAt: Date?
 
     var publicKey: PublicKey? {
         try? PublicKey.parse(publicKey: id)
