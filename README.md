@@ -31,15 +31,16 @@ yet. Invites are scanned as QR codes or pasted as text.
 - [`CLAUDE.md`](CLAUDE.md): the rules and the commands Claude Code follows in this repository.
 - `ios/`: the Swift and SwiftUI app, generated from `ios/project.yml` with XcodeGen.
 - `android/`: the Kotlin app and the `protocol` module it builds on.
-- `design/`: the icon sketch, the script that turns it into both apps' icons and the store
-  icon, and the screenshots above.
+- `design/`: the icon sketch, the script that turns it into both apps' icons, the store icon
+  and Google Play's feature graphic, the screenshots above, and the store listings with their
+  screenshots under `app-store/` and `play-store/`.
 - [`scripts/release.sh`](scripts/release.sh): tags store builds and checks that a release build
   comes from its tag, see Distribution.
 - [`scripts/check-dco.sh`](scripts/check-dco.sh) and
   [`.github/workflows/dco.yml`](.github/workflows/dco.yml): the sign-off check CI runs on pull
   requests and on pushes to `main`, see CONTRIBUTING.md.
 - [`zapstore.yaml`](zapstore.yaml) and [`CHANGELOG.md`](CHANGELOG.md): the Zapstore listing and
-  the release notes it reads.
+  the release notes it reads, which Google Play's release notes repeat.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): the terms contributions come under and the sign-off
   every commit needs.
 - [`PRIVACY.md`](PRIVACY.md): the privacy policy the store listings link to.
@@ -297,8 +298,9 @@ to fetch.
 
 ## Distribution
 
-Android is published on [Zapstore](https://zapstore.dev), the Nostr app store, and not on
-F-Droid. iOS goes to the App Store. Anyone who would rather avoid the App Store builds and
+Android goes to Google Play, and [`zapstore.yaml`](zapstore.yaml) also describes it for
+[Zapstore](https://zapstore.dev), the Nostr app store; it is not on F-Droid. iOS goes to the
+App Store. Anyone who would rather avoid the App Store builds and
 installs the iOS app from source, as under Development above; a free Apple ID is enough, and
 such a build runs for seven days before it needs reinstalling.
 
@@ -312,11 +314,16 @@ any published binary is exactly the tagged commit. The version and build number 
 creates and pushes the tag, and the release builds refuse to run unless the tree is clean and
 `HEAD` is that tag. Each release also gets a section in [`CHANGELOG.md`](CHANGELOG.md).
 
-### Android on Zapstore
+### Android release key
 
-Once, create the release key outside the repository and keep a backup: Zapstore links the
-key's certificate to the publisher's Nostr identity, and updates must carry the same
-signature, so a lost key means a new listing.
+Android store builds are signed with a release key kept outside the repository. On Google Play
+it is the upload key: Play App Signing re-signs every bundle with an app signing key Google
+keeps, and Play Console can reset a lost upload key. Zapstore instead links the key's
+certificate to the publisher's Nostr identity and needs the same signature on every update, so
+a lost key there means a new listing. Because Play re-signs, an install from Play and an
+install from Zapstore cannot update each other.
+
+Once, create the key and keep a backup:
 
 ```bash
 keytool -genkeypair -keystore ~/keys/mismeet-release.jks -storetype PKCS12 -alias mismeet -keyalg RSA -keysize 4096 -validity 10000
@@ -334,7 +341,66 @@ keyPassword=...
 PROPS
 ```
 
-Install `zsp`, Zapstore's publishing tool, with Go, which puts it in `~/go/bin`, or take a
+`-PuntaggedRelease` on `assembleRelease` or `bundleRelease` skips the tag check to try out the
+signing setup; never publish what it builds.
+
+### Android on Google Play
+
+Once:
+
+1. Create a personal developer account at <https://play.google.com/console/signup> with the
+   Google account that will own the app. It costs 25 USD once and asks for an identity
+   document. The Play Console Home page then asks to verify a real Android phone with the Play
+   Console app: any phone that is not rooted and runs Android 10 or newer, not an emulator.
+2. Create the app in Play Console: Mismeet, an app, free. Fill in the store listing and App
+   content from [`design/play-store/listing.md`](design/play-store/listing.md), with an email
+   address that Play shows publicly. Upload the background location video to YouTube as
+   unlisted or to Google Drive, and give its link in the location and foreground service
+   declarations.
+3. Run a closed test. Under Test and release > Testing > Closed testing, create a track, add
+   at least 12 testers by email and send them the track's opt-in link. Play opens production
+   only once 12 testers have stayed opted in for 14 days in a row; then click Apply for
+   production on the Dashboard, which Google reviews, usually within seven days.
+
+For each release:
+
+1. Raise `versionCode` and `versionName` in `android/app/build.gradle.kts`, add the version's
+   section to `CHANGELOG.md`, commit and push to `main`.
+2. Tag the commit and push the tag:
+
+   ```bash
+   scripts/release.sh tag android
+   ```
+
+3. Build the signed bundle from the tag. It lands in
+   `android/app/build/outputs/bundle/release/app-release.aab`:
+
+   ```bash
+   android/gradlew -p android bundleRelease
+   ```
+
+4. In Play Console, open the track under Test and release, click Create new release and upload
+   the bundle. On the first release Play asks how to sign the app: keep the key Google
+   generates. Add the release notes from `design/play-store/listing.md` under "What's new in
+   this release?", click Next, then roll the release out from Preview and confirm.
+
+The Play screenshots come from the emulator with the contacts Aino and Eero published by the
+fake publisher, and with its display set to 1080 x 1920, since Play refuses screenshots whose
+long side is more than twice the short one:
+
+```bash
+adb shell wm size 1080x1920
+```
+
+Set it back afterwards:
+
+```bash
+adb shell wm size reset
+```
+
+### Android on Zapstore
+
+It uses the release key above. Install `zsp`, Zapstore's publishing tool, with Go, which puts it in `~/go/bin`, or take a
 binary from its [releases](https://github.com/zapstore/zsp/releases):
 
 ```bash
@@ -371,9 +437,6 @@ For each release:
    ```bash
    SIGN_WITH=browser ~/go/bin/zsp publish --commit "$(git rev-parse HEAD)" zapstore.yaml
    ```
-
-`android/gradlew -p android assembleRelease -PuntaggedRelease` skips the tag check to try out
-the signing setup; never publish what it builds.
 
 ### iOS on TestFlight and the App Store
 

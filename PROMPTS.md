@@ -5,9 +5,18 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Prepare the Android app for Google Play
+
+2026-10-23, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**1.**
+> lets publish to play store too
+> > Personal (Recommended)
+> > lets skip the zapstore for now
+
 ## Let the fake publisher create its key and QR code without publishing
 
-2026-10-22, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-22, commit [96628d0](https://github.com/lambdakilo/mismeet/commit/96628d09df2c07d7125e94b302d9aabc458f7302), model claude-opus-5-5, effort xhigh.
 
 **28.**
 > [a request about the global Claude Code rules left out] also ive

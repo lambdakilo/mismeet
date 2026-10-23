@@ -34,10 +34,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val model = AppModel.get(this)
-        // Test hook for debuggable builds: `adb shell am start ... --es invites "uri;uri"` adds contacts.
+        // Test hook for debuggable builds: `adb shell am start ... --es invites "uri;Name|uri"` adds contacts.
         if (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
-            intent.getStringExtra("invites")?.split(";")?.forEachIndexed { index, text ->
-                runCatching { model.addContact(text, "Test ${index + 1}") }
+            intent.getStringExtra("invites")?.split(";")?.forEachIndexed { index, entry ->
+                runCatching { model.addContact(entry.substringAfter('|'), entry.substringBefore('|', "Test ${index + 1}")) }
             }
         }
         setContent {

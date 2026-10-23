@@ -1,7 +1,8 @@
 # Changelog
 
 Store releases, newest first, in the [Keep a Changelog](https://keepachangelog.com/) format.
-Zapstore reads the section whose version matches the published APK as its release notes.
+Zapstore reads the section whose version matches the published APK as its release notes, and
+Google Play's release notes repeat it.
 
 ## [0.1.0] - unreleased
 

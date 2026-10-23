@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -66,6 +67,23 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     val inviteUri = remember(state.relays) { model.inviteUri() }
     val qr = remember(inviteUri) { qrBitmap(inviteUri) }
     var newRelay by remember { mutableStateOf("") }
+    // Google Play requires this disclosure to come right before each location permission request.
+    var pendingLocationRequest by remember { mutableStateOf<Array<String>?>(null) }
+
+    pendingLocationRequest?.let { request ->
+        AlertDialog(
+            onDismissRequest = { pendingLocationRequest = null },
+            title = { Text("Sharing your location") },
+            text = { Text(LOCATION_DISCLOSURE) },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingLocationRequest = null
+                    permissions.launch(request)
+                }) { Text("Continue") }
+            },
+            dismissButton = { TextButton(onClick = { pendingLocationRequest = null }) { Text("Not now") } },
+        )
+    }
 
     Column(modifier.padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Invite", style = MaterialTheme.typography.titleMedium)
@@ -87,11 +105,11 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
             )
         } else {
             if (!foreground) {
-                Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) }) {
+                Button(onClick = { pendingLocationRequest = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION) }) {
                     Text("Allow location")
                 }
             } else if (!background) {
-                Button(onClick = { permissions.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) }) {
+                Button(onClick = { pendingLocationRequest = arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION) }) {
                     Text("Allow location all the time")
                 }
             }
@@ -127,6 +145,11 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
         }
     }
 }
+
+private const val LOCATION_DISCLOSURE =
+    "Mismeet collects location data to share your position with the contacts you choose, even when the app is closed " +
+        "or not in use. Each position is encrypted for those contacts alone, sent to the relays in your relay list and " +
+        "expires after 24 hours. It is never used for ads."
 
 private fun qrBitmap(text: String, size: Int = 480): Bitmap {
     val matrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size, mapOf(EncodeHintType.MARGIN to 1))

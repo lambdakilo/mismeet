@@ -51,8 +51,9 @@ follows it, and a protocol change edits the spec first, in the same change.
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
 - The app icon is generated from `design/icon-sketch.png` by `design/make-icon.py` into the
-  iOS asset catalog, the Android adaptive icon foreground and `design/icon-512.png`, the
-  Zapstore icon; change the sketch or the script and rerun it, never the PNGs by hand. It needs Pillow in a virtual environment:
+  iOS asset catalog, the Android adaptive icon foreground, `design/icon-512.png`, the store
+  icon for Google Play and Zapstore, and `design/play-store/feature-graphic.png`; change the
+  sketch or the script and rerun it, never the PNGs by hand. It needs Pillow in a virtual environment:
 
   ```bash
   python3 -m venv design/.venv && design/.venv/bin/pip install pillow && design/.venv/bin/python design/make-icon.py
@@ -60,20 +61,28 @@ follows it, and a protocol change edits the spec first, in the same change.
 
 ## Releases
 
-- Android goes to Zapstore (not F-Droid) through `zapstore.yaml`; iOS to TestFlight and the
-  App Store through `scripts/release.sh upload-ios`, which archives from the tag and uploads
-  with the build numbers kept. Publishing is the user's call: never run `zsp publish`, which
-  signs with the user's own Nostr key, and run `scripts/release.sh tag ios` and `upload-ios`
-  only when the user says go for that build. Xcode signs the upload with a cloud-managed
+- Android goes to Google Play as an app bundle from `bundleRelease`, signed with the upload
+  key and re-signed by Play App Signing with a key Google generated; `zapstore.yaml` also
+  describes it for Zapstore (not F-Droid). iOS goes to TestFlight and the App Store through
+  `scripts/release.sh upload-ios`, which archives from the tag and uploads with the build
+  numbers kept. Publishing is the user's call: never run `zsp publish`, which signs with the
+  user's own Nostr key, leave uploading a bundle and rolling out a Play release to the user,
+  and run `scripts/release.sh tag` and `upload-ios` only when the user says go for that
+  build. Xcode signs the upload with a cloud-managed
   distribution certificate, so none is created on this Mac. The App Store screenshots in `design/app-store/` are full size and RGB, at
-  sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622); redo them after a visible
-  change.
+  sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622), and the Play screenshots in
+  `design/play-store/phone/` are 1080 x 1920 RGB from the emulator under `wm size 1080x1920`,
+  since Play refuses a long side more than twice the short one; redo both after a visible
+  change. The Play listing and declarations live in `design/play-store/listing.md`, and the
+  disclosure dialog on the Me screen has to come right before each location permission
+  request, as Play's policy demands.
 - Every store build comes from an annotated tag `<platform>-<version>-<build>` made by
-  `scripts/release.sh tag`. `assembleRelease` and `scripts/release.sh archive-ios` refuse to
+  `scripts/release.sh tag`. `assembleRelease`, `bundleRelease` and `scripts/release.sh archive-ios` refuse to
   run unless the tree is clean and `HEAD` is that tag; `-PuntaggedRelease` skips the Android
   check only for testing the signing setup. Versions live in `android/app/build.gradle.kts`
   (`versionName`, `versionCode`) and `ios/project.yml` (`MARKETING_VERSION`,
-  `CURRENT_PROJECT_VERSION`); each release adds a `CHANGELOG.md` section, which Zapstore shows.
+  `CURRENT_PROJECT_VERSION`); each release adds a `CHANGELOG.md` section, which Zapstore shows and Play's release notes
+  repeat.
 - The release key never enters the repository: `android/keystore.properties` names it and is
   git-ignored, as are `*.jks`, `*.keystore` and `*.p12`. Test signing with a throwaway key in
   the scratchpad and delete the properties file afterwards.
@@ -247,7 +256,7 @@ publishes a location for an invite from a key kept under `android/protocol/build
 (`MISMEET_FAKE_NAME` selects another key, and `-` as the invite only creates the key) and writes
 the publisher's invite as `android/protocol/build/<name>-invite.png` for a phone to scan, and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
 simulator or the `invites` string extra on Android add contacts at launch, semicolon
-separated (`name|invite` names a contact on iOS), and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
+separated (`name|invite` names a contact), and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
 simulator. The README's screenshots under `design/screenshots/` come from the simulator and
 the emulator with the two fake contacts, scaled to 600 px high with `sips -Z 600`; redo them
 after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile...`), readable with

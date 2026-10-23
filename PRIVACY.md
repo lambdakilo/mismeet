@@ -19,6 +19,10 @@ Only when you share your location, which on Android is off until you turn it on:
   publish replaces the previous one. Relays cannot read the location or tell who it is for.
 - Your relay list goes to the same relays, so that contacts know where to look.
 
+Sharing works in the background: once it is on, the app collects location data to share your
+position with the contacts you choose, even when the app is closed or not in use. On Android a
+notification shows while it runs.
+
 When you look at your contacts, the app asks those relays for their latest events.
 
 The relays are run by third parties under their own terms. The defaults are relay.damus.io,

@@ -1,5 +1,5 @@
-"""Turns the icon sketch into the iOS app icon, the Android adaptive icon foreground and the
-512 px store icon that zapstore.yaml lists.
+"""Turns the icon sketch into the iOS app icon, the Android adaptive icon foreground, the
+512 px store icon that Google Play and zapstore.yaml use, and Google Play's feature graphic.
 
 The sketch is magenta strokes on black. The strokes are thickened so they survive at 60 px,
 the pin is cropped square, and the stroke colour is sampled from the drawing.
@@ -10,13 +10,14 @@ the pin is cropped square, and the stroke colour is sampled from the drawing.
 
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 SKETCH = ROOT / "design" / "icon-sketch.png"
 IOS_ICON = ROOT / "ios" / "Mismeet" / "Assets.xcassets" / "AppIcon.appiconset" / "icon-1024.png"
 ANDROID_FOREGROUND = ROOT / "android" / "app" / "src" / "main" / "res" / "mipmap-xxxhdpi" / "ic_launcher_foreground.png"
 STORE_ICON = ROOT / "design" / "icon-512.png"
+FEATURE_GRAPHIC = ROOT / "design" / "play-store" / "feature-graphic.png"
 
 
 def main() -> None:
@@ -45,7 +46,15 @@ def main() -> None:
     render(1024, 0.78, True).save(IOS_ICON)
     render(432, 0.58, False).save(ANDROID_FOREGROUND)
     render(512, 0.78, True).save(STORE_ICON)
-    print(f"stroke colour {color}, wrote {IOS_ICON.name}, {ANDROID_FOREGROUND.name} and {STORE_ICON.name}")
+
+    # Helvetica Neue ships with macOS; index 1 is its bold face.
+    feature = Image.new("RGB", (1024, 500), (0, 0, 0))
+    feature.paste(render(420, 0.78, True), (60, 40))
+    draw = ImageDraw.Draw(feature)
+    draw.text((500, 250), "Mismeet", font=ImageFont.truetype("HelveticaNeue.ttc", 112, index=1), fill=color, anchor="ls")
+    draw.text((504, 318), "Private location sharing", font=ImageFont.truetype("HelveticaNeue.ttc", 44), fill=(255, 255, 255), anchor="ls")
+    feature.save(FEATURE_GRAPHIC)
+    print(f"stroke colour {color}, wrote {IOS_ICON.name}, {ANDROID_FOREGROUND.name}, {STORE_ICON.name} and {FEATURE_GRAPHIC.name}")
 
 
 if __name__ == "__main__":
