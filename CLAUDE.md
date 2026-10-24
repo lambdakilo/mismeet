@@ -193,6 +193,10 @@ xcrun simctl location booted run "Freeway Drive"
 - Background location needs `UIBackgroundModes` with `location` and the two location usage
   strings in `Info.plist`, defined in `project.yml`. It is not an entitlement, so it works with
   the free team.
+- `ITSAppUsesNonExemptEncryption` is `false` in `project.yml`: it records the user's export
+  compliance answers (standard encryption algorithms, not distributed in France), with which
+  App Store Connect asks no compliance question per build. A change to the app's encryption,
+  or distribution in France, goes back to the user before the next upload.
 - Always pass `-derivedDataPath ios/build`, so the app path in the install command stays valid.
 - The app is iPhone only: `TARGETED_DEVICE_FAMILY` is `"1"` on the app target, because
   XcodeGen's application preset sets `"1,2"` there and overrides the project setting. A build

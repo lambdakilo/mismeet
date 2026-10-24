@@ -5,9 +5,25 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Let a plain release pick its own version
+## Declare the iOS export answer in the Info.plist
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**16.**
+> signed in to app store connect in the pane, answer build 3's export
+> compliance like before
+
+**17.**
+> signed in to app store connect in the pane on the mac, answer build
+> 3's export compliance like before
+
+**18.**
+> add the encryption declaration to the ios info.plist so future
+> testflight builds skip the compliance question
+
+## Let a plain release pick its own version
+
+2026-10-24, commit [6761df9](https://github.com/lambdakilo/mismeet/commit/6761df920d5464b448fc1f616f2627019beb7f5b), model claude-opus-5-5, effort xhigh.
 
 **15.**
 > actually nevermind i just say in the future release or new release
