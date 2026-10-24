@@ -5,9 +5,45 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Name listing.md as the source of the App Store text
+## Record the answers given in Play Console
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**4.**
+> erm does my nokia 3.1 have android 10
+
+**5.**
+> cant i emulate android phone and do the play console verify there
+
+**6.**
+> keystore password? also oops i deleted the background location mp4
+> already. play console checks done
+
+**7.**
+> signed in but [a rule about the browser pane left out]
+
+(create the app in Play Console with the listed values and the three
+declarations?)
+> Create it as listed (Recommended)
+
+(answer the ten App content declarations as proposed?)
+> Use these answers (Recommended)
+
+(how should the store graphics be declared for AI?)
+> Don't label assets (Recommended)
+
+(which email should Play show as the app's contact?)
+> [a SimpleLogin alias, typed]
+
+(switch Sign in details to Yes with review instructions?)
+> Yes, with instructions (Recommended)
+
+(agree to IARC's Terms of Use for the content rating?)
+> Yes, agree and continue (Recommended)
+
+## Name listing.md as the source of the App Store text
+
+2026-10-24, commit [e74446d](https://github.com/lambdakilo/mismeet/commit/e74446da12dd6e21458790193870edfe29878afb), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > [a request to review Claude Code's dream proposals left out]

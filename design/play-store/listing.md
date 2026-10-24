@@ -53,12 +53,21 @@ First release. Add the people you know by their invite QR code and see them on a
 
 ## App content
 
+As submitted in Play Console on 2026-10-24.
+
 - Privacy policy: the URL above.
-- Ads: no ads.
-- App access: all functionality is available without special access; there is no login.
-- Content rating: the app shares the user's location with other users; nothing else in the
-  questionnaire applies (no violence, sexual content, language, drugs, gambling, purchases or
-  user-generated content).
+- Ads: no ads. Advertising ID: not used.
+- Sign in details: restricted, since Play counts QR codes and actions on another device. One
+  set named "Two devices, no account", with no username or password and these instructions:
+
+  ```text
+  No account or login; each install makes its own key. Seeing a contact needs a second device with Mismeet. On device A open the Me tab to show the invite QR code. On device B open Contacts, tap Add, Scan QR code (or Paste after Copy invite on A), type a name, tap Add. On A turn on Share my location on the Me tab and allow location, then all the time. Within a minute, or after Publish now, B shows A on the Map and Contacts tabs. With one device, the Me tab shows the invite and the sharing switch.
+  ```
+
+- Content rating: category All Other App Types; the app shares the user's precise location
+  with other users, and nothing else in the questionnaire applies. IARC rated it PEGI 3, ESRB
+  Everyone and 3+ elsewhere, with the interactive element Shares Location.
+- Government app, financial features, health features: none.
 - Target audience: 18 and over. A location sharing app aimed at children would fall under the
   Families policy, and the app has no age checks.
 - Data safety: no data collected and none shared. The developer runs no server; the location
