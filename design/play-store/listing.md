@@ -90,9 +90,12 @@ Why the feature needs location in the background:
 Mismeet is a location sharing app: its core purpose is to let the family members and friends a user chooses see where the user is. Once the user turns sharing on, a foreground service with a visible notification publishes the position every 10 minutes, end-to-end encrypted for those contacts only. The service has to start without the app on screen, after the phone or the service restarts, which needs background location. The location is never used for ads or analytics.
 ```
 
-Video: a recording from the emulator under 30 seconds, uploaded to YouTube as unlisted or to
-Google Drive: the Me screen, the disclosure, the system prompt, "Allow all the time", then the
-app closed with the sharing notification showing.
+Video, 24 seconds from the emulator: the Me screen, the disclosure, the system prompt, "Allow
+all the time", then the app closed with the sharing notification showing.
+
+```text
+https://www.youtube.com/watch?v=3O42YLkma38
+```
 
 Foreground service type `location`, the same video:
 

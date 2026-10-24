@@ -5,9 +5,16 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Drop the instrumented test command; there are no such tests
+## Link the background location video in the Play listing
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**8.**
+> [pasted: the YouTube link of the background location video]
+
+## Drop the instrumented test command; there are no such tests
+
+2026-10-24, commit [3a60e77](https://github.com/lambdakilo/mismeet/commit/3a60e7792c88e9a20d51beddf5cfdb0a8d3fb3a8), model claude-opus-5-5, effort xhigh.
 
 **4.** Quoted under [1902d6a](https://github.com/lambdakilo/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6).
 
