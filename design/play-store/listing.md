@@ -78,16 +78,16 @@ As submitted in Play Console on 2026-10-24.
 
 ## Sensitive permissions
 
-Location in the background, one feature:
+Location permissions, as submitted on 2026-10-24. App purpose:
 
 ```text
-Sharing the user's location with the contacts they chose
+Mismeet lets people share their location with the family members and friends they choose and see theirs on a map, end-to-end encrypted over Nostr, with no account and no server of its own.
 ```
 
-Why the feature needs location in the background:
+The one feature that needs location in the background:
 
 ```text
-Mismeet is a location sharing app: its core purpose is to let the family members and friends a user chooses see where the user is. Once the user turns sharing on, a foreground service with a visible notification publishes the position every 10 minutes, end-to-end encrypted for those contacts only. The service has to start without the app on screen, after the phone or the service restarts, which needs background location. The location is never used for ads or analytics.
+Sharing the user's location with the contacts they chose. Once the user turns on Share my location, a foreground service with a visible notification publishes the position every 10 minutes, end-to-end encrypted for those contacts only, so they see a recent position while the phone is in a pocket. The service must start without the app on screen, after the phone or the service restarts, which needs background location. Location is never used for ads or analytics.
 ```
 
 Video, 24 seconds from the emulator: the Me screen, the disclosure, the system prompt, "Allow
@@ -97,14 +97,18 @@ all the time", then the app closed with the sharing notification showing.
 https://www.youtube.com/watch?v=3O42YLkma38
 ```
 
-Foreground service type `location`, the same video:
-
-```text
-User-initiated location sharing. The user turns it on with the Share my location switch and off with the same switch. While it runs, the service reads the position and publishes it every 10 minutes to the contacts the user chose. If it were deferred or interrupted, those contacts would see a stale position.
-```
+Foreground service permissions: the task "User-initiated location sharing", with the same video.
 
 Battery optimisation: the Me screen asks for the exemption with
 `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, because stock Android 12 otherwise stops the
 service. Play accepts that request from safety apps that keep users and their families safe;
 if review refuses it, the fallback is the settings list, `ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`,
 without the permission.
+
+## Closed testing
+
+The track "Closed testing - Alpha" covers every country and region Play lists but France, 176
+of them, and the rest of the world, as on the App Store. Testers join the Google Group mismeet-testers@googlegroups.com,
+which anyone can find and join, and only its owner sees members or posts; they then opt in
+through the track's link. Feedback goes to the GitHub issues. Release 1 (0.1.0) is the bundle
+built from the tag `android-0.1.0-1`.

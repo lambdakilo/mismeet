@@ -5,9 +5,34 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Link the background location video in the Play listing
+## Record the Play closed test and permission declarations
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**9.**
+> go for the android tag. also can i just get random gmail accounts
+> that say yes somewhere? how have people usually done this?
+
+(which countries should the closed test cover?)
+> All but France (Recommended)
+
+(how should testers join the closed test?)
+> Google Group (Recommended)
+
+**10.**
+> captcha solved and group created, bundle uploaded to the closed
+> testing release
+
+(submit the background location declaration as written, with the
+video?)
+> Submit as written (Recommended)
+
+(declare the foreground service as user-initiated location sharing?)
+> User-initiated sharing (Recommended)
+
+## Link the background location video in the Play listing
+
+2026-10-24, commit [cfd6a51](https://github.com/lambdakilo/mismeet/commit/cfd6a51ba88a526f615f5de206eb0f1b77a9f440), model claude-opus-5-5, effort xhigh.
 
 **8.**
 > [pasted: the YouTube link of the background location video]
