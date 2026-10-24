@@ -66,17 +66,25 @@ follows it, and a protocol change edits the spec first, in the same change.
   key and re-signed by Play App Signing with a key Google generated; `zapstore.yaml` also
   describes it for Zapstore (not F-Droid). iOS goes to TestFlight and the App Store through
   `scripts/release.sh upload-ios`, which archives from the tag and uploads with the build
-  numbers kept. Publishing is the user's call: never run `zsp publish`, which signs with the
-  user's own Nostr key, leave uploading a bundle and rolling out a Play release to the user,
-  and run `scripts/release.sh tag` and `upload-ios` only when the user says go for that
-  build. Xcode signs the upload with a cloud-managed
-  distribution certificate, so none is created on this Mac. The App Store screenshots in `design/app-store/` are full size and RGB, at
+  numbers kept; Xcode signs the upload with a cloud-managed distribution certificate, so none
+  is created on this Mac. The App Store screenshots in `design/app-store/` are full size and RGB, at
   sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622), and the Play screenshots in
   `design/play-store/phone/` are 1080 x 1920 RGB from the emulator under `wm size 1080x1920`,
   since Play refuses a long side more than twice the short one; redo both after a visible
   change. The Play listing and declarations live in `design/play-store/listing.md`, and the
   disclosure dialog on the Me screen has to come right before each location permission
   request, as Play's policy demands.
+- Every push to `main` that changes what an app is built from (`ios/` for iOS, `android/` for
+  Android) ships a test build of that app, by the user's standing go: raise
+  `CURRENT_PROJECT_VERSION` or `versionCode` in the pushed commit, then run
+  `scripts/release.sh tag <platform>` and `upload-ios` for TestFlight or `upload-android` for
+  Play's closed testing track, which goes through the Play Developer API with the service
+  account key that the git-ignored `android/.play-key` names. A push that changes neither app
+  ships nothing. A store release happens only when the user says new major, minor or patch
+  release: raise `MARKETING_VERSION` and `versionName` to match, add the `CHANGELOG.md`
+  section, ship the test builds, then submit the iOS build for App Store review and the
+  Android release to production in Play Console, with the user's declarations. Never run `zsp
+  publish`, which signs with the user's own Nostr key.
 - The App Store listing text, from the subtitle and categories to the notes for App Review,
   lives in `design/app-store/listing.md`: change it there and commit, then enter it in App
   Store Connect, never only in the browser.

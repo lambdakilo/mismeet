@@ -13,3 +13,4 @@ android/keystore.properties
 *.jks
 *.keystore
 *.p12
+android/.play-key

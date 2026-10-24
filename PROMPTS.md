@@ -5,9 +5,48 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Record the Play closed test and permission declarations
+## Ship a test build on every app-changing push
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**11.**
+> submitted the 15 changes for review in publishing overview
+
+**12.**
+> clicked submit 15 changes for review again and confirmed, check it
+> went through
+
+(click Submit 15 changes for review in the browser pane for you?)
+> Yes, click it (Recommended)
+
+**13.**
+> [pasted: a line of Claude's reply]
+>
+> by this do you mean npubs etc? also does each tester have to use 14
+> days or just 12 testers during 14 days? what happens if no testers
+> after 14 days? can you find me screenshots on how the link to app
+> workflow looks like on theri androids? also why no new version on my
+> testflight?
+
+**14.**
+> for pushes to main just push new version to testflight and if i ever
+> use an equivalent on android (maybe thats this one? the 14 days
+> people). i say new minor/major/patch release if i want to release to
+> app store or play store a new version so yes upload new build to
+> testflight and the google play right?
+
+(which pushes to main should get a new test build?)
+> Pushes that change an app (Recommended)
+
+(which Play track should the per-push Android builds go to?)
+> Closed testing (Recommended)
+
+(how should Android builds reach Play?)
+> Play API, set up once (Recommended)
+
+## Record the Play closed test and permission declarations
+
+2026-10-24, commit [2b2c046](https://github.com/lambdakilo/mismeet/commit/2b2c04676e2b66e88fb7410217dfd2e5adf5eb85), model claude-opus-5-5, effort xhigh.
 
 **9.**
 > go for the android tag. also can i just get random gmail accounts
@@ -406,9 +445,11 @@ text in CLAUDE.md?)
 - ci: continuous integration
 - CLA: Contributor License Agreement
 - dco: Developer Certificate of Origin
+- etc: et cetera
 - i.e.: that is
 - llms: large language models
 - npub: Nostr public key, bech32 encoded
+- npubs: Nostr public keys in their bech32 form
 - nvm: never mind
 - osm: OpenStreetMap
 - qr: quick response code

@@ -8,6 +8,8 @@
 #   scripts/release.sh archive-ios             check, then archive the iOS app
 #   scripts/release.sh upload-ios              check, archive and upload to App Store Connect, which
 #                                              offers the build in TestFlight and for App Store review
+#   scripts/release.sh upload-android          check, build the bundle and release it to the closed
+#                                              testing track through the Play Developer API
 set -euo pipefail
 
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
@@ -114,11 +116,50 @@ PLIST
   echo "Uploaded $(basename "$archive" .xcarchive). It shows in App Store Connect > TestFlight once processed."
 }
 
+b64url() {
+  openssl base64 -A | tr '+/' '-_' | tr -d '='
+}
+
+# An OAuth access token for the service account whose JSON key android/.play-key names.
+play_token() {
+  local key="$1" now header claims sig
+  now="$(date +%s)"
+  header="$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)"
+  claims="$(jq -cn --arg iss "$(jq -r .client_email "$key")" --argjson iat "$now" \
+    '{iss: $iss, scope: "https://www.googleapis.com/auth/androidpublisher",
+      aud: "https://oauth2.googleapis.com/token", iat: $iat, exp: ($iat + 3600)}' | b64url)"
+  sig="$(printf '%s.%s' "$header" "$claims" | openssl dgst -sha256 -sign <(jq -r .private_key "$key") | b64url)"
+  curl -fsS https://oauth2.googleapis.com/token \
+    -d grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer -d assertion="$header.$claims.$sig" \
+    | jq -r .access_token
+}
+
+upload_android() {
+  local tag key token api upload edit code
+  tag="$(check android)"
+  key="$(cat "$root/android/.play-key")"
+  "$root/android/gradlew" -q -p "$root/android" bundleRelease >&2
+  token="$(play_token "$key")"
+  api="https://androidpublisher.googleapis.com/androidpublisher/v3/applications/app.mismeet.android"
+  upload="https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/app.mismeet.android"
+  edit="$(curl -fsS -X POST -H "Authorization: Bearer $token" "$api/edits" | jq -r .id)"
+  code="$(curl -fsS -X POST -H "Authorization: Bearer $token" -H 'Content-Type: application/octet-stream' \
+    --data-binary @"$root/android/app/build/outputs/bundle/release/app-release.aab" \
+    "$upload/edits/$edit/bundles?uploadType=media" | jq -r .versionCode)"
+  # The track's own name is alpha, whatever Play Console calls it.
+  curl -fsS -X PUT -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
+    -d "$(jq -cn --arg name "$tag" --arg code "$code" '{releases: [{name: $name, versionCodes: [$code], status: "completed"}]}')" \
+    "$api/edits/$edit/tracks/alpha" >/dev/null
+  curl -fsS -X POST -H "Authorization: Bearer $token" "$api/edits/$edit:commit" >/dev/null
+  echo "Uploaded $tag to closed testing. Play sends it for review; Publishing overview shows the state."
+}
+
 case "${1:-}" in
   version) version "${2:-}" ;;
   tag) tag "${2:-}" ;;
   check) check "${2:-}" ;;
   archive-ios) archive_ios ;;
   upload-ios) upload_ios ;;
-  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+  upload-android) upload_android ;;
+  *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

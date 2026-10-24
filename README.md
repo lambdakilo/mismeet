@@ -324,6 +324,11 @@ any published binary is exactly the tagged commit. The version and build number 
 creates and pushes the tag, and the release builds refuse to run unless the tree is clean and
 `HEAD` is that tag. Each release also gets a section in [`CHANGELOG.md`](CHANGELOG.md).
 
+Every push to `main` that changes an app also ships a test build of it: the push raises the
+build number, the commit is tagged, and the build goes to TestFlight or to Play's closed
+testing track. Only a new version, major, minor or patch, goes to the App Store and to Play
+production.
+
 ### Android release key
 
 Android store builds are signed with a release key kept outside the repository. On Google Play
@@ -367,32 +372,40 @@ Once:
    address that Play shows publicly. Upload the background location video to YouTube as
    unlisted or to Google Drive, and give its link in the location and foreground service
    declarations.
-3. Run a closed test. Under Test and release > Testing > Closed testing, create a track, add
-   at least 12 testers by email and send them the track's opt-in link. Play opens production
-   only once 12 testers have stayed opted in for 14 days in a row; then click Apply for
-   production on the Dashboard, which Google reviews, usually within seven days.
+3. Run a closed test. Under Test and release > Testing > Closed testing, set the track's
+   countries and its testers, here the Google Group `mismeet-testers`, which testers join
+   before they opt in through the track's link. Upload the first bundle by hand under Create
+   new release; Play asks how to sign the app, and the key Google generates is kept. Play
+   opens production only once 12 testers have stayed opted in for 14 days in a row; then
+   click Apply for production on the Dashboard, which Google reviews, usually within seven
+   days.
+4. Give `scripts/release.sh` access to Play through the Play Developer API. In the Google
+   Cloud console, create a project, enable the Google Play Android Developer API, create a
+   service account and a JSON key for it, and keep the key outside the repository. In Play
+   Console, open Users and permissions, enter the service account's email address, add the app
+   under App permissions with Release apps to testing tracks, and click Invite user. Then
+   point the script at the key, with your key's path:
 
-For each release:
+   ```bash
+   echo ~/keys/mismeet-play.json > android/.play-key
+   ```
 
-1. Raise `versionCode` and `versionName` in `android/app/build.gradle.kts`, add the version's
-   section to `CHANGELOG.md`, commit and push to `main`.
+For each test build:
+
+1. Raise `versionCode` in `android/app/build.gradle.kts`, and for a new version also
+   `versionName` and its section in `CHANGELOG.md`; commit and push to `main`.
 2. Tag the commit and push the tag:
 
    ```bash
    scripts/release.sh tag android
    ```
 
-3. Build the signed bundle from the tag. It lands in
-   `android/app/build/outputs/bundle/release/app-release.aab`:
+3. Build the signed bundle from the tag and release it to the closed testing track, which
+   Google reviews before testers get it:
 
    ```bash
-   android/gradlew -p android bundleRelease
+   scripts/release.sh upload-android
    ```
-
-4. In Play Console, open the track under Test and release, click Create new release and upload
-   the bundle. On the first release Play asks how to sign the app: keep the key Google
-   generates. Add the release notes from `design/play-store/listing.md` under "What's new in
-   this release?", click Next, then roll the release out from Preview and confirm.
 
 The Play screenshots come from the emulator with the contacts Aino and Eero published by the
 fake publisher, and with its display set to 1080 x 1920, since Play refuses screenshots whose
