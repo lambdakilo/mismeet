@@ -5,9 +5,15 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Point CLAUDE.md at the README's fake publisher commands
+## Drop the instrumented test command; there are no such tests
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**4.** Quoted under [1902d6a](https://github.com/lambdakilo/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6).
+
+## Point CLAUDE.md at the README's fake publisher commands
+
+2026-10-24, commit [1902d6a](https://github.com/lambdakilo/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > [a request to review Claude Code's dream proposals left out]

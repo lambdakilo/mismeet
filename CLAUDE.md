@@ -224,12 +224,6 @@ verify command stays offline.
 MISMEET_RELAY_TESTS=1 android/gradlew -p android :protocol:test --tests 'app.mismeet.protocol.RelayIntegrationTest'
 ```
 
-Instrumented tests on the phone:
-
-```bash
-android/gradlew -p android connectedDebugAndroidTest
-```
-
 Emulator (`mismeet`, API 36 without Google APIs, created as the README describes). Start it
 headless, wait for it, and it is the device for the install and launch commands:
 
