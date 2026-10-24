@@ -80,10 +80,13 @@ follows it, and a protocol change edits the spec first, in the same change.
   `scripts/release.sh tag <platform>` and `upload-ios` for TestFlight or `upload-android` for
   Play's closed testing track, which goes through the Play Developer API with the service
   account key that the git-ignored `android/.play-key` names. A push that changes neither app
-  ships nothing. A store release happens only when the user says new major, minor or patch
-  release: raise `MARKETING_VERSION` and `versionName` to match, add the `CHANGELOG.md`
-  section, ship the test builds, then submit the iOS build for App Store review and the
-  Android release to production in Play Console, with the user's declarations. Never run `zsp
+  ships nothing. A store release happens only when the user says release or new release, and
+  the session picks the version from the changes since the last release: patch for fixes
+  alone, minor when users get something new, major when the protocol changes in a way older
+  apps cannot read (a new `d` tag, spec section 11). It raises `MARKETING_VERSION` and
+  `versionName` to that version, adds the `CHANGELOG.md` section, ships the test builds, then
+  submits the iOS build for App Store review and the Android release to production in Play
+  Console, with the user's declarations. Never run `zsp
   publish`, which signs with the user's own Nostr key.
 - The App Store listing text, from the subtitle and categories to the notes for App Review,
   lives in `design/app-store/listing.md`: change it there and commit, then enter it in App

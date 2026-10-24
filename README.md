@@ -326,8 +326,9 @@ creates and pushes the tag, and the release builds refuse to run unless the tree
 
 Every push to `main` that changes an app also ships a test build of it: the push raises the
 build number, the commit is tagged, and the build goes to TestFlight or to Play's closed
-testing track. Only a new version, major, minor or patch, goes to the App Store and to Play
-production.
+testing track. Only a release goes to the App Store and to Play production, with its version
+raised as semantic versioning says: patch for fixes, minor for new features, major for a
+protocol change older apps cannot read.
 
 ### Android release key
 

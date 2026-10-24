@@ -5,9 +5,17 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Ship a test build on every app-changing push
+## Let a plain release pick its own version
 
 2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**15.**
+> actually nevermind i just say in the future release or new release
+> and you figure out if its a patch minor or major
+
+## Ship a test build on every app-changing push
+
+2026-10-24, commit [fe9adf1](https://github.com/lambdakilo/mismeet/commit/fe9adf12681afa6670cbf0aec35903f02490fee6), model claude-opus-5-5, effort xhigh.
 
 **11.**
 > submitted the 15 changes for review in publishing overview
