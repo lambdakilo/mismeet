@@ -255,17 +255,53 @@ adb exec-out screencap -p > emulator.png
 adb emu kill
 ```
 
-Fake publisher and launch hooks for debug builds, as in the README (`MISMEET_FAKE_SPEED`,
-`MISMEET_FAKE_HEADING` and `MISMEET_FAKE_AGE` make the contact move): `:protocol:fakePublish`
-publishes a location for an invite from a key kept under `android/protocol/build/`
-(`MISMEET_FAKE_NAME` selects another key, and `-` as the invite only creates the key) and writes
-the publisher's invite as `android/protocol/build/<name>-invite.png` for a phone to scan, and `SIMCTL_CHILD_MISMEET_TEST_INVITES` on the
-simulator or the `invites` string extra on Android add contacts at launch, semicolon
-separated (`name|invite` names a contact), and `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` opens that tab on the
-simulator. The README's screenshots under `design/screenshots/` come from the simulator and
-the emulator with the two fake contacts, scaled to 600 px high with `sips -Z 600`; redo them
-after a visible change. The apps log their own invite at launch (`Invite: nostr:nprofile...`), readable with
-`adb logcat -d -s Mismeet:I` and, on the simulator, `log show --info` with the app's subsystem.
+Fake publisher and launch hooks for debug builds, the same commands as the README's "Testing
+without a second phone". The watching app logs its own invite at launch on a line starting
+`Invite:`, which these print:
+
+```bash
+adb logcat -d -s Mismeet:I
+```
+
+```bash
+xcrun simctl spawn booted log show --info --last 5m --predicate 'subsystem == "app.mismeet.ios"'
+```
+
+Publish a location for that invite. The publisher prints its own invite, writes it as
+`android/protocol/build/<name>-invite.png` for a phone to scan, and keeps its key under
+`android/protocol/build/`, so a rerun moves the same contact. `MISMEET_FAKE_NAME=other` in front
+makes a second publisher, several reader invites go comma-separated, `-` as the invite only
+creates the key, and relays may follow the coordinates:
+
+```bash
+android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.1699 24.9384"
+```
+
+`MISMEET_FAKE_SPEED` in metres per second, `MISMEET_FAKE_HEADING` in degrees and
+`MISMEET_FAKE_AGE` in seconds before now make the contact move:
+
+```bash
+MISMEET_FAKE_SPEED=12 MISMEET_FAKE_HEADING=316 MISMEET_FAKE_AGE=120 \
+  android/gradlew -p android -q :protocol:fakePublish -PfakeArgs="<invite> 60.17106 24.93688"
+```
+
+Add contacts at launch, semicolon separated, and `Name|<invite>` names one. On the simulator,
+`SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in front of the launch opens that tab:
+
+```bash
+SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted app.mismeet.ios
+```
+
+```bash
+adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;<invite>'"
+```
+
+The README's screenshots under `design/screenshots/` come from the simulator and the emulator
+with the two fake contacts, scaled to 600 px high; redo them after a visible change:
+
+```bash
+sips -Z 600 design/screenshots/<name>.png
+```
 
 - Build with the checked-in wrapper only, never the Homebrew `gradle` (it is Gradle 9.8 on JDK
   27, which the Android Gradle Plugin does not support); the wrapper pins the version the plugin
