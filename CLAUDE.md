@@ -77,6 +77,9 @@ follows it, and a protocol change edits the spec first, in the same change.
   change. The Play listing and declarations live in `design/play-store/listing.md`, and the
   disclosure dialog on the Me screen has to come right before each location permission
   request, as Play's policy demands.
+- The App Store listing text, from the subtitle and categories to the notes for App Review,
+  lives in `design/app-store/listing.md`: change it there and commit, then enter it in App
+  Store Connect, never only in the browser.
 - Every store build comes from an annotated tag `<platform>-<version>-<build>` made by
   `scripts/release.sh tag`. `assembleRelease`, `bundleRelease` and `scripts/release.sh archive-ios` refuse to
   run unless the tree is clean and `HEAD` is that tag; `-PuntaggedRelease` skips the Android

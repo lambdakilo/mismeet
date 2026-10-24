@@ -5,9 +5,20 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Name listing.md as the source of the App Store text
+
+2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**4.**
+> [a request to review Claude Code's dream proposals left out]
+
+(p11: name design/app-store/listing.md as the source of the App Store
+text in CLAUDE.md?)
+> Add it (Recommended)
+
 ## Add contact photos and road estimates, fix two Android races
 
-2026-10-23, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-23, commit [8318779](https://github.com/lambdakilo/mismeet/commit/8318779a226477e28c5bf0f0687d352820b78665), model claude-opus-5-5, effort xhigh.
 
 **3.**
 > can you make it so that people can set images to their contacts
@@ -98,7 +109,7 @@ so a change by hand is lost at the next commit.
 
 ## Correct the paid team setup and say where README commands run
 
-2026-10-17, commit [b5f1016](https://github.com/lambdakilo/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9), model claude-opus-5-5, effort default.
+2026-10-17, commit [b5f1016](https://github.com/lambdakilo/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9), model claude-opus-5-5.
 
 **20.**
 > upload the first testflight build
@@ -110,21 +121,21 @@ so a change by hand is lost at the next commit.
 
 ## Document the ruleset that requires the sign-off check on main
 
-2026-10-14, commit [473e945](https://github.com/lambdakilo/mismeet/commit/473e945eb1a770f94a16affd5b6bd1b5e2a57d0c), model claude-opus-5-5, effort default.
+2026-10-14, commit [473e945](https://github.com/lambdakilo/mismeet/commit/473e945eb1a770f94a16affd5b6bd1b5e2a57d0c), model claude-opus-5-5.
 
 **19.**
 > make the sign-off check required on main
 
 ## Check DCO sign-offs in CI
 
-2026-10-14, commit [e96d8dd](https://github.com/lambdakilo/mismeet/commit/e96d8ddee6e369f058918332a353a4687741dab2), model claude-opus-5-5, effort default.
+2026-10-14, commit [e96d8dd](https://github.com/lambdakilo/mismeet/commit/e96d8ddee6e369f058918332a353a4687741dab2), model claude-opus-5-5.
 
 **18.**
 > add a dco sign-off check to ci
 
 ## Add the app store exception, CONTRIBUTING.md and a privacy policy
 
-2026-10-14, commit [b62c419](https://github.com/lambdakilo/mismeet/commit/b62c419ca302df8a8780616ee6de50ee13e60fa6), model claude-opus-5-5, effort default.
+2026-10-14, commit [b62c419](https://github.com/lambdakilo/mismeet/commit/b62c419ca302df8a8780616ee6de50ee13e60fa6), model claude-opus-5-5.
 
 **15.** Quoted under [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
 
@@ -135,13 +146,13 @@ so a change by hand is lost at the next commit.
 
 ## Say how zsp installs here and how a browser extension signs
 
-2026-10-14, commit [002eb50](https://github.com/lambdakilo/mismeet/commit/002eb50461628a14596b120f5c40406a37ad6b8f), model claude-opus-5-5, effort default.
+2026-10-14, commit [002eb50](https://github.com/lambdakilo/mismeet/commit/002eb50461628a14596b120f5c40406a37ad6b8f), model claude-opus-5-5.
 
 **16.** Quoted under [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02).
 
 ## Upload iOS builds for TestFlight and add App Store screenshots
 
-2026-10-14, commit [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02), model claude-opus-5-5, effort default.
+2026-10-14, commit [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02), model claude-opus-5-5.
 
 **16.**
 > should i use my primal npub or some separate for software publishing?
@@ -151,13 +162,13 @@ so a change by hand is lost at the next commit.
 
 ## Commit the Info.plist XcodeGen generated from the new project.yml
 
-2026-10-14, commit [0b3cf99](https://github.com/lambdakilo/mismeet/commit/0b3cf99a2ad1859ec1339ac03a789febee3386d1), model claude-opus-5-5, effort default.
+2026-10-14, commit [0b3cf99](https://github.com/lambdakilo/mismeet/commit/0b3cf99a2ad1859ec1339ac03a789febee3386d1), model claude-opus-5-5.
 
 **15.** Quoted under [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
 
 ## Prepare store releases: tagged builds, Zapstore, App Store archive
 
-2026-10-14, commit [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb), model claude-opus-5-5, effort default.
+2026-10-14, commit [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb), model claude-opus-5-5.
 
 **15.**
 > [pasted: the user's notes on licensing and distribution: keep
