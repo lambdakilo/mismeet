@@ -5,9 +5,20 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Share invites as links that open the app
+## Redo the 6.9-inch App Store Me screenshot
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**40.**
+> research if i need to do the xcode thingy. [a note on how Claude Code
+> follows up open questions left out]
+
+(Boot the iPhone 18 Pro Max simulator for the 6.9-inch Me shot)
+> Boot it now (Recommended)
+
+## Share invites as links that open the app
+
+2026-10-25, commit [e5eb22b](https://github.com/lambdakilo/mismeet/commit/e5eb22bbcddd10736524a9ecb9ff991d01e2a02f), model claude-opus-5-5, effort xhigh.
 
 **38.**
 > signed in can you explain why i need to sign in so much to xcode
