@@ -59,6 +59,13 @@ follows it, and a protocol change edits the spec first, in the same change.
   ```bash
   python3 -m venv design/.venv && design/.venv/bin/pip install pillow && design/.venv/bin/python design/make-icon.py
   ```
+- The country borders that frame the opening map, `ios/Mismeet/Location/countries.json` and
+  `android/app/src/main/assets/countries.json`, are written by `scripts/make-countries.py` from
+  Natural Earth (public domain); change the script and rerun it, never the JSON by hand:
+
+  ```bash
+  python3 -I scripts/make-countries.py
+  ```
 
 ## Releases
 

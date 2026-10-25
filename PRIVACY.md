@@ -42,6 +42,9 @@ overpass-api.de, in fixed squares of about a kilometre that are never centred on
 keeps them on the phone for 30 days. That server sees your IP address and those squares, much
 as map tiles of the same area would show, but no position.
 
+The map opens on the people in your own country. Which country a position lies in is worked out
+on the phone from borders that come with the app, so no position is sent anywhere for it.
+
 The camera is used only to scan invite QR codes; no image is stored or sent. A photo you choose
 for a contact is stored on your phone only and is never sent.
 

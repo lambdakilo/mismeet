@@ -24,7 +24,8 @@ tests, a device key, local contact and relay storage, relay publishing and fetch
 monitoring and a first set of screens. Neither app has been exercised end to end on a phone
 yet. Invites are scanned as QR codes or pasted as text. A contact can have a photo, kept on the
 phone, and the map shows a moving contact's likely position along the roads since the last
-fix, from OpenStreetMap data (spec section 8.6).
+fix, from OpenStreetMap data (spec section 8.6). The map opens on the people in the phone's own
+country, and a button at the bottom widens it to everyone, abroad included.
 
 ## Files
 
@@ -38,6 +39,8 @@ fix, from OpenStreetMap data (spec section 8.6).
   screenshots under `app-store/` and `play-store/`.
 - [`scripts/release.sh`](scripts/release.sh): tags store builds and checks that a release build
   comes from its tag, see Distribution.
+- [`scripts/make-countries.py`](scripts/make-countries.py): writes the country borders both
+  apps bundle, from Natural Earth's public domain 1:50m countries.
 - [`scripts/check-dco.sh`](scripts/check-dco.sh) and
   [`.github/workflows/dco.yml`](.github/workflows/dco.yml): the sign-off check CI runs on pull
   requests and on pushes to `main`, see CONTRIBUTING.md.
@@ -299,7 +302,9 @@ to fetch.
 3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
    code", allow the camera, scan it, name the contact, Add. The row shows "Seen ... within N m"
    after the next refresh, within a minute, or at once with Refresh. Both apps open on the map,
-   framed around everyone with a known position; "Everyone" frames them again after panning.
+   framed around everyone with a known position in the phone's own country. After panning, the
+   button at the bottom frames that view again; with someone abroad, "Everyone" in that view
+   widens it to them too.
 4. Walk a few hundred metres with the iPhone, or drive. Significant location changes wake the
    app and the Android row's "Seen" time moves. Pulling the Contacts list down on the iPhone
    refreshes its own view; the "Publish now" button on its Me screen forces a publish.

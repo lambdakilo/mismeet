@@ -5,9 +5,56 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Keep an unreadable state file instead of wiping it
+## Follow dark mode, crop contact photos, open the map on home
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**24.**
+> also can you implement mismeet to respect dark mode / light mode
+> preferences of the user? there should also be a simple circle
+> cropping tool for the profile picture. also dont show npub in the
+> contacs page its ugly. also crop the map so that all my friends can
+> be seen inside one country, i.e. if they are away on other country
+> dont include them in the app opening crop. there should be a crop
+> button so that i can see everyone again if i zoom in
+
+(which country the map opens on)
+> Where I am
+
+(what the button does)
+> home then all also put these buttons to bottom not top like on find
+> me
+
+**25.**
+> 2 mismeet ended suddenly apple messages came to my screen
+
+**26.**
+> third one
+
+**27.**
+> twice again pls stop its interrupting my other work
+
+**28.**
+> or is that necessary. tell me if it is
+
+**29.**
+> also can i delete the youtube video already
+
+**30.**
+> [a question about Claude Code closing its windows left out]
+
+(whether to relaunch the iOS app under the debugger now)
+> Yes, now (Recommended)
+
+(how to check the crash fix without the debugger)
+> without the debugger what you mean why cant you use debugger?
+
+(how to check the crash fix)
+> I enabled Developer Mode
+
+## Keep an unreadable state file instead of wiping it
+
+2026-10-25, commit [38af3b6](https://github.com/lambdakilo/mismeet/commit/38af3b6ab99b0ef1553433f7cf4dbede4e8bfc69), model claude-opus-5-5, effort xhigh.
 
 **19.**
 > signed in to my apple account again in xcode settings, retry the
@@ -500,6 +547,7 @@ text in CLAUDE.md?)
 - npubs: Nostr public keys in their bech32 form
 - nvm: never mind
 - osm: OpenStreetMap
+- pls: please
 - qr: quick response code
 - repo: repository
 - sku: stock keeping unit

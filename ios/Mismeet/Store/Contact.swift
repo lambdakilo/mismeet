@@ -24,10 +24,6 @@ struct Contact: Codable, Identifiable, Equatable {
         try? PublicKey.parse(publicKey: id)
     }
 
-    var npubPrefix: String {
-        String(((try? publicKey?.toBech32()) ?? id).prefix(12))
-    }
-
     /// The relays to ask about this contact: its own, or the app's list until a kind 10002 is seen.
     func queryRelays(defaults: [String]) -> [RelayUrl] {
         (relays.isEmpty ? defaults : relays).compactMap { try? RelayUrl.parse(url: $0) }

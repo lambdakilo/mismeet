@@ -29,8 +29,6 @@ data class Contact(
 
     fun publicKey(): PublicKey? = runCatching { PublicKey.parse(id) }.getOrNull()
 
-    fun npubPrefix(): String = (runCatching { publicKey()?.toBech32() }.getOrNull() ?: id).take(12)
-
     /** The relays to ask about this contact: its own, or the app's list until a kind 10002 is seen. */
     fun queryRelays(defaults: List<String>): List<RelayUrl> =
         relays.ifEmpty { defaults }.mapNotNull { runCatching { RelayUrl.parse(it) }.getOrNull() }

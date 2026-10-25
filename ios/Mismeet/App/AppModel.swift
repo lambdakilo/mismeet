@@ -138,24 +138,29 @@ final class AppModel {
         recipientsChanged()
     }
 
-    /// A picture for a contact, cropped square and kept on this phone only; it is never published.
-    func setPhoto(_ id: String, data: Data) {
+    /// A picked picture, upright and decoded just large enough to crop on screen, or nil when it
+    /// cannot be read.
+    func loadPhoto(data: Data) -> UIImage? {
         let options = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: Self.photoSize * 3,
+            kCGImageSourceThumbnailMaxPixelSize: Self.cropSourceSize,
         ] as CFDictionary
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else {
-            return log("Could not use that picture")
+            log("Could not use that picture")
+            return nil
         }
-        let side = min(thumbnail.width, thumbnail.height)
-        guard let square = thumbnail.cropping(to: CGRect(x: (thumbnail.width - side) / 2, y: (thumbnail.height - side) / 2, width: side, height: side)) else { return }
+        return UIImage(cgImage: thumbnail)
+    }
+
+    /// A square picture for a contact, kept on this phone only; it is never published.
+    func setPhoto(_ id: String, square: UIImage) {
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         let size = CGSize(width: Self.photoSize, height: Self.photoSize)
         let scaled = UIGraphicsImageRenderer(size: size, format: format).image { _ in
-            UIImage(cgImage: square).draw(in: CGRect(origin: .zero, size: size))
+            square.draw(in: CGRect(origin: .zero, size: size))
         }
         guard let jpeg = scaled.jpegData(compressionQuality: 0.85),
               let index = state.contacts.firstIndex(where: { $0.id == id }) else { return }
@@ -185,6 +190,7 @@ final class AppModel {
     }
 
     private static let photoSize = 256
+    private static let cropSourceSize = 2048
 
     private func photoURL(_ id: String) -> URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]

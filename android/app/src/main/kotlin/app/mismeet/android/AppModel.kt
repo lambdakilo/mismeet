@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.BatteryManager
 import android.util.Log
 import app.mismeet.android.identity.DeviceKeys
+import app.mismeet.android.location.Countries
 import app.mismeet.android.location.LocationProvider
 import app.mismeet.android.location.LocationService
 import app.mismeet.android.location.RoadData
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.nostrdevkit.sdk.Event
 import org.nostrdevkit.sdk.Filter
 import org.nostrdevkit.sdk.Keys
@@ -67,6 +69,7 @@ class AppModel private constructor(private val context: Context) {
     private val refreshing = Mutex()
     private val photos = ConcurrentHashMap<String, Pair<Long, Bitmap>>()
     val roads = RoadData(context)
+    val countries by lazy { Countries(context.assets.open("countries.json").bufferedReader().use { it.readText() }) }
 
     init {
         if (_state.value.sharingEnabled && _state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
@@ -146,16 +149,20 @@ class AppModel private constructor(private val context: Context) {
         recipientsChanged()
     }
 
-    /** A picture for a contact, cropped square and kept on this phone only; it is never published. */
-    fun setPhoto(id: String, uri: Uri) {
+    /** A picked picture, decoded just large enough to crop on screen, or null when it cannot be read. */
+    suspend fun loadPhoto(uri: Uri): Bitmap? = withContext(Dispatchers.IO) {
+        runCatching {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
+                decoder.setTargetSampleSize(max(1, min(info.size.width, info.size.height) / CROP_SOURCE_SIZE))
+                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+            }
+        }.onFailure { log("Could not use that picture: ${it.message}") }.getOrNull()
+    }
+
+    /** A square picture for a contact, kept on this phone only; it is never published. */
+    fun setPhoto(id: String, square: Bitmap) {
         scope.launch(Dispatchers.IO) {
             runCatching {
-                val decoded = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri)) { decoder, info, _ ->
-                    decoder.setTargetSampleSize(max(1, min(info.size.width, info.size.height) / PHOTO_SIZE))
-                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                }
-                val side = min(decoded.width, decoded.height)
-                val square = Bitmap.createBitmap(decoded, (decoded.width - side) / 2, (decoded.height - side) / 2, side, side)
                 val file = photoFile(id).apply { parentFile?.mkdirs() }
                 file.outputStream().use { Bitmap.createScaledBitmap(square, PHOTO_SIZE, PHOTO_SIZE, true).compress(Bitmap.CompressFormat.JPEG, 85, it) }
             }.onSuccess {
@@ -413,5 +420,6 @@ class AppModel private constructor(private val context: Context) {
         }
 
         private const val PHOTO_SIZE = 256
+        private const val CROP_SOURCE_SIZE = 1024
     }
 }

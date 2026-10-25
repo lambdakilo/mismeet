@@ -35,8 +35,14 @@ struct ContactsView: View {
 }
 
 struct ContactRow: View {
+    private struct PickedImage: Identifiable {
+        let id = UUID()
+        let image: UIImage
+    }
+
     @Environment(AppModel.self) private var model
     @State private var pickedPhoto: PhotosPickerItem?
+    @State private var cropping: PickedImage?
     let contact: Contact
 
     var body: some View {
@@ -53,7 +59,6 @@ struct ContactRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(contact.name).font(.headline)
                 Text(status).font(.subheadline).foregroundStyle(.secondary)
-                Text(contact.npubPrefix).font(.caption.monospaced()).foregroundStyle(.tertiary)
             }
             Spacer()
             Toggle("Share my location", isOn: Binding(
@@ -65,10 +70,15 @@ struct ContactRow: View {
         .onChange(of: pickedPhoto) { _, item in
             guard let item else { return }
             Task {
-                if let data = try? await item.loadTransferable(type: Data.self) {
-                    model.setPhoto(contact.id, data: data)
+                if let data = try? await item.loadTransferable(type: Data.self), let image = model.loadPhoto(data: data) {
+                    cropping = PickedImage(image: image)
                 }
                 pickedPhoto = nil
+            }
+        }
+        .fullScreenCover(item: $cropping) { picked in
+            PhotoCropView(image: picked.image) { square in
+                model.setPhoto(contact.id, square: square)
             }
         }
     }

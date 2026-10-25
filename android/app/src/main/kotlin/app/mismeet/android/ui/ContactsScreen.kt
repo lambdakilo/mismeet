@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ import app.mismeet.protocol.TravelMode
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @Composable
 fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
@@ -52,11 +54,13 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
     var showAdd by remember { mutableStateOf(false) }
     var photoFor by remember { mutableStateOf<Contact?>(null) }
     var choosingFor by remember { mutableStateOf<String?>(null) }
+    var cropping by remember { mutableStateOf<Pair<String, Bitmap>?>(null) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         val id = choosingFor
         choosingFor = null
-        if (uri != null && id != null) model.setPhoto(id, uri)
+        if (uri != null && id != null) scope.launch { model.loadPhoto(uri)?.let { cropping = id to it } }
     }
     val choosePhoto = { id: String ->
         choosingFor = id
@@ -108,6 +112,13 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
         )
     }
 
+    cropping?.let { (id, bitmap) ->
+        PhotoCropDialog(bitmap, onDismiss = { cropping = null }, onChoose = { square ->
+            cropping = null
+            model.setPhoto(id, square)
+        })
+    }
+
     if (showAdd) {
         AddContactDialog(
             onDismiss = { showAdd = false },
@@ -132,7 +143,6 @@ private fun ContactRow(
                 Column(Modifier.weight(1f)) {
                     Text(contact.name, style = MaterialTheme.typography.titleMedium)
                     Text(status(contact), style = MaterialTheme.typography.bodySmall)
-                    Text(contact.npubPrefix(), style = MaterialTheme.typography.labelSmall)
                 }
                 if (onShare != null) Switch(checked = contact.share, onCheckedChange = onShare)
             }
