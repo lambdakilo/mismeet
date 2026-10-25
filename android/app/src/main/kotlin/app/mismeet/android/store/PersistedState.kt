@@ -51,14 +51,31 @@ data class PersistedState(
     }
 }
 
-class StateStore(context: Context) {
-    private val file = File(context.filesDir, "state.json")
+class StateStore(private val file: File) {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private var savesBlocked = false
 
-    fun load(): PersistedState =
-        runCatching { json.decodeFromString(PersistedState.serializer(), file.readText()) }.getOrDefault(PersistedState())
+    constructor(context: Context) : this(File(context.filesDir, "state.json"))
+
+    /**
+     * Starts empty when the file cannot be used, without losing it: a file that does not decode,
+     * such as one a newer version wrote, moves aside to state-unreadable-<millis>.json, and one
+     * that cannot be read at all blocks every save.
+     */
+    fun load(): PersistedState {
+        if (!file.exists()) return PersistedState()
+        val text = runCatching { file.readText() }.getOrElse {
+            savesBlocked = true
+            return PersistedState()
+        }
+        return runCatching { json.decodeFromString(PersistedState.serializer(), text) }.getOrElse {
+            savesBlocked = !file.renameTo(File(file.parentFile, "state-unreadable-${System.currentTimeMillis()}.json"))
+            PersistedState()
+        }
+    }
 
     fun save(state: PersistedState) {
+        if (savesBlocked) return
         val temp = File(file.parentFile, "state.json.tmp")
         temp.writeText(json.encodeToString(PersistedState.serializer(), state))
         if (!temp.renameTo(file)) file.writeText(temp.readText())

@@ -5,9 +5,32 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Keep an unreadable state file instead of wiping it
+
+2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**19.**
+> signed in to my apple account again in xcode settings, retry the
+> build 4 upload
+
+**21.**
+> cant you do step 1
+
+(click Invite user in Play Console for the service account?)
+> Yes, invite it (Recommended)
+
+**22.**
+> if i make updates will the current contacts stay in peoples phones?
+> where are they btw stored? sqlite?
+
+**23.** (answering whether a load failure should keep the old state file)
+> yes, make an unreadable state file survive: keep a copy instead of
+> overwriting it, decode missing ios fields with their defaults, and
+> add a test that loads today's state format
+
 ## Declare the iOS export answer in the Info.plist
 
-2026-10-24, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [f14fda1](https://github.com/lambdakilo/mismeet/commit/f14fda1f1b12ccab8f04290b42b1380200791b31), model claude-opus-5-5, effort xhigh.
 
 **16.**
 > signed in to app store connect in the pane, answer build 3's export
@@ -465,6 +488,7 @@ text in CLAUDE.md?)
 - AGPL: GNU Affero General Public License
 - agplv3: GNU Affero General Public License, version 3
 - APK: Android application package
+- btw: by the way
 - ccbysa4.0: Creative Commons Attribution-ShareAlike 4.0 International
 - ci: continuous integration
 - CLA: Contributor License Agreement

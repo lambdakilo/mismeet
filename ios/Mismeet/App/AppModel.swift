@@ -56,6 +56,14 @@ final class AppModel {
             self?.location.startMonitoringIfAuthorized()
         }
         location.startMonitoringIfAuthorized()
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.store.savesBlocked else { return }
+                self.state = self.store.load()
+            }
+        }
         if state.relayListPublishedAt == nil {
             Task { await publishRelayList() }
         }
