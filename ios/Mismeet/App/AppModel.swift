@@ -25,6 +25,8 @@ final class AppModel {
     private(set) var state: PersistedState
     private(set) var log: [LogLine] = []
     private(set) var showsLog = false
+    /// Why an action the user took did not happen, shown in an alert until dismissed.
+    var notice: String?
     private(set) var authorization: CLAuthorizationStatus
     private(set) var isRefreshing = false
     private(set) var isPublishing = false
@@ -160,7 +162,7 @@ final class AppModel {
         ] as CFDictionary
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let thumbnail = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else {
-            log("Could not use that picture")
+            tell("Could not use that picture")
             return nil
         }
         return UIImage(cgImage: thumbnail)
@@ -180,7 +182,7 @@ final class AppModel {
             try FileManager.default.createDirectory(at: photoURL(id).deletingLastPathComponent(), withIntermediateDirectories: true)
             try jpeg.write(to: photoURL(id), options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
         } catch {
-            return log("Could not save that picture: \(error)")
+            return tell("Could not save that picture", detail: "\(error)")
         }
         state.contacts[index].photoSetAt = Date()
         save()
@@ -212,7 +214,7 @@ final class AppModel {
     func setShare(_ id: String, _ share: Bool) {
         guard let index = state.contacts.firstIndex(where: { $0.id == id }), state.contacts[index].share != share else { return }
         if share, state.contacts.filter(\.share).count >= ProtocolConstants.maxSharingContacts {
-            log("Cannot share with more than \(ProtocolConstants.maxSharingContacts) contacts")
+            tell("Cannot share with more than \(ProtocolConstants.maxSharingContacts) contacts")
             return
         }
         state.contacts[index].share = share
@@ -235,13 +237,13 @@ final class AppModel {
 
     func addRelay(_ text: String) {
         guard let url = try? RelayUrl.parse(url: text.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-            log("Not a relay URL: \(text)")
+            tell("Not a relay URL: \(text)")
             return
         }
         let value = url.description
         guard !state.relays.contains(value) else { return }
         guard state.relays.count < ProtocolConstants.maxRelaysPerList else {
-            log("At most \(ProtocolConstants.maxRelaysPerList) relays")
+            tell("At most \(ProtocolConstants.maxRelaysPerList) relays")
             return
         }
         state.relays.append(value)
@@ -259,7 +261,7 @@ final class AppModel {
 
     func publishNow() {
         guard authorization == .authorizedAlways || authorization == .authorizedWhenInUse else {
-            log("Location permission is needed to publish")
+            tell("Location permission is needed to publish")
             return
         }
         pendingTrigger = .manual
@@ -460,6 +462,11 @@ final class AppModel {
 
     private func save() {
         store.save(state)
+    }
+
+    private func tell(_ text: String, detail: String? = nil) {
+        log(detail.map { "\(text): \($0)" } ?? text)
+        notice = text
     }
 
     private func log(_ text: String) {

@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.mismeet.android.AppModel
@@ -52,6 +53,7 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     val log by model.log.collectAsState()
     val context = LocalContext.current
+    val focus = LocalFocusManager.current
     var permissionVersion by remember { mutableIntStateOf(0) }
     val permissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permissionVersion++
@@ -137,7 +139,7 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(value = newRelay, onValueChange = { newRelay = it }, label = { Text("wss://") }, modifier = Modifier.weight(1f))
-            Button(onClick = { model.addRelay(newRelay); newRelay = "" }, enabled = newRelay.isNotBlank()) { Text("Add") }
+            Button(onClick = { model.addRelay(newRelay); newRelay = ""; focus.clearFocus() }, enabled = newRelay.isNotBlank()) { Text("Add") }
         }
 
         if (BuildConfig.SHOWS_LOG) {

@@ -34,6 +34,10 @@ struct RootView: View {
                 MeView()
             }
         }
+        .alert(model.notice ?? "", isPresented: Binding(
+            get: { model.notice != nil },
+            set: { if !$0 { model.notice = nil } }
+        )) {}
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { model.becameActive() }
         }

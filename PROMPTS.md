@@ -5,9 +5,22 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Show the log only in test builds
+## Tell the user why an action did not happen
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**37.**
+> yes, show those log-only errors (bad relay url, too many relays, too
+> many contacts, picture failed, location needed) as alerts or
+> snackbars on both apps
+
+(whether to boot the iOS simulator for the tests and a look at the
+alert)
+> Boot it now (Recommended)
+
+## Show the log only in test builds
+
+2026-10-25, commit [5e08112](https://github.com/lambdakilo/mismeet/commit/5e08112bc2ac060da86a28a19b31857c82c79852), model claude-opus-5-5, effort xhigh.
 
 **31.**
 > wait so what was the situation with the app store publishing? i know
@@ -579,3 +592,4 @@ text in CLAUDE.md?)
 - qr: quick response code
 - repo: repository
 - sku: stock keeping unit
+- url: uniform resource locator

@@ -33,8 +33,11 @@ import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -60,6 +63,10 @@ class AppModel private constructor(private val context: Context) {
     val state: StateFlow<PersistedState> = _state.asStateFlow()
     private val _log = MutableStateFlow<List<LogLine>>(emptyList())
     val log: StateFlow<List<LogLine>> = _log.asStateFlow()
+    private val _notices = MutableSharedFlow<String>(extraBufferCapacity = 4)
+
+    /** Why an action the user took did not happen, each shown once in a snackbar. */
+    val notices: SharedFlow<String> = _notices.asSharedFlow()
     val keys: Keys = DeviceKeys.loadOrCreate(context)
     val npub: String = keys.publicKey().toBech32()
 
@@ -118,7 +125,7 @@ class AppModel private constructor(private val context: Context) {
     fun publishNow() {
         if (!_state.value.sharingEnabled) return
         if (!LocationProvider.hasForegroundPermission(context)) {
-            log("Location permission is needed to publish")
+            tell("Location permission is needed to publish")
             return
         }
         scope.launch { publishFresh(Trigger.MANUAL) }
@@ -156,7 +163,7 @@ class AppModel private constructor(private val context: Context) {
                 decoder.setTargetSampleSize(max(1, min(info.size.width, info.size.height) / CROP_SOURCE_SIZE))
                 decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
             }
-        }.onFailure { log("Could not use that picture: ${it.message}") }.getOrNull()
+        }.onFailure { tell("Could not use that picture", it.message) }.getOrNull()
     }
 
     /** A square picture for a contact, kept on this phone only; it is never published. */
@@ -168,7 +175,7 @@ class AppModel private constructor(private val context: Context) {
             }.onSuccess {
                 val now = System.currentTimeMillis()
                 update { state -> state.copy(contacts = state.contacts.map { if (it.id == id) it.copy(photoSetAt = now) else it }) }
-            }.onFailure { log("Could not use that picture: ${it.message}") }
+            }.onFailure { tell("Could not use that picture", it.message) }
         }
     }
 
@@ -190,7 +197,7 @@ class AppModel private constructor(private val context: Context) {
         val contact = current.contacts.firstOrNull { it.id == id } ?: return
         if (contact.share == share) return
         if (share && current.contacts.count { it.share } >= ProtocolConstants.MAX_SHARING_CONTACTS) {
-            log("Cannot share with more than ${ProtocolConstants.MAX_SHARING_CONTACTS} contacts")
+            tell("Cannot share with more than ${ProtocolConstants.MAX_SHARING_CONTACTS} contacts")
             return
         }
         update { s -> s.copy(contacts = s.contacts.map { if (it.id == id) it.copy(share = share) else it }) }
@@ -202,13 +209,13 @@ class AppModel private constructor(private val context: Context) {
     fun addRelay(text: String) {
         val url = runCatching { RelayUrl.parse(text.trim()) }.getOrNull()
         if (url == null) {
-            log("Not a relay URL: $text")
+            tell("Not a relay URL: $text")
             return
         }
         val value = url.toString()
         if (value in _state.value.relays) return
         if (_state.value.relays.size >= ProtocolConstants.MAX_RELAYS_PER_LIST) {
-            log("At most ${ProtocolConstants.MAX_RELAYS_PER_LIST} relays")
+            tell("At most ${ProtocolConstants.MAX_RELAYS_PER_LIST} relays")
             return
         }
         update { it.copy(relays = it.relays + value) }
@@ -404,6 +411,11 @@ class AppModel private constructor(private val context: Context) {
     private fun update(transform: (PersistedState) -> PersistedState) = synchronized(store) {
         _state.update(transform)
         store.save(_state.value)
+    }
+
+    private fun tell(text: String, detail: String? = null) {
+        log(if (detail == null) text else "$text: $detail")
+        _notices.tryEmit(text)
     }
 
     private fun log(text: String) {

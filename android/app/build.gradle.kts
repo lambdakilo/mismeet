@@ -14,7 +14,7 @@ android {
         applicationId = "app.mismeet.android"
         minSdk = 31
         targetSdk = 36
-        versionCode = 3
+        versionCode = 4
         versionName = "0.1.0"
         // Both test phones and the Apple silicon emulator are arm64; the other ABIs would
         // triple the APK through the bindings' native libraries.
