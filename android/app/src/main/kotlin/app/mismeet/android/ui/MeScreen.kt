@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -67,8 +68,8 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
         permissionVersion++
         onPauseOrDispose {}
     }
-    val inviteUri = remember(state.relays) { model.inviteUri() }
-    val qr = remember(inviteUri) { qrBitmap(inviteUri) }
+    val inviteLink = remember(state.relays) { model.inviteLink() }
+    val qr = remember(inviteLink) { qrBitmap(inviteLink) }
     var newRelay by remember { mutableStateOf("") }
     // Google Play requires this disclosure to come right before each location permission request.
     var pendingLocationRequest by remember { mutableStateOf<Array<String>?>(null) }
@@ -92,9 +93,15 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
         Text("Invite", style = MaterialTheme.typography.titleMedium)
         Image(qr.asImageBitmap(), contentDescription = "Invite QR code", modifier = Modifier.size(240.dp).align(Alignment.CenterHorizontally))
         Text(model.npub, style = MaterialTheme.typography.bodySmall)
-        Button(onClick = {
-            context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Mismeet invite", inviteUri))
-        }) { Text("Copy invite") }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = {
+                val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, inviteLink)
+                context.startActivity(Intent.createChooser(send, "Share invite"))
+            }) { Text("Share invite") }
+            OutlinedButton(onClick = {
+                context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Mismeet invite", inviteLink))
+            }) { Text("Copy invite") }
+        }
 
         Text("Sharing from this phone", style = MaterialTheme.typography.titleMedium)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

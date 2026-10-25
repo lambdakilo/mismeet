@@ -50,15 +50,23 @@ A person with two phones appears to their contacts as two contacts.
 
 ### 4.1 Invite
 
-A user shares their identity as a NIP-21 URI holding a NIP-19 `nprofile`:
+A user shares their identity as an invite link, an `https` URL whose fragment is a NIP-19
+`nprofile`:
 
 ```
-nostr:nprofile1...
+https://lambdakilo.github.io/mismeet/i#nprofile1...
 ```
 
 The `nprofile` carries the user's public key (TLV type 0) and up to four of the user's relays
-(TLV type 1), as absolute `wss://` URLs. The app shows it as a QR code and as copyable text.
-The app MUST also accept a bare `nprofile1...` and a bare or `nostr:` prefixed `npub1...`.
+(TLV type 1), as absolute `wss://` URLs. The app shows the link as a QR code and as copyable
+text. Chat apps make an `https` link tappable, which they do not for a custom scheme. On a phone
+with the app, the link opens the app (an iOS universal link, an Android verified app link) on
+adding a contact, with the invite filled in. Without the app, the page at that address links to
+the app stores and shows the invite to paste after installing. A browser never sends the
+fragment to the server, so the web host sees no key.
+
+The app MUST also accept the NIP-21 URI `nostr:nprofile1...`, which earlier versions shared, a
+bare `nprofile1...` and a bare or `nostr:` prefixed `npub1...`.
 An invite without relays gets the app's default relay list until a kind `10002` is seen
 (section 7.1).
 
@@ -69,8 +77,9 @@ people can compare them.
 
 ### 4.2 Adding is approving
 
-Scanning or pasting an invite creates a contact record on the device that did the scanning,
-with a display name typed by that user. Adding a contact has two effects on the adder's device:
+Adding an invite, opened as a link, scanned or pasted, creates a contact record on the device
+that added it, with a display name typed by that user. Opening a link only fills in the invite;
+the contact exists once the user confirms. Adding a contact has two effects on the adder's device:
 
 - Sharing: the adder's location events include a real entry for the contact.
 - Watching: the adder's reader fetches and decrypts the contact's location events.
@@ -464,6 +473,7 @@ Other properties:
 | `OK` timeout | 10 seconds |
 | Whole publish timeout | 25 seconds |
 | Rate-limit backoff | 300 seconds |
+| Invite link | `https://lambdakilo.github.io/mismeet/i#` followed by the `nprofile` |
 | Coordinate precision | 6 decimals |
 | Dummy filler length when no fix exists | 100 bytes |
 | Estimate minimum speed | 1 m/s |
@@ -501,8 +511,8 @@ platform, and the protocol constants live in a single constants file per platfor
 7. A reader accepts a payload with unknown extra keys and rejects one with a missing required
    key or the wrong `v`.
 8. A reader sends each relay only the authors associated with that relay.
-9. Invites round-trip through `nostr:nprofile` with up to four relays, and `npub` input is
-   accepted.
+9. Invites round-trip through the invite link and `nostr:nprofile` with up to four relays, and
+   `npub` input is accepted.
 10. Nothing is ever published except kinds `31122` and `10002`.
 11. An estimate follows section 8.6: the mode from `spd`, the ways each mode may use, the
     snap, the least turn at each node, and the speed, span and age limits.

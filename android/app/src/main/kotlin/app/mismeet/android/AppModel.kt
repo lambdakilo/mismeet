@@ -61,6 +61,10 @@ class AppModel private constructor(private val context: Context) {
     private val store = StateStore(context)
     private val _state = MutableStateFlow(store.load())
     val state: StateFlow<PersistedState> = _state.asStateFlow()
+    private val _openedInvite = MutableStateFlow<String?>(null)
+
+    /** An invite link the app was opened with, until the Add contact dialog takes it. */
+    val openedInvite: StateFlow<String?> = _openedInvite.asStateFlow()
     private val _log = MutableStateFlow<List<LogLine>>(emptyList())
     val log: StateFlow<List<LogLine>> = _log.asStateFlow()
     private val _notices = MutableSharedFlow<String>(extraBufferCapacity = 4)
@@ -80,12 +84,12 @@ class AppModel private constructor(private val context: Context) {
 
     init {
         if (_state.value.sharingEnabled && _state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
-        log("Invite: ${inviteUri()}")
+        log("Invite: ${inviteLink()}")
     }
 
-    fun inviteUri(): String {
+    fun inviteLink(): String {
         val urls = _state.value.relays.mapNotNull { runCatching { RelayUrl.parse(it) }.getOrNull() }
-        return runCatching { Invite(keys.publicKey(), urls).uri() }.getOrDefault("nostr:$npub")
+        return runCatching { Invite(keys.publicKey(), urls).link() }.getOrDefault(ProtocolConstants.INVITE_LINK_PREFIX + npub)
     }
 
     // Lifecycle
@@ -132,6 +136,14 @@ class AppModel private constructor(private val context: Context) {
     }
 
     // Contacts
+
+    fun openInvite(link: String) {
+        _openedInvite.value = link
+    }
+
+    fun inviteTaken() {
+        _openedInvite.value = null
+    }
 
     fun addContact(inviteText: String, name: String) {
         val invite = Invite.parse(inviteText)

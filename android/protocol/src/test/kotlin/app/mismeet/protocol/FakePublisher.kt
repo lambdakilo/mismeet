@@ -75,7 +75,7 @@ fun main(args: Array<String>) = runBlocking {
         client.shutdown()
     }
 
-    val invite = Invite(keys.publicKey(), relays.map { RelayUrl.parse(it) }).uri()
+    val invite = Invite(keys.publicKey(), relays.map { RelayUrl.parse(it) }).link()
     println()
     println(
         if (readers.isEmpty()) "Published nothing. Add this publisher on the watching phone:"

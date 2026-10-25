@@ -1,5 +1,6 @@
 package app.mismeet.android
 
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,6 +24,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -46,11 +48,21 @@ class MainActivity : ComponentActivity() {
                 runCatching { model.addContact(entry.substringAfter('|'), entry.substringBefore('|', "Test ${index + 1}")) }
             }
         }
+        if (savedInstanceState == null) openInvite(intent)
         setContent {
             MaterialTheme(colorScheme = if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
                 MismeetScreen(model)
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        openInvite(intent)
+    }
+
+    private fun openInvite(intent: Intent) {
+        if (intent.action == Intent.ACTION_VIEW) intent.dataString?.let { AppModel.get(this).openInvite(it) }
     }
 
     override fun onResume() {
@@ -63,6 +75,10 @@ class MainActivity : ComponentActivity() {
 private fun MismeetScreen(model: AppModel) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val snackbar = remember { SnackbarHostState() }
+    val openedInvite by model.openedInvite.collectAsState()
+    LaunchedEffect(openedInvite) {
+        if (openedInvite != null) tab = 1
+    }
     LaunchedEffect(Unit) {
         model.notices.collect { snackbar.showSnackbar(it) }
     }

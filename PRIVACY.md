@@ -45,6 +45,10 @@ as map tiles of the same area would show, but no position.
 The map opens on the people in your own country. Which country a position lies in is worked out
 on the phone from borders that come with the app, so no position is sent anywhere for it.
 
+An invite link opens a page on lambdakilo.github.io, hosted by GitHub Pages, when Mismeet is
+not installed. The invite sits after the `#` in the link, which browsers do not send, so GitHub
+sees your IP address and that the page was opened, but not the invite.
+
 The camera is used only to scan invite QR codes; no image is stored or sent. A photo you choose
 for a contact is stored on your phone only and is never sent.
 

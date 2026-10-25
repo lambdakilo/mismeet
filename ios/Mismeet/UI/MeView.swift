@@ -8,7 +8,7 @@ struct MeView: View {
         NavigationStack {
             List {
                 Section("Invite") {
-                    if let image = QRCode.image(for: model.inviteURI) {
+                    if let image = QRCode.image(for: model.inviteLink) {
                         Image(uiImage: image)
                             .resizable()
                             .interpolation(.none)
@@ -19,8 +19,9 @@ struct MeView: View {
                     Text(model.npub)
                         .font(.footnote.monospaced())
                         .textSelection(.enabled)
+                    ShareLink(item: model.inviteLink) { Text("Share invite") }
                     Button("Copy invite") {
-                        UIPasteboard.general.string = model.inviteURI
+                        UIPasteboard.general.string = model.inviteLink
                     }
                 }
                 Section("Location") {

@@ -5,19 +5,21 @@ import NostrSDK
 final class InviteTests: XCTestCase {
     private let keys = Keys.generate()
 
-    func testRoundTripsThroughNprofileUri() throws {
+    func testRoundTripsThroughLinkAndNprofileUri() throws {
         let relays = [try RelayUrl.parse(url: "wss://relay.example.com"), try RelayUrl.parse(url: "wss://nos.example.org")]
-        let uri = try Invite(publicKey: keys.publicKey(), relays: relays).uri()
-        XCTAssertTrue(uri.hasPrefix("nostr:nprofile1"))
-        let parsed = try Invite.parse(uri)
+        let link = try Invite(publicKey: keys.publicKey(), relays: relays).link()
+        XCTAssertTrue(link.hasPrefix("https://lambdakilo.github.io/mismeet/i#nprofile1"))
+        let parsed = try Invite.parse(link)
         XCTAssertEqual(parsed.publicKey, keys.publicKey())
         XCTAssertEqual(parsed.relays, relays)
-        XCTAssertEqual(try Invite.parse(String(uri.dropFirst("nostr:".count))), parsed)
+        let nprofile = String(link.dropFirst(ProtocolConstants.inviteLinkPrefix.count))
+        XCTAssertEqual(try Invite.parse(nprofile), parsed)
+        XCTAssertEqual(try Invite.parse("nostr:\(nprofile)"), parsed)
     }
 
     func testKeepsAtMostFourRelays() throws {
         let relays = try (1...6).map { try RelayUrl.parse(url: "wss://relay\($0).example.com") }
-        let parsed = try Invite.parse(try Invite(publicKey: keys.publicKey(), relays: relays).uri())
+        let parsed = try Invite.parse(try Invite(publicKey: keys.publicKey(), relays: relays).link())
         XCTAssertEqual(parsed.relays, Array(relays.prefix(4)))
     }
 

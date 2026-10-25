@@ -38,6 +38,10 @@ struct RootView: View {
             get: { model.notice != nil },
             set: { if !$0 { model.notice = nil } }
         )) {}
+        .onOpenURL { url in
+            model.openedInvite = url.absoluteString
+            screen = .contacts
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { model.becameActive() }
         }

@@ -22,7 +22,9 @@ the Mac, as described under Testing without a second phone.
 The protocol is specified and both apps build with the protocol core and its conformance
 tests, a device key, local contact and relay storage, relay publishing and fetching, location
 monitoring and a first set of screens. Neither app has been exercised end to end on a phone
-yet. Invites are scanned as QR codes or pasted as text. A contact can have a photo, kept on the
+yet. An invite is a link, `https://lambdakilo.github.io/mismeet/i#nprofile1...`, sent from the
+Me screen with Share invite, scanned as a QR code or pasted; tapping it on a phone with Mismeet
+opens Add contact with the invite filled in. A contact can have a photo, kept on the
 phone, and the map shows a moving contact's likely position along the roads since the last
 fix, from OpenStreetMap data (spec section 8.6). The map opens on the people in the phone's own
 country, and a button at the bottom widens it to everyone, abroad included.
@@ -158,7 +160,7 @@ adb exec-out screencap -p > emulator.png
 ### Testing without a second phone
 
 A fake publisher on the Mac stands in for the iPhone. The watching app prints its own invite
-at launch, `Invite: nostr:nprofile...`, to logcat on Android and to the simulator's log on iOS,
+at launch, `Invite: https://lambdakilo.github.io/mismeet/i#nprofile1...`, to logcat on Android and to the simulator's log on iOS,
 and shows it on the Me screen:
 
 ```bash
@@ -507,6 +509,20 @@ Once, after the membership is active:
 3. In App Store Connect (<https://appstoreconnect.apple.com>), open Apps, click "+" and then
    New App. Choose iOS, the name Mismeet (names are unique on the store, so another may be
    needed), the bundle id `app.mismeet.ios`, and the SKU `mismeet`.
+4. Give `scripts/release.sh` an App Store Connect API key, so that uploads stop depending on
+   the Apple Account in Xcode, which signs out now and then. In App Store Connect, open Users
+   and Access > Integrations > App Store Connect API, where the Account Holder clicks Request
+   Access once. Then generate a team key with Admin access, which cloud signing needs, and
+   download it, which is possible only once. Keep it outside the repository and write its path
+   and the issuer id shown with the keys to `ios/.asc-key`, with your file and issuer id:
+
+   ```bash
+   printf '%s\n' ~/keys/AuthKey_ABCDE12345.p8 \
+     00000000-0000-0000-0000-000000000000 > ios/.asc-key
+   ```
+
+   Without the file, the script uses the Apple Account signed in under Xcode > Settings >
+   Apple Accounts.
 
 For each build:
 

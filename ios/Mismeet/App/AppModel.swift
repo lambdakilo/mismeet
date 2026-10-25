@@ -27,6 +27,8 @@ final class AppModel {
     private(set) var showsLog = false
     /// Why an action the user took did not happen, shown in an alert until dismissed.
     var notice: String?
+    /// An invite link the app was opened with, until the Add contact sheet takes it.
+    var openedInvite: String?
     private(set) var authorization: CLAuthorizationStatus
     private(set) var isRefreshing = false
     private(set) var isPublishing = false
@@ -84,7 +86,7 @@ final class AppModel {
         #else
         Task { showsLog = await Self.installedFromTestFlight() }
         #endif
-        log("Invite: \(inviteURI)")
+        log("Invite: \(inviteLink)")
     }
 
     // TestFlight and the App Store install the same binary; only the App Store's record of the
@@ -94,9 +96,9 @@ final class AppModel {
         return transaction.environment == .sandbox
     }
 
-    var inviteURI: String {
+    var inviteLink: String {
         let urls = state.relays.compactMap { try? RelayUrl.parse(url: $0) }
-        return (try? Invite(publicKey: keys.publicKey(), relays: urls).uri()) ?? "nostr:\(npub)"
+        return (try? Invite(publicKey: keys.publicKey(), relays: urls).link()) ?? ProtocolConstants.inviteLinkPrefix + npub
     }
 
     var authorizationText: String {

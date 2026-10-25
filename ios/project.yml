@@ -13,7 +13,7 @@ packages:
 settings:
   base:
     MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "7"
+    CURRENT_PROJECT_VERSION: "8"
     SWIFT_VERSION: "6.0"
     CODE_SIGN_STYLE: Automatic
     TARGETED_DEVICE_FAMILY: "1"
@@ -40,6 +40,10 @@ targets:
         NSLocationAlwaysAndWhenInUseUsageDescription: Mismeet keeps your contacts updated also while the app is not open.
         NSCameraUsageDescription: Mismeet scans the invite QR code of a contact.
         ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: Mismeet/Mismeet.entitlements
+      properties:
+        com.apple.developer.associated-domains: [applinks:lambdakilo.github.io]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.mismeet.ios

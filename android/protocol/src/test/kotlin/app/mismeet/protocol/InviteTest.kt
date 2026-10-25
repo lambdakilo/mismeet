@@ -13,20 +13,22 @@ class InviteTest {
     private fun urls(invite: Invite) = invite.relays.map { it.toString() }
 
     @Test
-    fun roundTripsThroughNprofileUri() {
+    fun roundTripsThroughLinkAndNprofileUri() {
         val relays = listOf(RelayUrl.parse("wss://relay.example.com"), RelayUrl.parse("wss://nos.example.org"))
-        val uri = Invite(keys.publicKey(), relays).uri()
-        assertTrue(uri, uri.startsWith("nostr:nprofile1"))
-        val parsed = Invite.parse(uri)
+        val link = Invite(keys.publicKey(), relays).link()
+        assertTrue(link, link.startsWith("https://lambdakilo.github.io/mismeet/i#nprofile1"))
+        val parsed = Invite.parse(link)
         assertEquals(keys.publicKey().toHex(), parsed.publicKey.toHex())
         assertEquals(relays.map { it.toString() }, urls(parsed))
-        assertEquals(urls(parsed), urls(Invite.parse(uri.removePrefix("nostr:"))))
+        val nprofile = link.removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
+        assertEquals(urls(parsed), urls(Invite.parse(nprofile)))
+        assertEquals(urls(parsed), urls(Invite.parse("nostr:$nprofile")))
     }
 
     @Test
     fun keepsAtMostFourRelays() {
         val relays = (1..6).map { RelayUrl.parse("wss://relay$it.example.com") }
-        val parsed = Invite.parse(Invite(keys.publicKey(), relays).uri())
+        val parsed = Invite.parse(Invite(keys.publicKey(), relays).link())
         assertEquals(relays.take(4).map { it.toString() }, urls(parsed))
     }
 

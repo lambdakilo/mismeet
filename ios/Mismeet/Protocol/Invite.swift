@@ -1,7 +1,8 @@
 import Foundation
 import NostrSDK
 
-/// A contact invite, spec section 4.1: a `nostr:nprofile` URI, or a bare `nprofile` or `npub`.
+/// A contact invite, spec section 4.1: an invite link, a `nostr:` URI, or a bare `nprofile` or
+/// `npub`.
 struct Invite: Equatable {
     var publicKey: PublicKey
     var relays: [RelayUrl]
@@ -10,13 +11,16 @@ struct Invite: Equatable {
         case notAProfile
     }
 
-    func uri() throws -> String {
+    func link() throws -> String {
         let relays = Array(relays.prefix(ProtocolConstants.maxRelaysPerList))
-        return try Nip19Profile(publicKey: publicKey, relays: relays).toNostrUri()
+        return ProtocolConstants.inviteLinkPrefix + (try Nip19Profile(publicKey: publicKey, relays: relays).toBech32())
     }
 
     static func parse(_ text: String) throws -> Invite {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        var trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.hasPrefix(ProtocolConstants.inviteLinkPrefix) {
+            trimmed.removeFirst(ProtocolConstants.inviteLinkPrefix.count)
+        }
         if trimmed.hasPrefix("nostr:") {
             switch try Nip21.parse(uri: trimmed).asEnum() {
             case .pubkey(let publicKey):

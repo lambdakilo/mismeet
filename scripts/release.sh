@@ -17,6 +17,16 @@ set -euo pipefail
 
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 
+# The App Store Connect API key that the git-ignored ios/.asc-key names, the .p8 file on its first
+# line and the issuer id on its second. Without it, xcodebuild uses the Apple Account in Xcode,
+# which signs out now and then.
+asc_key=()
+if [ -f "$root/ios/.asc-key" ]; then
+  p8="$(sed -n 1p "$root/ios/.asc-key")"
+  asc_key=(-authenticationKeyPath "$p8" -authenticationKeyID "$(basename "$p8" .p8 | sed 's/^AuthKey_//')"
+    -authenticationKeyIssuerID "$(sed -n 2p "$root/ios/.asc-key")")
+fi
+
 version() {
   case "$1" in
     android)
@@ -85,7 +95,8 @@ archive_ios() {
   xcodegen generate --spec "$root/ios/project.yml" >/dev/null
   xcodebuild -project "$root/ios/Mismeet.xcodeproj" -scheme Mismeet -configuration Release \
     -destination 'generic/platform=iOS' -archivePath "$root/ios/build/$tag.xcarchive" \
-    -allowProvisioningUpdates DEVELOPMENT_TEAM="$(cat "$root/ios/.team-id")" archive | xcbeautify >&2
+    -allowProvisioningUpdates ${asc_key[@]+"${asc_key[@]}"} DEVELOPMENT_TEAM="$(cat "$root/ios/.team-id")" \
+    archive | xcbeautify >&2
   echo "$root/ios/build/$tag.xcarchive"
 }
 
@@ -115,7 +126,7 @@ upload_ios() {
 </plist>
 PLIST
   xcodebuild -exportArchive -archivePath "$archive" -exportOptionsPlist "$options" \
-    -exportPath "$root/ios/build/export" -allowProvisioningUpdates | xcbeautify
+    -exportPath "$root/ios/build/export" -allowProvisioningUpdates ${asc_key[@]+"${asc_key[@]}"} | xcbeautify
   echo "Uploaded $(basename "$archive" .xcarchive). It shows in App Store Connect > TestFlight once processed."
 }
 

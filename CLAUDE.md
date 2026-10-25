@@ -51,6 +51,15 @@ follows it, and a protocol change edits the spec first, in the same change.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
+- Invites are links, `https://lambdakilo.github.io/mismeet/i#<nprofile>` (spec section 4.1),
+  opened as an iOS universal link (Associated Domains in `project.yml`) and an Android verified
+  app link (the intent filter on `MainActivity`). The site repository
+  `lambdakilo/lambdakilo.github.io`, the user's own, pushed to `main`, serves what they need:
+  `.well-known/apple-app-site-association` for `VXSNWDR5MY.app.mismeet.ios`,
+  `.well-known/assetlinks.json` with the SHA-256 of the Play App Signing certificate and of the
+  upload key, and `mismeet/i.html`, the page shown without the app. A new team, bundle id,
+  package or signing key changes those files in the same change. A GitHub Pages site for the
+  `mismeet` repository would take over `/mismeet/` and break every link.
 - The app icon is generated from `design/icon-sketch.png` by `design/make-icon.py` into the
   iOS asset catalog, the Android adaptive icon foreground, `design/icon-512.png`, the store
   icon for Google Play and Zapstore, and `design/play-store/feature-graphic.png`; change the
@@ -74,7 +83,8 @@ follows it, and a protocol change edits the spec first, in the same change.
   describes it for Zapstore (not F-Droid). iOS goes to TestFlight and the App Store through
   `scripts/release.sh upload-ios`, which archives from the tag and uploads with the build
   numbers kept; Xcode signs the upload with a cloud-managed distribution certificate, so none
-  is created on this Mac. The App Store screenshots in `design/app-store/` are full size and RGB, at
+  is created on this Mac. It authenticates with the App Store Connect API key that the
+  git-ignored `ios/.asc-key` names, or without that file with the Apple Account in Xcode. The App Store screenshots in `design/app-store/` are full size and RGB, at
   sizes App Store Connect accepts (1320 x 2868 and 1206 x 2622), and the Play screenshots in
   `design/play-store/phone/` are 1080 x 1920 RGB from the emulator under `wm size 1080x1920`,
   since Play refuses a long side more than twice the short one; redo both after a visible

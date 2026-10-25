@@ -5,9 +5,34 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Tell the user why an action did not happen
+## Share invites as links that open the app
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**38.**
+> signed in can you explain why i need to sign in so much to xcode
+
+**39.**
+> instead of people copying and pasting each others npubs could we make
+> it so that a local uri scheme could be just shared with to people so
+> that they just click it
+
+(How the shared invite should open the app)
+> https link (Recommended)
+
+**40.**
+> research if i need to do the xcode thingy. [a note on how Claude Code
+> follows up open questions left out]
+
+(Boot the simulator for the iOS tests and screenshots)
+> Boot it now (Recommended)
+
+(Switch iOS uploads to an App Store Connect API key)
+> Yes, set up a key (Recommended)
+
+## Tell the user why an action did not happen
+
+2026-10-25, commit [c036b03](https://github.com/lambdakilo/mismeet/commit/c036b03d9d087d07671e61d18345ab67c606dcaa), model claude-opus-5-5, effort xhigh.
 
 **37.**
 > yes, show those log-only errors (bad relay url, too many relays, too
@@ -584,6 +609,7 @@ text in CLAUDE.md?)
 - etc: et cetera
 - i.e.: that is
 - llms: large language models
+- npub: a Nostr public key in its NIP-19 text form
 - npub: Nostr public key, bech32 encoded
 - npubs: Nostr public keys in their bech32 form
 - nvm: never mind
@@ -592,4 +618,5 @@ text in CLAUDE.md?)
 - qr: quick response code
 - repo: repository
 - sku: stock keeping unit
+- uri: uniform resource identifier
 - url: uniform resource locator

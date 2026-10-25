@@ -27,6 +27,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
-    var showAdd by remember { mutableStateOf(false) }
+    // The invite the Add contact dialog opens with; null while it is closed.
+    var adding by remember { mutableStateOf<String?>(null) }
+    val openedInvite by model.openedInvite.collectAsState()
+    LaunchedEffect(openedInvite) {
+        openedInvite?.let {
+            adding = it
+            model.inviteTaken()
+        }
+    }
     var photoFor by remember { mutableStateOf<Contact?>(null) }
     var choosingFor by remember { mutableStateOf<String?>(null) }
     var cropping by remember { mutableStateOf<Pair<String, Bitmap>?>(null) }
@@ -72,7 +81,7 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
             Text("Contacts", style = MaterialTheme.typography.headlineMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextButton(onClick = { model.refreshNow() }) { Text("Refresh") }
-                Button(onClick = { showAdd = true }) { Text("Add") }
+                Button(onClick = { adding = "" }) { Text("Add") }
             }
         }
         if (state.contacts.isEmpty()) {
@@ -119,9 +128,10 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
         })
     }
 
-    if (showAdd) {
+    adding?.let { invite ->
         AddContactDialog(
-            onDismiss = { showAdd = false },
+            initialInvite = invite,
+            onDismiss = { adding = null },
             onAdd = { invite, name -> model.addContact(invite, name) },
         )
     }
@@ -192,8 +202,8 @@ private fun openMap(context: Context, contact: Contact) {
 }
 
 @Composable
-private fun AddContactDialog(onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
-    var invite by remember { mutableStateOf("") }
+private fun AddContactDialog(initialInvite: String, onDismiss: () -> Unit, onAdd: (String, String) -> Unit) {
+    var invite by remember(initialInvite) { mutableStateOf(initialInvite) }
     var name by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -210,7 +220,7 @@ private fun AddContactDialog(onDismiss: () -> Unit, onAdd: (String, String) -> U
                     value = invite,
                     onValueChange = { invite = it },
                     label = { Text("Invite") },
-                    placeholder = { Text("nostr:nprofile1…") },
+                    placeholder = { Text("Invite link") },
                     minLines = 3,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

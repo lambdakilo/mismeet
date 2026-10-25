@@ -10,13 +10,14 @@ import org.nostrdevkit.sdk.RelayUrl
 
 class NotAProfileException : Exception("not an npub or nprofile")
 
-/** A contact invite, spec section 4.1: a `nostr:nprofile` URI, or a bare `nprofile` or `npub`. */
+/** A contact invite, spec section 4.1: an invite link, a `nostr:` URI, or a bare `nprofile` or `npub`. */
 data class Invite(val publicKey: PublicKey, val relays: List<RelayUrl>) {
-    fun uri(): String = Nip19Profile(publicKey, relays.take(ProtocolConstants.MAX_RELAYS_PER_LIST)).toNostrUri()
+    fun link(): String =
+        ProtocolConstants.INVITE_LINK_PREFIX + Nip19Profile(publicKey, relays.take(ProtocolConstants.MAX_RELAYS_PER_LIST)).toBech32()
 
     companion object {
         fun parse(text: String): Invite {
-            val trimmed = text.trim()
+            val trimmed = text.trim().removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
             if (trimmed.startsWith("nostr:")) {
                 return when (val entity = Nip21.parse(trimmed).asEnum()) {
                     is Nip21Enum.Pubkey -> Invite(entity.publicKey, emptyList())

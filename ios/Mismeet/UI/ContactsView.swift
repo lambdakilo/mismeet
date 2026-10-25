@@ -2,8 +2,13 @@ import PhotosUI
 import SwiftUI
 
 struct ContactsView: View {
+    private struct AddRequest: Identifiable {
+        let id = UUID()
+        var invite = ""
+    }
+
     @Environment(AppModel.self) private var model
-    @State private var showingAdd = false
+    @State private var adding: AddRequest?
 
     var body: some View {
         NavigationStack {
@@ -25,11 +30,16 @@ struct ContactsView: View {
             .navigationTitle("Contacts")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Add", systemImage: "plus") { showingAdd = true }
+                    Button("Add", systemImage: "plus") { adding = AddRequest() }
                 }
             }
             .refreshable { await model.refresh() }
-            .sheet(isPresented: $showingAdd) { AddContactView() }
+            .sheet(item: $adding) { AddContactView(invite: $0.invite) }
+            .onChange(of: model.openedInvite, initial: true) { _, link in
+                guard let link else { return }
+                adding = AddRequest(invite: link)
+                model.openedInvite = nil
+            }
         }
     }
 }
@@ -112,16 +122,20 @@ struct ContactRow: View {
 struct AddContactView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
-    @State private var invite = ""
+    @State private var invite: String
     @State private var name = ""
     @State private var error: String?
     @State private var scanning = false
+
+    init(invite: String = "") {
+        _invite = State(initialValue: invite)
+    }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Invite") {
-                    TextField("nostr:nprofile1…", text: $invite, axis: .vertical)
+                    TextField("Invite link", text: $invite, axis: .vertical)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .lineLimit(3...6)
