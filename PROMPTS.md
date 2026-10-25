@@ -5,9 +5,19 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Redo the 6.9-inch App Store Me screenshot
+## Name the App Store Connect API labels in the key setup step
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**41.**
+> can you find teh team key in the builtin browser
+
+**42.**
+> downloaded
+
+## Redo the 6.9-inch App Store Me screenshot
+
+2026-10-25, commit [b68945b](https://github.com/lambdakilo/mismeet/commit/b68945b1359ca0e4a103569cdf3849da8bd81e4f), model claude-opus-5-5, effort xhigh.
 
 **40.**
 > research if i need to do the xcode thingy. [a note on how Claude Code

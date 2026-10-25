@@ -511,10 +511,11 @@ Once, after the membership is active:
    needed), the bundle id `app.mismeet.ios`, and the SKU `mismeet`.
 4. Give `scripts/release.sh` an App Store Connect API key, so that uploads stop depending on
    the Apple Account in Xcode, which signs out now and then. In App Store Connect, open Users
-   and Access > Integrations > App Store Connect API, where the Account Holder clicks Request
-   Access once. Then generate a team key with Admin access, which cloud signing needs, and
-   download it, which is possible only once. Keep it outside the repository and write its path
-   and the issuer id shown with the keys to `ios/.asc-key`, with your file and issuer id:
+   and Access > Integrations > App Store Connect API. The first time, the Account Holder clicks
+   Request Access, ticks the box in the dialog and clicks Submit. Then generate a key under Team
+   Keys with Admin access, which cloud signing needs, and download it, which is possible only
+   once. Keep it outside the repository and write its path and the Issuer ID shown above the
+   keys to `ios/.asc-key`, with your file and issuer id:
 
    ```bash
    printf '%s\n' ~/keys/AuthKey_ABCDE12345.p8 \
