@@ -5,9 +5,16 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Name the App Store Connect API labels in the key setup step
+## Drop the npub prefix comparison from spec 4.1
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**43.** (answering whether the apps should show the prefix or the spec should drop it)
+> drop the npub prefix sentence from spec 4.1 instead
+
+## Name the App Store Connect API labels in the key setup step
+
+2026-10-25, commit [61c1559](https://github.com/lambdakilo/mismeet/commit/61c1559f08f53e4eedc729779cd0c921b87e6732), model claude-opus-5-5, effort xhigh.
 
 **41.**
 > can you find teh team key in the builtin browser
@@ -626,7 +633,7 @@ text in CLAUDE.md?)
 - ccbysa4.0: Creative Commons Attribution-ShareAlike 4.0 International
 - ci: continuous integration
 - CLA: Contributor License Agreement
-- dco: Developer Certificate of Origin
+- DCO: Developer Certificate of Origin
 - etc: et cetera
 - i.e.: that is
 - llms: large language models

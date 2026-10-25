@@ -72,8 +72,7 @@ An invite without relays gets the app's default relay list until a kind `10002` 
 
 An invite contains no secret. It should still be exchanged in person or over a channel the user
 trusts, because whoever substitutes their own key in an invite receives the location meant for
-the invitee. The app shows the first eight characters of the `npub` next to each contact so two
-people can compare them.
+the invitee.
 
 ### 4.2 Adding is approving
 
