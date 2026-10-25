@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.mismeet.android.AppModel
+import app.mismeet.android.BuildConfig
 import app.mismeet.android.location.LocationProvider
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -139,9 +140,11 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
             Button(onClick = { model.addRelay(newRelay); newRelay = "" }, enabled = newRelay.isNotBlank()) { Text("Add") }
         }
 
-        Text("Log", style = MaterialTheme.typography.titleMedium)
-        log.asReversed().forEach { line ->
-            Text("${DateFormat.getTimeFormat(context).format(line.time)}  ${line.text}", style = MaterialTheme.typography.bodySmall)
+        if (BuildConfig.SHOWS_LOG) {
+            Text("Log", style = MaterialTheme.typography.titleMedium)
+            log.asReversed().forEach { line ->
+                Text("${DateFormat.getTimeFormat(context).format(line.time)}  ${line.text}", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

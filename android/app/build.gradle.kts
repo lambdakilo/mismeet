@@ -14,7 +14,7 @@ android {
         applicationId = "app.mismeet.android"
         minSdk = 31
         targetSdk = 36
-        versionCode = 2
+        versionCode = 3
         versionName = "0.1.0"
         // Both test phones and the Apple silicon emulator are arm64; the other ABIs would
         // triple the APK through the bindings' native libraries.
@@ -43,8 +43,20 @@ android {
         }
     }
 
+    // Play cannot tell an app which track installed it, so closed testing gets builds of its own
+    // with -PtestBuild, the only release builds that show the log.
+    buildTypes {
+        getByName("debug") {
+            buildConfigField("boolean", "SHOWS_LOG", "true")
+        }
+        getByName("release") {
+            buildConfigField("boolean", "SHOWS_LOG", providers.gradleProperty("testBuild").isPresent.toString())
+        }
+    }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     compileOptions {

@@ -4,6 +4,7 @@ import ImageIO
 import NostrSDK
 import Observation
 import OSLog
+import StoreKit
 import UIKit
 
 struct LogLine: Identifiable, Equatable {
@@ -23,6 +24,7 @@ final class AppModel {
 
     private(set) var state: PersistedState
     private(set) var log: [LogLine] = []
+    private(set) var showsLog = false
     private(set) var authorization: CLAuthorizationStatus
     private(set) var isRefreshing = false
     private(set) var isPublishing = false
@@ -76,8 +78,18 @@ final class AppModel {
                 try? addContact(invite: String(parts[parts.count - 1]), name: name)
             }
         }
+        showsLog = true
+        #else
+        Task { showsLog = await Self.installedFromTestFlight() }
         #endif
         log("Invite: \(inviteURI)")
+    }
+
+    // TestFlight and the App Store install the same binary; only the App Store's record of the
+    // install tells them apart.
+    private static func installedFromTestFlight() async -> Bool {
+        guard case .verified(let transaction)? = try? await AppTransaction.shared else { return false }
+        return transaction.environment == .sandbox
     }
 
     var inviteURI: String {

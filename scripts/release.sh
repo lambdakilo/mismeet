@@ -8,8 +8,11 @@
 #   scripts/release.sh archive-ios             check, then archive the iOS app
 #   scripts/release.sh upload-ios              check, archive and upload to App Store Connect, which
 #                                              offers the build in TestFlight and for App Store review
-#   scripts/release.sh upload-android          check, build the bundle and release it to the closed
-#                                              testing track through the Play Developer API
+#   scripts/release.sh upload-android          check, build the bundle with the log and release it to
+#                                              the closed testing track through the Play Developer API
+#   scripts/release.sh upload-android production
+#                                              check, build the bundle without the log and put it in a
+#                                              production draft, rolled out in Play Console
 set -euo pipefail
 
 root="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
@@ -135,10 +138,15 @@ play_token() {
 }
 
 upload_android() {
-  local tag key token api upload edit code
+  local tag key token api upload edit code track status test_build
+  case "${1:-}" in
+    "") track=alpha status=completed test_build=1 ;;
+    production) track=production status=draft test_build= ;;
+    *) echo "upload-android takes no argument or production" >&2; exit 2 ;;
+  esac
   tag="$(check android)"
   key="$(cat "$root/android/.play-key")"
-  "$root/android/gradlew" -q -p "$root/android" bundleRelease >&2
+  "$root/android/gradlew" -q -p "$root/android" bundleRelease ${test_build:+-PtestBuild} >&2
   token="$(play_token "$key")"
   api="https://androidpublisher.googleapis.com/androidpublisher/v3/applications/app.mismeet.android"
   upload="https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/app.mismeet.android"
@@ -146,12 +154,16 @@ upload_android() {
   code="$(curl -fsS -X POST -H "Authorization: Bearer $token" -H 'Content-Type: application/octet-stream' \
     --data-binary @"$root/android/app/build/outputs/bundle/release/app-release.aab" \
     "$upload/edits/$edit/bundles?uploadType=media" | jq -r .versionCode)"
-  # The track's own name is alpha, whatever Play Console calls it.
+  # Closed testing's own name is alpha, whatever Play Console calls it.
   curl -fsS -X PUT -H "Authorization: Bearer $token" -H 'Content-Type: application/json' \
-    -d "$(jq -cn --arg name "$tag" --arg code "$code" '{releases: [{name: $name, versionCodes: [$code], status: "completed"}]}')" \
-    "$api/edits/$edit/tracks/alpha" >/dev/null
+    -d "$(jq -cn --arg name "$tag" --arg code "$code" --arg status "$status" '{releases: [{name: $name, versionCodes: [$code], status: $status}]}')" \
+    "$api/edits/$edit/tracks/$track" >/dev/null
   curl -fsS -X POST -H "Authorization: Bearer $token" "$api/edits/$edit:commit" >/dev/null
-  echo "Uploaded $tag to closed testing. Play sends it for review; Publishing overview shows the state."
+  if [ "$track" = alpha ]; then
+    echo "Uploaded $tag to closed testing. Play sends it for review; Publishing overview shows the state."
+  else
+    echo "Uploaded $tag as a production draft. Roll it out under Production in Play Console."
+  fi
 }
 
 case "${1:-}" in
@@ -160,6 +172,6 @@ case "${1:-}" in
   check) check "${2:-}" ;;
   archive-ios) archive_ios ;;
   upload-ios) upload_ios ;;
-  upload-android) upload_android ;;
-  *) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+  upload-android) upload_android "${2:-}" ;;
+  *) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
 esac

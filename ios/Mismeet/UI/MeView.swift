@@ -50,10 +50,12 @@ struct MeView: View {
                         .disabled(newRelay.isEmpty)
                     }
                 }
-                Section("Log") {
-                    ForEach(model.log.reversed()) { line in
-                        Text("\(line.time.formatted(date: .omitted, time: .standard))  \(line.text)")
-                            .font(.caption)
+                if model.showsLog {
+                    Section("Log") {
+                        ForEach(model.log.reversed()) { line in
+                            Text("\(line.time.formatted(date: .omitted, time: .standard))  \(line.text)")
+                                .font(.caption)
+                        }
                     }
                 }
             }

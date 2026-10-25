@@ -5,9 +5,37 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Follow dark mode, crop contact photos, open the map on home
+## Show the log only in test builds
 
 2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**31.**
+> wait so what was the situation with the app store publishing? i know
+> testflight works fine
+
+**32.**
+> yes, open app store connect in the pane, i'll sign in, then check the
+> 0.1.0 review
+
+**33.**
+> leave 0.1.0 in review with build 2, the newer builds go out as the
+> next release
+
+**34.**
+> oof three links is a lot for a tester
+
+**35.**
+> yes, tap become a tester for my account in the pane and see if the
+> page links to the install
+
+**36.**
+> [a remark about Claude Code's replies left out] also dont show logs
+> in the app store build in tthe future ok? only in testflight and
+> whatever ill use for android as test
+
+## Follow dark mode, crop contact photos, open the map on home
+
+2026-10-25, commit [340d9b7](https://github.com/lambdakilo/mismeet/commit/340d9b79c0723ae7a7ef744881af531d34be54b7), model claude-opus-5-5, effort xhigh.
 
 **24.**
 > also can you implement mismeet to respect dark mode / light mode
