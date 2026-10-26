@@ -5,9 +5,16 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Name contacts' districts and focus a contact from the list
+## Redo the Contacts screenshots with the district names
 
 2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**3.** (answering whether to redo the README and store screenshots now)
+> redo the readme and store screenshots for the district names
+
+## Name contacts' districts and focus a contact from the list
+
+2026-10-26, commit [e74969b](https://github.com/lambdakilo/mismeet/commit/e74969be74e9372cf330ab741f8d8e33f38334f7), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > i wanna concentrate a person from a list like on find me. instead of
