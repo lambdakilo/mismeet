@@ -28,7 +28,7 @@ Mismeet shows the people you choose where you are, and you where they are, witho
 Your phone publishes its location to Nostr relays, encrypted separately for each person you share with. Relays pass it along but can read neither the location nor who it is for, and every location expires after 24 hours.
 
 - Add a contact by scanning the QR code of their invite, or by pasting it.
-- See everyone on the map at a glance, with how long ago each position was seen and how fast they were going.
+- See everyone on the map at a glance, with where and how long ago each position was seen and how far each person is from you.
 - When someone is on the move, see where the road has probably taken them since, guessed from OpenStreetMap roads.
 - Give your contacts photos; they stay on your phone.
 - Watch your contacts without sharing anything yourself: sharing is off until you turn it on, and until then the app asks for no permission.

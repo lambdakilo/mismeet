@@ -1,3 +1,4 @@
+import CoreLocation
 import PhotosUI
 import SwiftUI
 
@@ -88,6 +89,9 @@ struct ContactRow: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
+                    if let distance = ContactRow.distance(to: contact, in: model.state) {
+                        Text(distance).font(.subheadline).foregroundStyle(.secondary)
+                    }
                 }
                 .contentShape(Rectangle())
             }
@@ -116,15 +120,13 @@ struct ContactRow: View {
         }
     }
 
-    /// Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago, within 30 m".
+    /// Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago".
     static func status(of contact: Contact, place: String?) -> String {
         if let payload = contact.lastPayload {
             let fixed = Date(timeIntervalSince1970: TimeInterval(payload.fixTime))
             let age = RelativeDateTimeFormatter().localizedString(for: fixed, relativeTo: Date())
             let stale = contact.sharing == .notSharing ? ", no longer sharing" : ""
-            let moving = ContactRow.movement(of: payload).map { ", \($0)" } ?? ""
-            let seen = "\(age), within \(payload.accuracy) m\(moving)\(stale)"
-            return place.map { "\($0), seen \(seen)" } ?? "Seen \(seen)"
+            return place.map { "\($0), seen \(age)\(stale)" } ?? "Seen \(age)\(stale)"
         }
         switch contact.sharing {
         case .notSharing: return "Not sharing with you"
@@ -132,15 +134,16 @@ struct ContactRow: View {
         }
     }
 
-    /// How a contact was moving at the fix, such as "by bike at 18 km/h", or nil when it was not.
-    static func movement(of payload: LocationPayload) -> String? {
-        guard let speed = payload.speed, speed >= ProtocolConstants.estimateMinSpeed else { return nil }
-        let mode = switch TravelMode(speed: speed) {
-        case .foot: "on foot"
-        case .bike: "by bike"
-        case .car: "by car"
-        }
-        return "\(mode) at \(Int((speed * 3.6).rounded())) km/h"
+    /// How far this phone's last fix is from a contact's, such as "850 m", "1.4 km" or "18 km", while
+    /// sharing keeps that fix current.
+    static func distance(to contact: Contact, in state: PersistedState) -> String? {
+        guard state.sharingEnabled, let own = state.lastFix, let payload = contact.lastPayload else { return nil }
+        let metres = CLLocation(latitude: own.latitude, longitude: own.longitude)
+            .distance(from: CLLocation(latitude: payload.latitude, longitude: payload.longitude))
+        let rounded = Int((metres / 10).rounded()) * 10
+        if rounded < 1_000 { return "\(rounded) m" }
+        let km = metres / 1_000
+        return km < 10 ? "\(km.formatted(.number.precision(.fractionLength(1)))) km" : "\(Int(km.rounded())) km"
     }
 }
 

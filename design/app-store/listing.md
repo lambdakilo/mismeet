@@ -29,7 +29,7 @@ Your phone publishes its location to Nostr relays, encrypted separately for each
 - Add a contact by scanning the QR code of their invite, or by pasting it.
 - Watch your contacts without sharing anything yourself: sharing is off until you turn it on, and until then the app needs no location permission.
 - Choose for each contact whether you share your location with them.
-- See everyone on the map at a glance, with how long ago each position was seen.
+- See everyone on the map at a glance, with where and how long ago each position was seen and how far each person is from you.
 - Your location updates in the background as you move.
 - No sign-up, no email, no phone number. Your identity is a key that stays on your phone.
 

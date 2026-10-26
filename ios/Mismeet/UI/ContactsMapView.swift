@@ -106,6 +106,9 @@ struct ContactsMapView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
+                    if let distance = ContactRow.distance(to: contact, in: model.state) {
+                        Text(distance).font(.subheadline).foregroundStyle(.secondary)
+                    }
                     Button("Close", systemImage: "xmark") {
                         focused = nil
                         show(.nearby)

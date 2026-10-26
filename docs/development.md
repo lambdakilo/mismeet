@@ -274,8 +274,8 @@ to fetch.
    Add > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
    "Location: accepted by N of 3 relays" within a few seconds.
 3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
-   code", allow the camera, scan it, name the contact, Add. The row shows "Seen ... within N m"
-   after the next refresh, within a minute, or at once with Refresh. Both apps open on the map,
+   code", allow the camera, scan it, name the contact, Add. The row shows the district, "seen ...",
+   and the distance after the next refresh, within a minute, or at once with Refresh. Both apps open on the map,
    framed around everyone with a known position in the phone's own country. After panning, the
    button at the bottom frames that view again; with someone abroad, "Everyone" in that view
    widens it to them too.

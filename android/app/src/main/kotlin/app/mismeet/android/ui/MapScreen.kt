@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.DashPathEffect
 import android.graphics.drawable.BitmapDrawable
-import android.text.format.DateUtils
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -195,8 +194,7 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
                         position = GeoPoint(payload.latitude, payload.longitude)
                         icon = BitmapDrawable(view.resources, avatar)
                         title = contact.name
-                        snippet = "Seen ${DateUtils.getRelativeTimeSpanString(payload.fixTime * 1000)}, within ${payload.accuracy} m" +
-                            movement(payload)?.let { ", $it" }.orEmpty()
+                        snippet = status(contact, placeNames[contact.id])
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     }
                 }
@@ -230,6 +228,7 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
                             Text(contact.name, style = MaterialTheme.typography.titleMedium)
                             Text(status(contact, placeNames[contact.id]), style = MaterialTheme.typography.bodySmall)
                         }
+                        distance(contact, state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
                         IconButton(onClick = onUnfocus) { Icon(Icons.Filled.Close, contentDescription = "Close") }
                     }
                 }

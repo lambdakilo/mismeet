@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.location.Location
 import android.net.Uri
 import android.text.format.DateUtils
 import androidx.activity.result.PickVisualMediaRequest
@@ -45,11 +46,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.unit.dp
 import app.mismeet.android.AppModel
 import app.mismeet.android.store.Contact
+import app.mismeet.android.store.PersistedState
 import app.mismeet.protocol.LocationPayload
 import app.mismeet.protocol.ProtocolConstants
 import app.mismeet.protocol.TravelMode
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -91,6 +94,7 @@ fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifie
                 ContactRow(
                     contact = contact,
                     place = placeNames[contact.id],
+                    distance = distance(contact, state),
                     photo = model.photo(contact),
                     onFocus = { onFocus(contact.id) },
                     onPhoto = { if (contact.photoSetAt == null) choosePhoto(contact.id) else photoFor = contact },
@@ -146,6 +150,7 @@ fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifie
 private fun ContactRow(
     contact: Contact,
     place: String?,
+    distance: String?,
     photo: Bitmap?,
     onFocus: () -> Unit,
     onPhoto: () -> Unit,
@@ -161,6 +166,7 @@ private fun ContactRow(
                     Text(contact.name, style = MaterialTheme.typography.titleMedium)
                     Text(status(contact, place), style = MaterialTheme.typography.bodySmall)
                 }
+                if (distance != null) Text(distance, style = MaterialTheme.typography.bodyMedium)
                 if (onShare != null) Switch(checked = contact.share, onCheckedChange = onShare)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -172,20 +178,33 @@ private fun ContactRow(
     }
 }
 
-/** Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago, within 30 m". */
+/** Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago". */
 fun status(contact: Contact, place: String?): String {
     val payload = contact.lastPayload
     if (payload != null) {
         val age = DateUtils.getRelativeTimeSpanString(payload.fixTime * 1000, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
         val stale = if (contact.sharing == Contact.SharingStatus.NOT_SHARING) ", no longer sharing" else ""
-        val moving = movement(payload)?.let { ", $it" }.orEmpty()
-        val seen = "$age, within ${payload.accuracy} m$moving$stale"
-        return if (place != null) "$place, seen $seen" else "Seen $seen"
+        return if (place != null) "$place, seen $age$stale" else "Seen $age$stale"
     }
     return when (contact.sharing) {
         Contact.SharingStatus.NOT_SHARING -> "Not sharing with you"
         else -> "No location yet"
     }
+}
+
+/**
+ * How far this phone's last fix is from a contact's, such as "850 m", "1.4 km" or "18 km", while
+ * sharing keeps that fix current.
+ */
+fun distance(contact: Contact, state: PersistedState): String? {
+    val payload = contact.lastPayload ?: return null
+    val own = state.lastFix?.takeIf { state.sharingEnabled } ?: return null
+    val result = FloatArray(1)
+    Location.distanceBetween(own.latitude, own.longitude, payload.latitude, payload.longitude, result)
+    val rounded = (result[0] / 10).roundToInt() * 10
+    if (rounded < 1_000) return "$rounded m"
+    val km = result[0] / 1_000
+    return if (km < 10) String.format(Locale.getDefault(), "%.1f km", km) else "${km.roundToInt()} km"
 }
 
 /** How a contact was moving at the fix, such as "by bike at 18 km/h", or null when it was not. */
