@@ -5,9 +5,27 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Watch without sharing on iOS too, run on Android 10, drop Share invite
+## Drop the relay list from the Me screen
 
 2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**47.**
+> [pasted: 3 lines of terminal output with the phone's ABI list]
+> still nothing on play store its unavailable double check or should i
+> reboot phone
+
+**48.** (a reply button)
+> nokia is plugged in again, check what its play store shows
+
+**49.**
+> remove the listing and adding ability of the relays
+
+(Run the iOS unit tests although simulator boots crashed PosterBoard?)
+> Run them (Recommended)
+
+## Watch without sharing on iOS too, run on Android 10, drop Share invite
+
+2026-10-26, commit [f8f0b8f](https://github.com/lambdakilo/mismeet/commit/f8f0b8fab269ccb56c87295f41ddf0f57722240f), model claude-opus-5-5, effort xhigh.
 
 **44.**
 > can you make the most simple post or some info to the mismeet testers

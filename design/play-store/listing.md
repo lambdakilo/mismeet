@@ -73,7 +73,7 @@ As submitted in Play Console on 2026-10-24.
 - Data safety: no data collected and none shared. The developer runs no server; the location
   leaves the phone only end-to-end encrypted for the chosen contacts, which Play exempts from
   disclosure, and the app has no analytics, ads or crash reporting. Data is encrypted in
-  transit. The relays the user chooses still see a public key, an IP address and publish times,
+  transit. The Nostr relays still see a public key, an IP address and publish times,
   and the Overpass API sees an IP address and the road squares it serves, as `PRIVACY.md` says.
 
 ## Sensitive permissions

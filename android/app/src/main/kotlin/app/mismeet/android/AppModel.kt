@@ -216,29 +216,6 @@ class AppModel private constructor(private val context: Context) {
         recipientsChanged()
     }
 
-    // Relays
-
-    fun addRelay(text: String) {
-        val url = runCatching { RelayUrl.parse(text.trim()) }.getOrNull()
-        if (url == null) {
-            tell("Not a relay URL: $text")
-            return
-        }
-        val value = url.toString()
-        if (value in _state.value.relays) return
-        if (_state.value.relays.size >= ProtocolConstants.MAX_RELAYS_PER_LIST) {
-            tell("At most ${ProtocolConstants.MAX_RELAYS_PER_LIST} relays")
-            return
-        }
-        update { it.copy(relays = it.relays + value) }
-        if (_state.value.sharingEnabled) scope.launch { publishRelayList() }
-    }
-
-    fun removeRelay(url: String) {
-        update { it.copy(relays = it.relays - url) }
-        if (_state.value.sharingEnabled) scope.launch { publishRelayList() }
-    }
-
     // Publishing
 
     private suspend fun publishFresh(trigger: Trigger) {

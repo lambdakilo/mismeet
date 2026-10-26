@@ -75,7 +75,7 @@ No account, login or sample files are needed.
 With a single device, the Me tab shows the invite and the map shows your own position. Seeing a contact needs a second device running Mismeet, as in the screen recording.
 
 External services
-- Public Nostr relays: relay.damus.io, nos.lol and relay.primal.net by default, changeable on the Me tab. They store the encrypted location events and the list of relays each user publishes to, and cannot read locations.
+- Public Nostr relays: relay.damus.io, nos.lol and relay.primal.net. They store the encrypted location events and the list of relays each user publishes to, and cannot read locations.
 - Apple MapKit for the map.
 - The open-source Nostr Dev Kit library (MIT licence) for the Nostr protocol and the encryption.
 Mismeet uses no authentication, payment, analytics, advertising or AI service, and has no server of its own.

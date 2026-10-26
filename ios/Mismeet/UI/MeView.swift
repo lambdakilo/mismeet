@@ -2,7 +2,6 @@ import SwiftUI
 
 struct MeView: View {
     @Environment(AppModel.self) private var model
-    @State private var newRelay = ""
 
     var body: some View {
         NavigationStack {
@@ -42,22 +41,6 @@ struct MeView: View {
                         Text("Off: this phone only watches its contacts, publishes nothing and needs no location permission.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                    }
-                }
-                Section("Relays") {
-                    ForEach(model.state.relays, id: \.self) { relay in
-                        Text(relay).font(.footnote.monospaced())
-                    }
-                    .onDelete { offsets in model.removeRelays(at: offsets) }
-                    HStack {
-                        TextField("wss://", text: $newRelay)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                        Button("Add") {
-                            model.addRelay(newRelay)
-                            newRelay = ""
-                        }
-                        .disabled(newRelay.isEmpty)
                     }
                 }
                 if model.showsLog {

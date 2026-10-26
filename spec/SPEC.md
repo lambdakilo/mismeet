@@ -250,7 +250,7 @@ Section 13 lists this deviation.
 ### 7.1 Relay lists
 
 Each user has a relay list in the app, two to four `wss://` URLs, seeded from the app's default
-list and editable. The list is used for both writing and reading.
+list. The app offers no way to view or edit it. The list is used for both writing and reading.
 
 The publisher advertises its list as a NIP-65 kind `10002` event with one `r` tag per relay and
 no marker (read and write), empty content, published to every relay on the list. It is
@@ -306,9 +306,8 @@ A relay is suitable when it:
 - preferably lists NIP-40 in its NIP-11 `supported_nips`,
 - serves events to unauthenticated readers.
 
-The app checks NIP-11 when a relay is added and warns on a known mismatch. Candidate defaults,
-to be verified against this list before release: `wss://relay.damus.io`, `wss://nos.lol`,
-`wss://relay.primal.net`.
+The app's default relays are chosen against this list. Candidate defaults, to be verified
+against it before release: `wss://relay.damus.io`, `wss://nos.lol`, `wss://relay.primal.net`.
 
 ## 8. Client behaviour
 

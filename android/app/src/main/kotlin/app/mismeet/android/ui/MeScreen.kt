@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.mismeet.android.AppModel
@@ -53,7 +51,6 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     val log by model.log.collectAsState()
     val context = LocalContext.current
-    val focus = LocalFocusManager.current
     var permissionVersion by remember { mutableIntStateOf(0) }
     val permissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         permissionVersion++
@@ -69,7 +66,6 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
     }
     val inviteLink = remember(state.relays) { model.inviteLink() }
     val qr = remember(inviteLink) { qrBitmap(inviteLink) }
-    var newRelay by remember { mutableStateOf("") }
     // Google Play requires this disclosure to come right before each location permission request.
     var pendingLocationRequest by remember { mutableStateOf<Array<String>?>(null) }
 
@@ -130,18 +126,6 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
             state.lastPublishedAt?.let { Text("Last published ${DateFormat.getTimeFormat(context).format(it)}", style = MaterialTheme.typography.bodySmall) }
         }
 
-        Text("Relays", style = MaterialTheme.typography.titleMedium)
-        state.relays.forEach { relay ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(relay, style = MaterialTheme.typography.bodySmall)
-                TextButton(onClick = { model.removeRelay(relay) }) { Text("Remove") }
-            }
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(value = newRelay, onValueChange = { newRelay = it }, label = { Text("wss://") }, modifier = Modifier.weight(1f))
-            Button(onClick = { model.addRelay(newRelay); newRelay = ""; focus.clearFocus() }, enabled = newRelay.isNotBlank()) { Text("Add") }
-        }
-
         if (BuildConfig.SHOWS_LOG) {
             Text("Log", style = MaterialTheme.typography.titleMedium)
             log.asReversed().forEach { line ->
@@ -153,7 +137,7 @@ fun MeScreen(model: AppModel, modifier: Modifier = Modifier) {
 
 private const val LOCATION_DISCLOSURE =
     "Mismeet collects location data to share your position with the contacts you choose, even when the app is closed " +
-        "or not in use. Each position is encrypted for those contacts alone, sent to the relays in your relay list and " +
+        "or not in use. Each position is encrypted for those contacts alone, sent to public Nostr relays and " +
         "expires after 24 hours. It is never used for ads."
 
 private fun qrBitmap(text: String, size: Int = 480): Bitmap {

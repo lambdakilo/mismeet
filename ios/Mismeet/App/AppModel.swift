@@ -259,30 +259,6 @@ final class AppModel {
         }
     }
 
-    // MARK: Relays
-
-    func addRelay(_ text: String) {
-        guard let url = try? RelayUrl.parse(url: text.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-            tell("Not a relay URL: \(text)")
-            return
-        }
-        let value = url.description
-        guard !state.relays.contains(value) else { return }
-        guard state.relays.count < ProtocolConstants.maxRelaysPerList else {
-            tell("At most \(ProtocolConstants.maxRelaysPerList) relays")
-            return
-        }
-        state.relays.append(value)
-        save()
-        if state.sharingEnabled { Task { await publishRelayList() } }
-    }
-
-    func removeRelays(at offsets: IndexSet) {
-        state.relays.remove(atOffsets: offsets)
-        save()
-        if state.sharingEnabled { Task { await publishRelayList() } }
-    }
-
     // MARK: Publishing
 
     func publishNow() {

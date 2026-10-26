@@ -25,10 +25,10 @@ notification shows while it runs.
 
 When you look at your contacts, the app asks those relays for their latest events.
 
-The relays are run by third parties under their own terms. The defaults are relay.damus.io,
-nos.lol and relay.primal.net, and you can change them. A relay can see your public key, when
-you publish, your IP address, roughly how many contacts you share with (rounded up to 4, 8, 16,
-32 or 64) and, when you fetch, which public keys you ask about. Section 9 of the
+The relays are run by third parties under their own terms. The app uses relay.damus.io, nos.lol
+and relay.primal.net. A relay can see your public key, when you publish, your IP address,
+roughly how many contacts you share with (rounded up to 4, 8, 16, 32 or 64) and, when you
+fetch, which public keys you ask about. Section 9 of the
 [protocol specification](spec/SPEC.md) describes this in detail.
 
 ## Maps, roads and pictures
