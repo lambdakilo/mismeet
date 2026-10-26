@@ -82,6 +82,13 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         monitoring = true
     }
 
+    /// Also ends a registration left by an earlier process, which would otherwise keep relaunching the app.
+    func stopMonitoring() {
+        manager.stopMonitoringSignificantLocationChanges()
+        manager.allowsBackgroundLocationUpdates = false
+        monitoring = false
+    }
+
     func requestFreshFix() {
         manager.requestLocation()
     }

@@ -114,7 +114,7 @@ class AppModel private constructor(private val context: Context) {
         if (_state.value.sharingEnabled == enabled) return
         update { it.copy(sharingEnabled = enabled) }
         if (enabled) {
-            if (_state.value.relayListPublishedAt == null) scope.launch { publishRelayList() }
+            scope.launch { publishRelayList() }
             if (LocationProvider.hasForegroundPermission(context)) LocationService.start(context)
         } else {
             LocationService.stop(context)

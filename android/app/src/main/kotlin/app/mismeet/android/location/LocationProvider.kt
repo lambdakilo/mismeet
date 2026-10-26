@@ -9,6 +9,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.CancellationSignal
 import android.os.PowerManager
+import androidx.core.location.LocationManagerCompat
 import app.mismeet.protocol.LocationFix
 import kotlin.coroutines.resume
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -28,7 +29,7 @@ object LocationProvider {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
-    /** Stock Android 12 stops a foreground service it considers wasteful unless the app is exempted. */
+    /** Stock Android stops a foreground service it considers wasteful unless the app is exempted. */
     fun isIgnoringBatteryOptimizations(context: Context): Boolean =
         context.getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(context.packageName) ?: true
 
@@ -43,7 +44,7 @@ object LocationProvider {
                 val signal = CancellationSignal()
                 continuation.invokeOnCancellation { signal.cancel() }
                 try {
-                    manager.getCurrentLocation(provider, signal, context.mainExecutor) { continuation.resume(it) }
+                    LocationManagerCompat.getCurrentLocation(manager, provider, signal, context.mainExecutor) { continuation.resume(it) }
                 } catch (e: SecurityException) {
                     continuation.resume(null)
                 }

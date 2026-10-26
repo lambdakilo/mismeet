@@ -12,7 +12,7 @@ deletes all of it.
 
 ## What leaves your phone
 
-Only when you share your location, which on Android is off until you turn it on:
+Only when you share your location, which is off until you turn it on:
 
 - Your location goes to the Nostr relays in your relay list as one event, encrypted end to end
   separately for each contact you share with (NIP-44). It expires after 24 hours, and each new

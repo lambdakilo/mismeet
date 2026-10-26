@@ -5,9 +5,32 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Watch without sharing on iOS too, run on Android 10, drop Share invite
+
+2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**44.**
+> can you make the most simple post or some info to the mismeet testers
+> group that has the google play link so testers dont have to copy many
+> links
+
+**45.**
+> can you do it in informal finnish like i speak in slack underscored
+
+**46.**
+> oof the share invite button sucks balls. remove that. also it seems
+> my android 10 nokia 3.1 isnt "supported"? also can you make it so
+> that the app is usable without giving permission to use your location
+> if wanted? like you can just see other persons location at first if
+> youre skeptical
+
+(Boot the iPhone 17 and iPhone 18 Pro Max simulators for tests and
+screenshots)
+> Boot both (Recommended)
+
 ## Drop the npub prefix comparison from spec 4.1
 
-2026-10-25, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [d2d0a98](https://github.com/lambdakilo/mismeet/commit/d2d0a98cc74116d109b3e04a7422ba69d4764132), model claude-opus-5-5, effort xhigh.
 
 **43.** (answering whether the apps should show the prefix or the spec should drop it)
 > drop the npub prefix sentence from spec 4.1 instead

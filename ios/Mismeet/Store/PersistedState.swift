@@ -9,6 +9,7 @@ struct PersistedState: Codable, Equatable {
     var lastPublishedAt: Date?
     var lastFix: LocationFix?
     var relayListPublishedAt: Date?
+    var sharingEnabled = false
 }
 
 extension PersistedState {
@@ -21,6 +22,8 @@ extension PersistedState {
         lastPublishedAt = try container.decodeIfPresent(Date.self, forKey: .lastPublishedAt)
         lastFix = try container.decodeIfPresent(LocationFix.self, forKey: .lastFix)
         relayListPublishedAt = try container.decodeIfPresent(Date.self, forKey: .relayListPublishedAt)
+        // Before the switch existed, a phone that had published a location was sharing.
+        sharingEnabled = try container.decodeIfPresent(Bool.self, forKey: .sharingEnabled) ?? (lastPublishedCreatedAt != nil)
     }
 }
 

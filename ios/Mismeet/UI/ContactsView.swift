@@ -71,11 +71,13 @@ struct ContactRow: View {
                 Text(status).font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer()
-            Toggle("Share my location", isOn: Binding(
-                get: { contact.share },
-                set: { model.setShare(contact.id, $0) }
-            ))
-            .labelsHidden()
+            if model.state.sharingEnabled {
+                Toggle("Share my location", isOn: Binding(
+                    get: { contact.share },
+                    set: { model.setShare(contact.id, $0) }
+                ))
+                .labelsHidden()
+            }
         }
         .onChange(of: pickedPhoto) { _, item in
             guard let item else { return }

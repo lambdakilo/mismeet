@@ -17,7 +17,7 @@ follows it, and a protocol change edits the spec first, in the same change.
   `UI/`.
 - `android/`: Kotlin, built with the Gradle wrapper checked into `android/`. Two modules:
   `app` (the Android app, Compose) and `protocol` (a plain JVM library holding the protocol core
-  and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 31 so that stock Android 12
+  and its tests). `compileSdk` and `targetSdk` are 36, `minSdk` is 29 so that Android 10
   phones run it. No Google Play Services dependency: location comes from the platform
   `LocationManager` inside a foreground service that publishes on a fixed timer, never from the
   fused provider. Under `android/app/src/main/kotlin/app/mismeet/android/`: `AppModel.kt`,
@@ -47,6 +47,10 @@ follows it, and a protocol change edits the spec first, in the same change.
   table in the spec, section 10. The conformance checklist in section 12 is a unit test on each
   platform, under `ios/MismeetTests` and `android/protocol/src/test`.
 - Nothing but kinds `31122` and `10002` is ever published. No profile, no contact list, no DMs.
+- Publishing is opt-in and off by default on both platforms (spec section 8.1): the phone then
+  only watches its contacts, publishes nothing, not even its relay list, and needs no location
+  permission. The "Share my location" switch on the Me screen turns it on. Keep every
+  publishing path behind `sharingEnabled`.
 - Never log a secret key, a decrypted payload or a contact's public key above debug level.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.
@@ -344,20 +348,19 @@ sips -Z 600 design/screenshots/<name>.png
 - GrapheneOS has no Google location services. The network location provider exists only when the
   user turns on GrapheneOS's own network location in Settings, so rely on `GPS_PROVIDER` and
   treat `NETWORK_PROVIDER` as optional.
-- Publishing from Android is opt-in and off by default: the phone then only watches its
-  contacts, publishes nothing (not even its relay list) and asks for no permission; the QR
-  scanner asks for the camera when used. The "Share my location" switch on the Me screen turns
-  publishing on, and only then do the location, notification and battery prompts appear and
-  the foreground service run. Keep every publishing path behind `sharingEnabled`.
-- `minSdk` is 31: `POST_NOTIFICATIONS` exists from API 33, so permission checks for it are gated
-  on the API level, and stock Android 12 needs the battery optimisation exemption the Me screen
-  offers or it stops the foreground service.
+- On Android, the location, notification and battery prompts appear and the foreground service
+  runs only once "Share my location" is on; the QR scanner asks for the camera when used.
+- `minSdk` is 29, Android 10: `POST_NOTIFICATIONS` exists from API 33, so permission checks for
+  it are gated on the API level, `LocationManager.getCurrentLocation` from API 30, so fixes go
+  through `LocationManagerCompat`, and stock Android 12 needs the battery optimisation exemption
+  the Me screen offers or it stops the foreground service.
 - Background location is a foreground service with `foregroundServiceType="location"`. It needs
   `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`, `ACCESS_FINE_LOCATION`,
-  `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION` and `POST_NOTIFICATIONS`. Android
-  grants "while in use" first and "all the time" only from the app's settings page, so the app
-  has to send the user there.
-- The Nostr Dev Kit AAR ships native libraries for every ABI; the phones are arm64-v8a. A native
+  `ACCESS_COARSE_LOCATION`, `ACCESS_BACKGROUND_LOCATION` and `POST_NOTIFICATIONS`. From
+  Android 11, Android grants "while in use" first and "all the time" only from the app's
+  settings page, so the app has to send the user there.
+- The Nostr Dev Kit AAR ships native libraries for every ABI; the build keeps arm64-v8a and,
+  for older 32-bit phones, armeabi-v7a. A native
   crash at startup on GrapheneOS is most likely its hardened memory allocator: check the
   per-app exploit protection compatibility mode before debugging anything else, and report it.
 - AndroidX is pinned to the last versions that compile against API 36; the newer ones demand

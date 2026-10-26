@@ -314,13 +314,18 @@ to be verified against this list before release: `wss://relay.damus.io`, `wss://
 
 ### 8.1 When to publish
 
+Sharing is off until the user turns it on. Until then the device only watches its contacts: it
+publishes nothing, kind `10002` included, and needs no location permission. Turning sharing
+off counts as switching `share` off for every contact (section 8.3).
+
 A publisher publishes when:
 
 - iOS: a significant location change wakes the app, the app comes to the foreground, or the
   user asks for a refresh;
 - Android: the foreground service's location timer fires (default every 10 minutes, whether or
   not the position changed), the app comes to the foreground, or the user asks for a refresh;
-- either platform: a contact is removed or its `share` flag changes, or the relay list changes.
+- either platform: a contact is removed or its `share` flag changes, the relay list changes, or
+  the user turns sharing on or off; turning it on also publishes the relay list.
 
 Publishing is throttled to at most once per 60 seconds, except for the contact and relay list
 changes above. The fix used MUST be at most one hour old; if no such fix exists the publisher

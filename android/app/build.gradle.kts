@@ -12,14 +12,14 @@ android {
 
     defaultConfig {
         applicationId = "app.mismeet.android"
-        minSdk = 31
+        minSdk = 29
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = "0.1.0"
-        // Both test phones and the Apple silicon emulator are arm64; the other ABIs would
-        // triple the APK through the bindings' native libraries.
+        // Phones are arm64 or, among older ones, 32-bit ARM; the x86 builds of the bindings'
+        // native libraries would only make the APK larger.
         ndk {
-            abiFilters += listOf("arm64-v8a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
 

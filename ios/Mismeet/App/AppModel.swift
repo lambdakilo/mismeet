@@ -59,9 +59,13 @@ final class AppModel {
         location.onFix = { [weak self] fix in self?.handle(fix: fix) }
         location.onAuthorizationChange = { [weak self] status in
             self?.authorization = status
-            self?.location.startMonitoringIfAuthorized()
+            if self?.state.sharingEnabled == true { self?.location.startMonitoringIfAuthorized() }
         }
-        location.startMonitoringIfAuthorized()
+        if state.sharingEnabled {
+            location.startMonitoringIfAuthorized()
+        } else {
+            location.stopMonitoring()
+        }
         NotificationCenter.default.addObserver(
             forName: UIApplication.protectedDataDidBecomeAvailableNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -70,7 +74,7 @@ final class AppModel {
                 self.state = self.store.load()
             }
         }
-        if state.relayListPublishedAt == nil {
+        if state.sharingEnabled, state.relayListPublishedAt == nil {
             Task { await publishRelayList() }
         }
         #if DEBUG
@@ -116,7 +120,7 @@ final class AppModel {
 
     func becameActive() {
         Task { await refresh() }
-        if authorization == .authorizedAlways || authorization == .authorizedWhenInUse {
+        if state.sharingEnabled, authorization == .authorizedAlways || authorization == .authorizedWhenInUse {
             pendingTrigger = .foreground
             location.requestFreshFix()
         }
@@ -124,6 +128,26 @@ final class AppModel {
 
     func requestLocationAuthorization() {
         location.requestAuthorization()
+    }
+
+    /// Publishing is opt-in: off, the phone only watches its contacts, publishes nothing and needs
+    /// no permission. On, it advertises its relays, asks for location and monitors it.
+    func setSharingEnabled(_ enabled: Bool) {
+        guard state.sharingEnabled != enabled else { return }
+        state.sharingEnabled = enabled
+        save()
+        if enabled {
+            Task { await publishRelayList() }
+            if authorization == .notDetermined { location.requestAuthorization() }
+            location.startMonitoringIfAuthorized()
+            if authorization == .authorizedAlways || authorization == .authorizedWhenInUse {
+                pendingTrigger = .manual
+                location.requestFreshFix()
+            }
+        } else {
+            location.stopMonitoring()
+            recipientsChanged()
+        }
     }
 
     // MARK: Contacts
@@ -250,18 +274,19 @@ final class AppModel {
         }
         state.relays.append(value)
         save()
-        Task { await publishRelayList() }
+        if state.sharingEnabled { Task { await publishRelayList() } }
     }
 
     func removeRelays(at offsets: IndexSet) {
         state.relays.remove(atOffsets: offsets)
         save()
-        Task { await publishRelayList() }
+        if state.sharingEnabled { Task { await publishRelayList() } }
     }
 
     // MARK: Publishing
 
     func publishNow() {
+        guard state.sharingEnabled else { return }
         guard authorization == .authorizedAlways || authorization == .authorizedWhenInUse else {
             tell("Location permission is needed to publish")
             return
@@ -271,6 +296,7 @@ final class AppModel {
     }
 
     private func handle(fix: LocationFix) {
+        guard state.sharingEnabled else { return }
         let trigger = pendingTrigger ?? .wakeup
         pendingTrigger = nil
         state.lastFix = fix
@@ -380,7 +406,8 @@ final class AppModel {
     }
 
     private func sharingRecipients() -> [PublicKey] {
-        state.contacts.filter(\.share).compactMap(\.publicKey)
+        guard state.sharingEnabled else { return [] }
+        return state.contacts.filter(\.share).compactMap(\.publicKey)
     }
 
     private func batteryLevel() -> Double? {

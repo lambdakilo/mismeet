@@ -27,6 +27,7 @@ Mismeet shows the people you choose where you are, and you where they are, witho
 Your phone publishes its location to Nostr relays, encrypted separately for each person you share with. Relays pass it along but can read neither the location nor who it is for, and every location expires after 24 hours.
 
 - Add a contact by scanning the QR code of their invite, or by pasting it.
+- Watch your contacts without sharing anything yourself: sharing is off until you turn it on, and until then the app needs no location permission.
 - Choose for each contact whether you share your location with them.
 - See everyone on the map at a glance, with how long ago each position was seen.
 - Your location updates in the background as you move.
@@ -52,7 +53,7 @@ location,sharing,friends,family,map,privacy,encrypted,nostr,find,where,meet
 ```text
 Mismeet needs no account: each install creates its own key on the device.
 
-Location: the app asks for location while in use, then Always. With Always it publishes the user's position, end-to-end encrypted, on significant location changes while the app is closed, so that the contacts the user chose see a recent position. It publishes only for contacts the user added and left sharing on, and nothing when there are none.
+Location: sharing is off until the user turns on Share my location on the Me tab; until then the app only shows contacts and needs no location permission. Turned on, it asks for location while in use, then Always. With Always it publishes the user's position, end-to-end encrypted, on significant location changes while the app is closed, so that the contacts the user chose see a recent position. It publishes only for contacts the user added and left sharing on, and nothing when there are none.
 
 To try it, use two devices. On each, open the Me tab to show the invite QR code. On the other, open Contacts, tap +, then Scan QR code, and add it. Within a minute each phone shows the other on the map. With one device, the Me tab shows the invite and the map shows your own position.
 ```
@@ -68,7 +69,7 @@ Mismeet lets people share their location with the family members and friends the
 
 Setup and main features
 No account, login or sample files are needed.
-1. Open Mismeet and allow location access while using the app, then Always, so that the position updates in the background.
+1. Open Mismeet, turn on Share my location on the Me tab and allow location access while using the app, then tap Allow location for Always, so that the position updates in the background.
 2. To add a contact, open the Me tab on their device to show its invite QR code. On yours, open Contacts, tap +, tap Scan QR code, scan it, type a name and tap Add. Do the same the other way round to share in both directions.
 3. Within about a minute the Map tab shows the contact's position together with yours, and the Contacts tab shows how long ago it was seen. Each contact has a switch to stop sharing your location with them, and swiping a contact removes it.
 With a single device, the Me tab shows the invite and the map shows your own position. Seeing a contact needs a second device running Mismeet, as in the screen recording.

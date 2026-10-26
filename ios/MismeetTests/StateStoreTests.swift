@@ -33,6 +33,7 @@ final class StateStoreTests: XCTestCase {
         XCTAssertEqual(state.relays, PersistedState.defaultRelays)
         XCTAssertEqual(state.lastFix?.horizontalAccuracy, 8)
         XCTAssertNil(state.lastFix?.speed)
+        XCTAssertTrue(state.sharingEnabled)
     }
 
     func testFillsInFieldsAnOlderFileLacks() throws {
@@ -42,6 +43,7 @@ final class StateStoreTests: XCTestCase {
         XCTAssertEqual(contact.sharing, .unknown)
         XCTAssertNil(contact.photoSetAt)
         XCTAssertEqual(state.relays, PersistedState.defaultRelays)
+        XCTAssertFalse(state.sharingEnabled)
     }
 
     func testMovesAnUndecodableFileAsideBeforeStartingEmpty() throws {

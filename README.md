@@ -22,9 +22,9 @@ the Mac, as described under Testing without a second phone.
 The protocol is specified and both apps build with the protocol core and its conformance
 tests, a device key, local contact and relay storage, relay publishing and fetching, location
 monitoring and a first set of screens. Neither app has been exercised end to end on a phone
-yet. An invite is a link, `https://lambdakilo.github.io/mismeet/i#nprofile1...`, sent from the
-Me screen with Share invite, scanned as a QR code or pasted; tapping it on a phone with Mismeet
-opens Add contact with the invite filled in. A contact can have a photo, kept on the
+yet. An invite is a link, `https://lambdakilo.github.io/mismeet/i#nprofile1...`, copied from
+the Me screen, scanned as a QR code or pasted; tapping it on a phone with Mismeet opens Add
+contact with the invite filled in. A contact can have a photo, kept on the
 phone, and the map shows a moving contact's likely position along the roads since the last
 fix, from OpenStreetMap data (spec section 8.6). The map opens on the people in the phone's own
 country, and a button at the bottom widens it to everyone, abroad included.
@@ -66,7 +66,7 @@ Run the commands in this section and the next from the root of your checkout.
   `xcbeautify` from Homebrew, an Apple ID (a free one is enough: the app uses no push and no
   special entitlement) and an iPhone on iOS 18 or later. The test device is an iPhone XR.
 - Android: a JDK 17 or later (Temurin 21 here), the Android command line tools with
-  `platforms;android-36`, `build-tools;36.0.0` and `platform-tools`, and a phone on Android 12
+  `platforms;android-36`, `build-tools;36.0.0` and `platform-tools`, and a phone on Android 10
   or later. The test devices are a phone on GrapheneOS and a Motorola Moto G200 5G on Android
   12. Gradle comes from the checked-in wrapper; no Android Studio is needed.
 
@@ -285,10 +285,10 @@ adb logcat --pid="$(adb shell pidof -s app.mismeet.android)"
 - Stock Android, and Android 12 in particular, stops background services it considers
   wasteful. The Me screen offers the battery optimisation exemption; grant it, or the sharing
   service will not survive the screen being off for long.
-- Android asks for location "while in use" first and "all the time" only from the app's
-  settings page; the Me screen walks through both, but only once "Share my location" is on.
-  Off, which is the default, the phone only watches its contacts and needs no permission
-  beyond the camera for scanning a QR code.
+- From Android 11, Android asks for location "while in use" first and "all the time" only from
+  the app's settings page; the Me screen walks through both, but only once "Share my location"
+  is on. Off, which is the default on both platforms, the phone only watches its contacts and
+  needs no permission beyond the camera for scanning a QR code.
 
 ### First test between two phones
 
@@ -296,8 +296,9 @@ The iPhone publishes and the Android phone watches. Each phone scans the other's
 the iPhone's scan tells it whom to encrypt for, the Android phone's scan tells it whose events
 to fetch.
 
-1. On the iPhone, open Me, tap "Allow location" and grant it, then "Allow location" again for
-   "Always". The log on the same screen shows "Relay list: accepted by N of 3 relays".
+1. On the iPhone, open Me, turn on "Share my location" and grant location while using the app,
+   then tap "Allow location" for "Always". The log on the same screen shows "Relay list:
+   accepted by N of 3 relays".
 2. On the Android phone, open Me: its invite QR code is on screen. On the iPhone, Contacts >
    "+" > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
    "Location: accepted by N of 3 relays" within a few seconds.

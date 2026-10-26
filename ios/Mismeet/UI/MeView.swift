@@ -19,20 +19,29 @@ struct MeView: View {
                     Text(model.npub)
                         .font(.footnote.monospaced())
                         .textSelection(.enabled)
-                    ShareLink(item: model.inviteLink) { Text("Share invite") }
                     Button("Copy invite") {
                         UIPasteboard.general.string = model.inviteLink
                     }
                 }
-                Section("Location") {
-                    LabeledContent("Permission", value: model.authorizationText)
-                    if model.authorization != .authorizedAlways {
-                        Button("Allow location") { model.requestLocationAuthorization() }
-                    }
-                    Button("Publish now") { model.publishNow() }
-                        .disabled(model.isPublishing)
-                    if let at = model.state.lastPublishedAt {
-                        LabeledContent("Last published", value: at.formatted(date: .abbreviated, time: .shortened))
+                Section("Sharing from this phone") {
+                    Toggle("Share my location", isOn: Binding(
+                        get: { model.state.sharingEnabled },
+                        set: { model.setSharingEnabled($0) }
+                    ))
+                    if model.state.sharingEnabled {
+                        LabeledContent("Permission", value: model.authorizationText)
+                        if model.authorization != .authorizedAlways {
+                            Button("Allow location") { model.requestLocationAuthorization() }
+                        }
+                        Button("Publish now") { model.publishNow() }
+                            .disabled(model.isPublishing)
+                        if let at = model.state.lastPublishedAt {
+                            LabeledContent("Last published", value: at.formatted(date: .abbreviated, time: .shortened))
+                        }
+                    } else {
+                        Text("Off: this phone only watches its contacts, publishes nothing and needs no location permission.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 Section("Relays") {
