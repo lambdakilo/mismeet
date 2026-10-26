@@ -49,7 +49,7 @@ class RoadData(private val context: Context) {
         val file = File(directory, "${cell.row}_${cell.col}.json")
         val cached = file.takeIf { it.exists() && nowSeconds - it.lastModified() / 1000 < ProtocolConstants.ROAD_CELL_CACHE_SECONDS }
         val ways = cached?.let { runCatching { Overpass.parse(it.readText()) }.getOrNull() }
-            ?: fetch(cell)?.let { text ->
+            ?: fetchOverpass(context, Overpass.query(cell), "road cell ${cell.row}_${cell.col}")?.let { text ->
                 runCatching { Overpass.parse(text) }.getOrNull()?.also {
                     directory.mkdirs()
                     file.writeText(text)
@@ -65,29 +65,30 @@ class RoadData(private val context: Context) {
         true
     }
 
-    private fun fetch(cell: RoadCell): String? = runCatching {
-        val connection = URL(Overpass.URL).openConnection() as HttpURLConnection
-        try {
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.connectTimeout = 10_000
-            connection.readTimeout = 90_000
-            connection.setRequestProperty("User-Agent", "${context.packageName} (https://github.com/lambdakilo/mismeet)")
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-            connection.outputStream.use { it.write("data=${URLEncoder.encode(Overpass.query(cell), "UTF-8")}".toByteArray()) }
-            if (connection.responseCode == 200) {
-                connection.inputStream.bufferedReader().use { it.readText() }
-            } else {
-                // The cell says roughly where a contact is, so it stays at debug level.
-                Log.d("Mismeet", "Overpass answered ${connection.responseCode} for road cell ${cell.row}_${cell.col}")
-                null
-            }
-        } finally {
-            connection.disconnect()
-        }
-    }.onFailure { Log.d("Mismeet", "Overpass failed for road cell ${cell.row}_${cell.col}: $it") }.getOrNull()
-
     private companion object {
         const val MAX_CELLS_IN_MEMORY = 48
     }
 }
+
+/** Posts a query to Overpass, null unless it answers 200; [what] names the cell in debug logs. */
+internal fun fetchOverpass(context: Context, query: String, what: String): String? = runCatching {
+    val connection = URL(Overpass.URL).openConnection() as HttpURLConnection
+    try {
+        connection.requestMethod = "POST"
+        connection.doOutput = true
+        connection.connectTimeout = 10_000
+        connection.readTimeout = 90_000
+        connection.setRequestProperty("User-Agent", "${context.packageName} (https://github.com/lambdakilo/mismeet)")
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+        connection.outputStream.use { it.write("data=${URLEncoder.encode(query, "UTF-8")}".toByteArray()) }
+        if (connection.responseCode == 200) {
+            connection.inputStream.bufferedReader().use { it.readText() }
+        } else {
+            // The cell says roughly where a contact is, so it stays at debug level.
+            Log.d("Mismeet", "Overpass answered ${connection.responseCode} for $what")
+            null
+        }
+    } finally {
+        connection.disconnect()
+    }
+}.onFailure { Log.d("Mismeet", "Overpass failed for $what: $it") }.getOrNull()

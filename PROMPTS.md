@@ -5,9 +5,25 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Cut the README to one screen and move the rest to docs
+## Name contacts' districts and focus a contact from the list
 
 2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**1.**
+> i wanna concentrate a person from a list like on find me. instead of
+> city it should say the next smaller thing like instead of helsinki it
+> would say kumpula. ill paste some pictures on my iphone.
+> [pasted: three screenshots of Find My on the iPhone]
+
+(Where should a contact's district name come from?)
+> OSM, fixed squares (Recommended)
+
+**2.** (answering whether to commit, push to main and ship the test builds)
+> commit and push to main and ship the test builds
+
+## Cut the README to one screen and move the rest to docs
+
+2026-10-26, commit [92728bc](https://github.com/lambdakilo/mismeet/commit/92728bc55b0b105459840bc248a0aa85032748d9), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > fix the mismeet repo too to have oneliner description, oneliner
@@ -702,7 +718,7 @@ text in CLAUDE.md?)
 - npub: Nostr public key, bech32 encoded
 - npubs: Nostr public keys in their bech32 form
 - nvm: never mind
-- osm: OpenStreetMap
+- OSM: OpenStreetMap
 - pls: please
 - qr: quick response code
 - repo: repository

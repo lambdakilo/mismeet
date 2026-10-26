@@ -9,6 +9,8 @@ struct ContactsView: View {
 
     @Environment(AppModel.self) private var model
     @State private var adding: AddRequest?
+    /// Shows a contact on the map.
+    let focus: (String) -> Void
 
     var body: some View {
         NavigationStack {
@@ -21,7 +23,7 @@ struct ContactsView: View {
                     )
                 }
                 ForEach(model.state.contacts) { contact in
-                    ContactRow(contact: contact)
+                    ContactRow(contact: contact, focus: focus)
                 }
                 .onDelete { offsets in
                     model.removeContacts(at: offsets)
@@ -62,6 +64,7 @@ struct ContactRow: View {
     @State private var pickedPhoto: PhotosPickerItem?
     @State private var cropping: PickedImage?
     let contact: Contact
+    let focus: (String) -> Void
 
     var body: some View {
         HStack {
@@ -74,11 +77,21 @@ struct ContactRow: View {
                     Button("Remove photo", systemImage: "trash") { model.removePhoto(contact.id) }
                 }
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(contact.name).font(.headline)
-                Text(status).font(.subheadline).foregroundStyle(.secondary)
+            Button {
+                if contact.lastPayload != nil { focus(contact.id) }
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(contact.name).font(.headline)
+                        Text(ContactRow.status(of: contact, place: model.placeNames[contact.id]))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+                .contentShape(Rectangle())
             }
-            Spacer()
+            .buttonStyle(.plain)
             if model.state.sharingEnabled {
                 Toggle("Share my location", isOn: Binding(
                     get: { contact.share },
@@ -103,13 +116,15 @@ struct ContactRow: View {
         }
     }
 
-    private var status: String {
+    /// Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago, within 30 m".
+    static func status(of contact: Contact, place: String?) -> String {
         if let payload = contact.lastPayload {
             let fixed = Date(timeIntervalSince1970: TimeInterval(payload.fixTime))
             let age = RelativeDateTimeFormatter().localizedString(for: fixed, relativeTo: Date())
             let stale = contact.sharing == .notSharing ? ", no longer sharing" : ""
             let moving = ContactRow.movement(of: payload).map { ", \($0)" } ?? ""
-            return "Seen \(age), within \(payload.accuracy) m\(moving)\(stale)"
+            let seen = "\(age), within \(payload.accuracy) m\(moving)\(stale)"
+            return place.map { "\($0), seen \(seen)" } ?? "Seen \(seen)"
         }
         switch contact.sharing {
         case .notSharing: return "Not sharing with you"

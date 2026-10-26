@@ -4,6 +4,7 @@ struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.scenePhase) private var scenePhase
     @State private var screen = Screen.initial
+    @State private var focused: String?
 
     enum Screen: Hashable {
         case map, contacts, me
@@ -25,10 +26,13 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $screen) {
             Tab("Map", systemImage: "map", value: .map) {
-                ContactsMapView()
+                ContactsMapView(focused: $focused)
             }
             Tab("Contacts", systemImage: "person.2", value: .contacts) {
-                ContactsView()
+                ContactsView { id in
+                    focused = id
+                    screen = .map
+                }
             }
             Tab("Me", systemImage: "person.crop.circle", value: .me) {
                 MeView()
@@ -44,6 +48,12 @@ struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { model.becameActive() }
+        }
+        .task(id: model.state.contacts.map { "\($0.id):\($0.lastEventId ?? "")" }) {
+            while !Task.isCancelled {
+                await model.updatePlaceNames()
+                try? await Task.sleep(for: .seconds(ProtocolConstants.foregroundFetchIntervalSeconds))
+            }
         }
         .task {
             while !Task.isCancelled {

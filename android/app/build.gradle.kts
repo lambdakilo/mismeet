@@ -14,7 +14,7 @@ android {
         applicationId = "app.mismeet.android"
         minSdk = 29
         targetSdk = 36
-        versionCode = 8
+        versionCode = 9
         versionName = "0.1.0"
         // Phones are arm64 or, among older ones, 32-bit ARM; the x86 builds of the bindings'
         // native libraries would only make the APK larger.
@@ -23,8 +23,9 @@ android {
         }
     }
 
-    // The release key stays out of git: android/keystore.properties names it, as the README
-    // describes. Without that file there is no release signing and the release build fails.
+    // The release key stays out of git: android/keystore.properties names it, as
+    // docs/releasing.md describes. Without that file there is no release signing and the
+    // release build fails.
     val keystoreFile = rootProject.file("keystore.properties")
     if (keystoreFile.exists()) {
         val keystore = Properties().apply { keystoreFile.inputStream().use(::load) }

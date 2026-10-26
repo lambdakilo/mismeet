@@ -424,6 +424,36 @@ around the fix: `x = (lon - lon_fix) * cos(lat_fix) * 111320` and `y = (lat - la
 The estimate is the point where it stopped and the path travelled to it. The reader shows the
 path as a dashed line and the point as a faded marker labelled as estimated.
 
+### 8.7 Place name
+
+A reader names the district, town or village around a contact's last payload, such as
+Kumpula for a position in Helsinki, rather than the city. The name is for display only and is
+never published.
+
+Names are OpenStreetMap place nodes from the Overpass API, one cell at a time, so that, as
+with the road cells of section 8.6, the server learns areas and not positions. A position's
+place cell is `(floor(lat * 10), floor(lon * 5))`, so a cell spans 0.1 degrees of latitude
+and 0.2 of longitude, and its bounding box is `(row / 10, col / 5, (row + 1) / 10, (col + 1) /
+5)` written with one decimal. The query for a cell is:
+
+```text
+[out:json][timeout:25];
+node["place"~"^(suburb|town|village|city)$"]["name"](south,west,north,east);
+out;
+```
+
+Cells are cached on the device for 30 days. With distances on the plane of section 8.6 around
+the position, the reader:
+
+1. Loads every cell that the box from 5 km south-west to 5 km north-east of the position
+   touches. With any of them unavailable there is no name.
+2. Takes the nearest node whose `place` is `suburb`, `town` or `village` and that lies at most
+   5 km away, ties going to the lower node id.
+3. With no such node, takes the nearest `city` node at most 5 km away in the same way. With
+   none of those either there is no name.
+
+The name is that node's `name` tag.
+
 ## 9. Privacy and threat model
 
 What a relay operator, or anyone reading the relay, learns from the protocol:
@@ -452,6 +482,9 @@ Other properties:
 - A reader that shows estimates (section 8.6) asks the Overpass API for the road cells around
   contacts that move, which tells that server the reader's IP address and those cells, much
   as map tiles of the same area would.
+- A reader that shows place names (section 8.7) asks the Overpass API for the place cells,
+  about 10 km across, around every contact with a known position, which tells that server the
+  reader's IP address and those cells.
 - Device compromise, and keys extracted from an unlocked phone, are out of scope.
 
 ## 10. Constants and limits
@@ -488,6 +521,8 @@ Other properties:
 | Road snap bearing tolerance | 60 degrees |
 | Road cells per estimate | 12 |
 | Road cell cache | 30 days |
+| Place cell cache | 30 days |
+| Place name distance | 5 km |
 
 ## 11. Versioning
 
@@ -519,6 +554,8 @@ platform, and the protocol constants live in a single constants file per platfor
 10. Nothing is ever published except kinds `31122` and `10002`.
 11. An estimate follows section 8.6: the mode from `spd`, the ways each mode may use, the
     snap, the least turn at each node, and the speed, span and age limits.
+12. A place name follows section 8.7: the cells loaded, the place values and their order of
+    preference, the 5 km limit and the tie rule.
 
 ## 13. Deviations from NIPs and open questions for review
 

@@ -74,7 +74,8 @@ As submitted in Play Console on 2026-10-24.
   leaves the phone only end-to-end encrypted for the chosen contacts, which Play exempts from
   disclosure, and the app has no analytics, ads or crash reporting. Data is encrypted in
   transit. The Nostr relays still see a public key, an IP address and publish times,
-  and the Overpass API sees an IP address and the road squares it serves, as `PRIVACY.md` says.
+  and the Overpass API sees an IP address and the road and place name squares it serves, as
+  `PRIVACY.md` says.
 
 ## Sensitive permissions
 

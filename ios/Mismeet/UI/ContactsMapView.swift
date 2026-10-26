@@ -2,7 +2,8 @@ import MapKit
 import SwiftUI
 
 /// Opens framed around the people in this phone's country, the user included, like Find My. The
-/// button at the bottom returns there, and a second tap widens to everyone, abroad included.
+/// button at the bottom returns there, and a second tap widens to everyone, abroad included. A
+/// contact tapped in the list is focused, with a card at the bottom until it is closed.
 struct ContactsMapView: View {
     private struct Estimate {
         var path: [CLLocationCoordinate2D]
@@ -19,6 +20,7 @@ struct ContactsMapView: View {
     @State private var framing = Framing.nearby
     @State private var estimates: [String: Estimate] = [:]
     @State private var countries: Countries?
+    @Binding var focused: String?
 
     private var located: [Contact] {
         model.state.contacts.filter { $0.lastPayload != nil }
@@ -36,14 +38,28 @@ struct ContactsMapView: View {
         points(.nearby).count != points(.everyone).count
     }
 
+    private var focusedContact: Contact? {
+        located.first { $0.id == focused }
+    }
+
+    private var focusKey: String? {
+        focusedContact?.lastPayload.map { "\(focused ?? ""):\($0.latitude),\($0.longitude),\($0.accuracy)" }
+    }
+
     private var frameKey: String {
         located.map(\.id).joined(separator: ",") + ":" + estimates.keys.sorted().joined(separator: ",") + ":\(own != nil):\(home ?? "")"
     }
 
     var body: some View {
-        let widen = someoneAbroad && framing == .nearby && !position.positionedByUser
+        let widen = focusedContact == nil && someoneAbroad && framing == .nearby && !position.positionedByUser
         Map(position: $position, scope: mapScope) {
             UserAnnotation()
+            if let payload = focusedContact?.lastPayload {
+                MapCircle(center: CLLocationCoordinate2D(latitude: payload.latitude, longitude: payload.longitude),
+                          radius: CLLocationDistance(payload.accuracy))
+                    .foregroundStyle(.blue.opacity(0.25))
+                    .stroke(.white, lineWidth: 3)
+            }
             ForEach(located) { contact in
                 if let estimate = estimates[contact.id] {
                     MapPolyline(coordinates: estimate.path)
@@ -67,6 +83,7 @@ struct ContactsMapView: View {
                 MapCompass(scope: mapScope)
                 MapUserLocationButton(scope: mapScope)
                 Button {
+                    focused = nil
                     show(widen ? .everyone : .nearby)
                 } label: {
                     Label(
@@ -78,12 +95,44 @@ struct ContactsMapView: View {
             }
             .padding()
         }
+        .safeAreaInset(edge: .bottom) {
+            if let contact = focusedContact {
+                HStack(alignment: .top, spacing: 12) {
+                    ContactAvatar(contact: contact)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(contact.name).font(.headline)
+                        Text(ContactRow.status(of: contact, place: model.placeNames[contact.id]))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Close", systemImage: "xmark") {
+                        focused = nil
+                        show(.nearby)
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.circle)
+                }
+                .padding()
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+                .padding([.horizontal, .bottom])
+            }
+        }
         .mapScope(mapScope)
         .task {
             countries = await Task.detached { Countries.bundled() }.value
         }
         .onChange(of: frameKey, initial: true) { _, _ in
-            show(.nearby)
+            if focusedContact == nil { show(.nearby) }
+        }
+        .onChange(of: focusKey, initial: true) { _, _ in
+            guard let payload = focusedContact?.lastPayload else { return }
+            let span = max(Double(payload.accuracy) * 3, 800)
+            position = .region(MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: payload.latitude, longitude: payload.longitude),
+                latitudinalMeters: span, longitudinalMeters: span
+            ))
         }
         .task(id: located.map { "\($0.id):\($0.lastEventId ?? "")" }) {
             while !Task.isCancelled {

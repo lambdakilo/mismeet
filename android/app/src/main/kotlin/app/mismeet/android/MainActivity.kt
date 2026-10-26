@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -74,6 +75,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MismeetScreen(model: AppModel) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    // The contact the map focuses on, picked in the contact list.
+    var focused by rememberSaveable { mutableStateOf<String?>(null) }
+    val state by model.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     val openedInvite by model.openedInvite.collectAsState()
     LaunchedEffect(openedInvite) {
@@ -81,6 +85,12 @@ private fun MismeetScreen(model: AppModel) {
     }
     LaunchedEffect(Unit) {
         model.notices.collect { snackbar.showSnackbar(it) }
+    }
+    LaunchedEffect(state.contacts.map { it.id to it.lastEventId }) {
+        while (true) {
+            model.updatePlaceNames()
+            delay(ProtocolConstants.FOREGROUND_FETCH_INTERVAL_SECONDS * 1000)
+        }
     }
     LaunchedEffect(Unit) {
         while (true) {
@@ -115,8 +125,11 @@ private fun MismeetScreen(model: AppModel) {
     ) { padding ->
         val content = Modifier.padding(padding)
         when (tab) {
-            0 -> MapScreen(model, content)
-            1 -> ContactsScreen(model, content)
+            0 -> MapScreen(model, focused, onUnfocus = { focused = null }, content)
+            1 -> ContactsScreen(model, onFocus = {
+                focused = it
+                tab = 0
+            }, content)
             else -> MeScreen(model, content)
         }
     }

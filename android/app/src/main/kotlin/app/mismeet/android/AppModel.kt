@@ -12,6 +12,7 @@ import app.mismeet.android.identity.DeviceKeys
 import app.mismeet.android.location.Countries
 import app.mismeet.android.location.LocationProvider
 import app.mismeet.android.location.LocationService
+import app.mismeet.android.location.PlaceData
 import app.mismeet.android.location.RoadData
 import app.mismeet.android.nostr.RelayService
 import app.mismeet.android.store.Contact
@@ -19,6 +20,7 @@ import app.mismeet.android.store.PersistedState
 import app.mismeet.android.store.StateStore
 import app.mismeet.protocol.ContactRelays
 import app.mismeet.protocol.Invite
+import app.mismeet.protocol.LatLon
 import app.mismeet.protocol.LocationEventBuilder
 import app.mismeet.protocol.LocationEventReader
 import app.mismeet.protocol.LocationFix
@@ -80,6 +82,11 @@ class AppModel private constructor(private val context: Context) {
     private val refreshing = Mutex()
     private val photos = ConcurrentHashMap<String, Pair<Long, Bitmap>>()
     val roads = RoadData(context)
+    private val places = PlaceData(context)
+    private val _placeNames = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    /** The district, town or village of each contact's last position by contact id, spec section 8.7. */
+    val placeNames: StateFlow<Map<String, String>> = _placeNames.asStateFlow()
     val countries by lazy { Countries(context.assets.open("countries.json").bufferedReader().use { it.readText() }) }
 
     init {
@@ -390,6 +397,14 @@ class AppModel private constructor(private val context: Context) {
                 })
             }
             log("Refreshed from ${targets.size} relays: $decoded new, $unchanged unchanged since last time, ${current.contacts.size - decoded - unchanged} without an event")
+        }
+    }
+
+    suspend fun updatePlaceNames() {
+        _state.value.contacts.forEach { contact ->
+            val payload = contact.lastPayload ?: return@forEach
+            val name = places.name(LatLon(payload.latitude, payload.longitude), System.currentTimeMillis() / 1000)
+            _placeNames.update { if (name == null) it - contact.id else it + (contact.id to name) }
         }
     }
 

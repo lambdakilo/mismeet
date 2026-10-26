@@ -34,4 +34,6 @@ object ProtocolConstants {
     const val ROAD_SNAP_BEARING_DEGREES = 60.0
     const val ROAD_CELLS_PER_ESTIMATE = 12
     const val ROAD_CELL_CACHE_SECONDS = 2_592_000L
+    const val PLACE_CELL_CACHE_SECONDS = 2_592_000L
+    const val PLACE_NAME_METRES = 5_000.0
 }

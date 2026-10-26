@@ -35,6 +35,9 @@ final class AppModel {
     let keys: Keys
     let npub: String
     let roads = RoadData()
+    /// The district, town or village of each contact's last position by contact id, spec section 8.7.
+    private(set) var placeNames: [String: String] = [:]
+    private let places = PlaceData()
 
     private let store = StateStore()
     private let location = LocationService()
@@ -457,6 +460,15 @@ final class AppModel {
         }
         save()
         log("Refreshed from \(targets.count) relays: \(decoded) new, \(unchanged) unchanged since last time, \(state.contacts.count - decoded - unchanged) without an event")
+    }
+
+    func updatePlaceNames() async {
+        for contact in state.contacts {
+            guard let payload = contact.lastPayload else { continue }
+            let name = await places.name(at: LatLon(latitude: payload.latitude, longitude: payload.longitude), now: Date())
+            if Task.isCancelled { return }
+            placeNames[contact.id] = name
+        }
     }
 
     // MARK: Helpers

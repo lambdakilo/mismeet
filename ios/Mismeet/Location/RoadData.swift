@@ -46,7 +46,7 @@ actor RoadData {
            let data = try? Data(contentsOf: file) {
             ways = try? Overpass.parse(data)
         }
-        if ways == nil, let data = await fetch(cell), let parsed = try? Overpass.parse(data) {
+        if ways == nil, let data = await Overpass.fetch(Overpass.query(cell)), let parsed = try? Overpass.parse(data) {
             try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             try? data.write(to: file, options: .atomic)
             ways = parsed
@@ -64,16 +64,19 @@ actor RoadData {
         network = RoadNetwork(cells.values.flatMap { $0 })
         return true
     }
+}
 
-    private func fetch(_ cell: RoadCell) async -> Data? {
-        var request = URLRequest(url: Overpass.url, timeoutInterval: 90)
+extension Overpass {
+    /// Posts a query to Overpass, nil unless it answers 200.
+    static func fetch(_ query: String) async -> Data? {
+        var request = URLRequest(url: url, timeoutInterval: 90)
         request.httpMethod = "POST"
         request.setValue("app.mismeet.ios (https://github.com/lambdakilo/mismeet)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         var allowed = CharacterSet.alphanumerics
         allowed.insert(charactersIn: "-._~")
-        let query = Overpass.query(cell).addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
-        request.httpBody = Data("data=\(query)".utf8)
+        let body = query.addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
+        request.httpBody = Data("data=\(body)".utf8)
         guard let (data, response) = try? await URLSession.shared.data(for: request),
               (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
         return data

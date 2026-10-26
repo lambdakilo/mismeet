@@ -33,4 +33,6 @@ enum ProtocolConstants {
     static let roadSnapBearingDegrees = 60.0
     static let roadCellsPerEstimate = 12
     static let roadCellCacheSeconds: TimeInterval = 2_592_000
+    static let placeCellCacheSeconds: TimeInterval = 2_592_000
+    static let placeNameMetres = 5_000.0
 }

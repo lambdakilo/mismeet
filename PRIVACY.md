@@ -42,6 +42,11 @@ overpass-api.de, in fixed squares of about a kilometre that are never centred on
 keeps them on the phone for 30 days. That server sees your IP address and those squares, much
 as map tiles of the same area would show, but no position.
 
+To name the district, town or village a contact is in, the app downloads OpenStreetMap place
+names from the same Overpass API, in fixed squares of about 10 km, and keeps them on the phone
+for 30 days. The nearest name is picked on the phone, so that server again sees your IP
+address and those squares, but no position.
+
 The map opens on the people in your own country. Which country a position lies in is worked out
 on the phone from borders that come with the app, so no position is sent anywhere for it.
 

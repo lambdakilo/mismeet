@@ -1,14 +1,26 @@
 package app.mismeet.android.ui
 
+import android.graphics.Color
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.DashPathEffect
 import android.graphics.drawable.BitmapDrawable
 import android.text.format.DateUtils
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +46,7 @@ import app.mismeet.protocol.LatLon
 import java.io.File
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -46,16 +59,19 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.Polyline
 
 /**
  * OpenStreetMap tiles through osmdroid: no Google dependency, and the tile policy wants a user
  * agent. Opens framed around the people in this phone's country, like Find My; the button at the
- * bottom returns there, and a second tap widens to everyone, abroad included.
+ * bottom returns there, and a second tap widens to everyone, abroad included. The [focused]
+ * contact, tapped in the list, is framed with a card at the bottom until it is closed.
  */
 @Composable
-fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
+fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
+    val placeNames by model.placeNames.collectAsState()
     val context = LocalContext.current
     val dark = isSystemInDarkTheme()
     remember {
@@ -76,11 +92,14 @@ fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
     val everyone = points(located, own, estimates) { true }
     val nearby = points(located, own, estimates, inHome).ifEmpty { everyone }
     val someoneAbroad = nearby.size != everyone.size
+    val focusedContact = located.firstOrNull { it.id == focused }
+    val focusKey = focusedContact?.lastPayload?.let { "${focusedContact.id}:${it.latitude},${it.longitude},${it.accuracy}" }
 
     var framing by remember { mutableStateOf(Framing.NEARBY) }
     var framedAt by remember { mutableStateOf<Pair<GeoPoint, Double>?>(null) }
     var moved by remember { mutableStateOf(false) }
-    val frameKey = located.joinToString(",") { it.id } + ":" + estimates.keys.sorted().joinToString(",") + ":" + (own != null) + ":" + home
+    val frameKey = focusKey
+        ?: (located.joinToString(",") { it.id } + ":" + estimates.keys.sorted().joinToString(",") + ":" + (own != null) + ":" + home)
     val framedKey = remember { arrayOf("") }
     val map = remember { arrayOfNulls<MapView>(1) }
     val show by rememberUpdatedState { view: MapView, target: Framing ->
@@ -89,6 +108,17 @@ fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
         framedAt = GeoPoint(view.mapCenter.latitude, view.mapCenter.longitude) to view.zoomLevelDouble
         moved = false
         if (target == Framing.NEARBY) framedKey[0] = frameKey
+    }
+    val reframe by rememberUpdatedState { view: MapView ->
+        val payload = focusedContact?.lastPayload
+        if (payload == null) {
+            show(view, Framing.NEARBY)
+        } else {
+            frameAround(view, GeoPoint(payload.latitude, payload.longitude), payload.accuracy)
+            framedAt = GeoPoint(view.mapCenter.latitude, view.mapCenter.longitude) to view.zoomLevelDouble
+            moved = false
+            framedKey[0] = frameKey
+        }
     }
     LaunchedEffect(state.contacts) {
         while (true) {
@@ -112,7 +142,7 @@ fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
                     setMultiTouchControls(true)
                     controller.setZoom(12.0)
                     controller.setCenter(nearby.firstOrNull() ?: GeoPoint(60.17, 24.94))
-                    addOnFirstLayoutListener { _, _, _, _, _ -> show(this, Framing.NEARBY) }
+                    addOnFirstLayoutListener { _, _, _, _, _ -> reframe(this) }
                     addMapListener(object : MapListener {
                         override fun onScroll(event: ScrollEvent?) = noteMove(this@apply)
                         override fun onZoom(event: ZoomEvent?) = noteMove(this@apply)
@@ -133,6 +163,15 @@ fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
                 view.overlayManager.tilesOverlay.setColorFilter(if (dark) DARK_TILES else null)
                 view.overlayManager.tilesOverlay.loadingBackgroundColor = if (dark) DARK_LOADING else LIGHT_LOADING
                 view.overlays.clear()
+                focusedContact?.lastPayload?.let { payload ->
+                    view.overlays += Polygon(view).apply {
+                        setPoints(Polygon.pointsAsCircle(GeoPoint(payload.latitude, payload.longitude), payload.accuracy.toDouble()))
+                        fillPaint.color = FOCUS_FILL
+                        outlinePaint.color = Color.WHITE
+                        outlinePaint.strokeWidth = markerSize / 14f
+                        infoWindow = null
+                    }
+                }
                 located.forEach { contact ->
                     val payload = contact.lastPayload ?: return@forEach
                     val avatar = avatarBitmap(contact, model.photo(contact), markerSize)
@@ -170,15 +209,32 @@ fun MapScreen(model: AppModel, modifier: Modifier = Modifier) {
                     }
                 }
                 view.invalidate()
-                if (framedKey[0] != frameKey && view.width > 0) show(view, Framing.NEARBY)
+                if (framedKey[0] != frameKey && view.width > 0) reframe(view)
             },
             onRelease = { view -> view.onDetach() },
         )
-        val widen = someoneAbroad && framing == Framing.NEARBY && !moved
-        Button(
-            onClick = { map[0]?.let { show(it, if (widen) Framing.EVERYONE else Framing.NEARBY) } },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-        ) { Text(if (someoneAbroad && !widen) countryName(home) else "Everyone") }
+        val widen = focusedContact == null && someoneAbroad && framing == Framing.NEARBY && !moved
+        Column(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.End,
+        ) {
+            Button(
+                onClick = { if (focusedContact != null) onUnfocus() else map[0]?.let { show(it, if (widen) Framing.EVERYONE else Framing.NEARBY) } },
+            ) { Text(if (someoneAbroad && !widen) countryName(home) else "Everyone") }
+            focusedContact?.let { contact ->
+                Card(Modifier.fillMaxWidth()) {
+                    Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Avatar(contact, model.photo(contact), 44.dp, Modifier.size(44.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(contact.name, style = MaterialTheme.typography.titleMedium)
+                            Text(status(contact, placeNames[contact.id]), style = MaterialTheme.typography.bodySmall)
+                        }
+                        IconButton(onClick = onUnfocus) { Icon(Icons.Filled.Close, contentDescription = "Close") }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -186,6 +242,7 @@ private enum class Framing { NEARBY, EVERYONE }
 
 private const val ESTIMATE_REFRESH_MILLIS = 10_000L
 private const val ESTIMATE_COLOUR = 0xCC5E35B1.toInt()
+private const val FOCUS_FILL = 0x402979FF
 private const val LIGHT_LOADING = 0xFFD8D0D0.toInt()
 private const val DARK_LOADING = 0xFF202124.toInt()
 
@@ -213,6 +270,14 @@ private fun points(
 
 private fun countryName(code: String?): String =
     code?.let { runCatching { Locale.Builder().setRegion(it).build().displayCountry }.getOrNull() }?.ifBlank { null } ?: "Home"
+
+/** Frames a focused contact with the circle of its accuracy, and at least 800 m across. */
+private fun frameAround(map: MapView, point: GeoPoint, accuracy: Int) {
+    val half = maxOf(accuracy * 1.5, 400.0)
+    val dLat = half / 110_574.0
+    val dLon = half / (cos(Math.toRadians(point.latitude)) * 111_320.0)
+    map.zoomToBoundingBox(BoundingBox(point.latitude + dLat, point.longitude + dLon, point.latitude - dLat, point.longitude - dLon), false)
+}
 
 private fun frame(map: MapView, points: List<GeoPoint>) {
     when (points.size) {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -38,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.ui.unit.dp
@@ -52,8 +54,9 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 @Composable
-fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
+fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
+    val placeNames by model.placeNames.collectAsState()
     // The invite the Add contact dialog opens with; null while it is closed.
     var adding by remember { mutableStateOf<String?>(null) }
     val openedInvite by model.openedInvite.collectAsState()
@@ -87,7 +90,9 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
             items(state.contacts, key = { it.id }) { contact ->
                 ContactRow(
                     contact = contact,
+                    place = placeNames[contact.id],
                     photo = model.photo(contact),
+                    onFocus = { onFocus(contact.id) },
                     onPhoto = { if (contact.photoSetAt == null) choosePhoto(contact.id) else photoFor = contact },
                     onShare = if (state.sharingEnabled) ({ model.setShare(contact.id, it) }) else null,
                     onRemove = { model.removeContact(contact.id) },
@@ -140,19 +145,21 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
 @Composable
 private fun ContactRow(
     contact: Contact,
+    place: String?,
     photo: Bitmap?,
+    onFocus: () -> Unit,
     onPhoto: () -> Unit,
     onShare: ((Boolean) -> Unit)?,
     onRemove: () -> Unit,
     onOpenMap: () -> Unit,
 ) {
-    Card(Modifier.fillMaxWidth()) {
+    Card(Modifier.fillMaxWidth().clip(CardDefaults.shape).clickable(enabled = contact.lastPayload != null, onClick = onFocus)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Avatar(contact, photo, 48.dp, Modifier.size(48.dp).clickable(onClick = onPhoto))
                 Column(Modifier.weight(1f)) {
                     Text(contact.name, style = MaterialTheme.typography.titleMedium)
-                    Text(status(contact), style = MaterialTheme.typography.bodySmall)
+                    Text(status(contact, place), style = MaterialTheme.typography.bodySmall)
                 }
                 if (onShare != null) Switch(checked = contact.share, onCheckedChange = onShare)
             }
@@ -165,13 +172,15 @@ private fun ContactRow(
     }
 }
 
-private fun status(contact: Contact): String {
+/** Where and when a contact was last seen, such as "Kumpula, seen 2 minutes ago, within 30 m". */
+fun status(contact: Contact, place: String?): String {
     val payload = contact.lastPayload
     if (payload != null) {
         val age = DateUtils.getRelativeTimeSpanString(payload.fixTime * 1000, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS)
         val stale = if (contact.sharing == Contact.SharingStatus.NOT_SHARING) ", no longer sharing" else ""
         val moving = movement(payload)?.let { ", $it" }.orEmpty()
-        return "Seen $age, within ${payload.accuracy} m$moving$stale"
+        val seen = "$age, within ${payload.accuracy} m$moving$stale"
+        return if (place != null) "$place, seen $seen" else "Seen $seen"
     }
     return when (contact.sharing) {
         Contact.SharingStatus.NOT_SHARING -> "Not sharing with you"
