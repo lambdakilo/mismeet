@@ -9,7 +9,7 @@ A contribution is licensed under the same terms as the file it changes:
   exception is part of the licence your sign-off refers to. It lets the app be distributed
   through app stores whose terms restrict users, Apple's App Store included, as long as the
   source stays available elsewhere under the AGPL.
-- Prose, meaning `spec/SPEC.md`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`,
+- Prose, meaning `spec/SPEC.md`, `README.md`, `docs/`, `CONTRIBUTING.md`, `CHANGELOG.md`,
   `PRIVACY.md` and `CLAUDE.md`, under Creative Commons Attribution-ShareAlike 4.0
   International.
 
@@ -86,8 +86,8 @@ dependency without an equivalent exception would block the iOS release.
 ## Before you open a pull request
 
 Change [`spec/SPEC.md`](spec/SPEC.md) first when the protocol changes, in the same pull
-request. Then run the checks for the platform you changed; the setup they need is in the
-README under Development.
+request. Then run the checks for the platform you changed; the setup they need is in
+[`docs/development.md`](docs/development.md).
 
 ```bash
 android/gradlew -p android lint test

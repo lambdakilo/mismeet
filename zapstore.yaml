@@ -1,7 +1,7 @@
 # Zapstore listing for the Android app, read by zsp (https://github.com/zapstore/zsp).
 # The Zapstore relay fetches this file from the repository and whitelists the publisher when
 # pubkey matches the key the release is signed with, so it stays committed at the root.
-# Publishing steps are in README.md under Distribution.
+# Publishing steps are in docs/releasing.md under Android on Zapstore.
 
 # The publisher's npub. Fill it in and commit before the first publish.
 # pubkey: npub1...

@@ -7,6 +7,10 @@ follows it, and a protocol change edits the spec first, in the same change.
 ## Layout
 
 - `spec/`: the protocol specification.
+- `docs/`: what people do by hand, written for them: `development.md` (requirements, the
+  one-time setup, building and testing, the first test between two phones) and `releasing.md`
+  (store accounts, keys and the steps of each release). The README stays one screen at
+  1440x730 and links to both.
 - `ios/`: Swift and SwiftUI app. XcodeGen generates `ios/Mismeet.xcodeproj` from
   `ios/project.yml`. Never edit the `.pbxproj`; change `project.yml` and regenerate. Deployment
   target iOS 18. Location comes from significant location change monitoring with the "Always"
@@ -150,10 +154,10 @@ follows it, and a protocol change edits the spec first, in the same change.
 ## Building and running
 
 The prerequisites and the one-time setup (Apple ID and team id, device identifier, SDK path,
-`adb`, developer options on the phones) are in README.md under Development, written for
-people; they do not belong here. The commands below assume that setup is done, so that
-`ios/.team-id`, `ios/.device-id` and `android/local.properties` exist. The README lists the
-same commands for people: change both together.
+`adb`, developer options on the phones) are in `docs/development.md`, written for people;
+they do not belong here. The commands below assume that setup is done, so that
+`ios/.team-id`, `ios/.device-id` and `android/local.properties` exist. `docs/development.md`
+lists the same commands for people: change both together.
 
 ### iOS
 
@@ -273,8 +277,8 @@ verify command stays offline.
 MISMEET_RELAY_TESTS=1 android/gradlew -p android :protocol:test --tests 'app.mismeet.protocol.RelayIntegrationTest'
 ```
 
-Emulator (`mismeet`, API 36 without Google APIs, created as the README describes). Start it
-headless, wait for it, and it is the device for the install and launch commands:
+Emulator (`mismeet`, API 36 without Google APIs, created as `docs/development.md` describes).
+Start it headless, wait for it, and it is the device for the install and launch commands:
 
 ```bash
 nohup /opt/homebrew/share/android-commandlinetools/emulator/emulator -avd mismeet -no-window -no-audio -no-boot-anim -no-snapshot > /dev/null 2>&1 &
@@ -298,9 +302,9 @@ adb exec-out screencap -p > emulator.png
 adb emu kill
 ```
 
-Fake publisher and launch hooks for debug builds, the same commands as the README's "Testing
-without a second phone". The watching app logs its own invite at launch on a line starting
-`Invite:`, which these print:
+Fake publisher and launch hooks for debug builds, the same commands as "Testing without a
+second phone" in `docs/development.md`. The watching app logs its own invite at launch on a
+line starting `Invite:`, which these print:
 
 ```bash
 adb logcat -d -s Mismeet:I
@@ -340,7 +344,8 @@ adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;
 ```
 
 The README's screenshots under `design/screenshots/` come from the simulator and the emulator
-with the two fake contacts, scaled to 600 px high; redo them after a visible change:
+with the two fake contacts, scaled to 600 px high and shown in one row by `width`
+attributes; redo them after a visible change:
 
 ```bash
 sips -Z 600 design/screenshots/<name>.png

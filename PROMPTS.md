@@ -5,9 +5,17 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Move Contacts' Refresh and Add and the sheet buttons down
+## Cut the README to one screen and move the rest to docs
 
 2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**1.**
+> fix the mismeet repo too to have oneliner description, oneliner
+> topics and one screenful readme
+
+## Move Contacts' Refresh and Add and the sheet buttons down
+
+2026-10-26, commit [99f0f99](https://github.com/lambdakilo/mismeet/commit/99f0f998fddbae4a4cac0937382d4bb887e56608), model claude-opus-5-5, effort xhigh.
 
 **51.**
 > contacts refresh and add button are in top of the screen. put them
