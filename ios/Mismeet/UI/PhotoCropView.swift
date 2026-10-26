@@ -21,65 +21,67 @@ struct PhotoCropView: View {
     private var cover: CGFloat { side / min(image.size.width, image.size.height) }
 
     var body: some View {
-        NavigationStack {
-            let scale = cover * min(max(zoom * gestureZoom, 1), Self.maxZoom)
-            let shown = clamp(CGSize(width: offset.width + gestureOffset.width, height: offset.height + gestureOffset.height), scale: scale)
-            // The picture is an overlay, so its zoomed size never stretches the area the circle is measured from.
-            Color.black
-                .overlay {
-                    Image(uiImage: image)
-                        .resizable()
-                        .frame(width: image.size.width * scale, height: image.size.height * scale)
-                        .offset(shown)
-                }
-                .overlay {
-                    Rectangle()
-                        .fill(.black.opacity(0.6))
-                        .overlay { Circle().frame(width: side, height: side).blendMode(.destinationOut) }
-                        .compositingGroup()
-                }
-                .overlay {
-                    Circle()
-                        .stroke(.white, lineWidth: 2)
-                        .frame(width: side, height: side)
-                }
-                .clipped()
-            .contentShape(Rectangle())
-            .onGeometryChange(for: CGSize.self) { $0.size } action: { area = $0 }
-            .gesture(
-                MagnifyGesture()
-                    .updating($gestureZoom) { value, state, _ in state = value.magnification }
-                    .onEnded { value in
-                        zoom = min(max(zoom * value.magnification, 1), Self.maxZoom)
-                        offset = clamp(offset, scale: cover * zoom)
-                    }
-                    .simultaneously(with: DragGesture()
-                        .updating($gestureOffset) { value, state, _ in state = value.translation }
-                        .onEnded { value in
-                            offset = clamp(
-                                CGSize(width: offset.width + value.translation.width, height: offset.height + value.translation.height),
-                                scale: cover * zoom
-                            )
-                        }
-                    )
-            )
-            .background(.black)
-            .toolbarBackground(.black, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Choose") {
-                        if let square = crop() { onChoose(square) }
-                        dismiss()
-                    }
-                    .disabled(area == .zero)
-                }
+        let scale = cover * min(max(zoom * gestureZoom, 1), Self.maxZoom)
+        let shown = clamp(CGSize(width: offset.width + gestureOffset.width, height: offset.height + gestureOffset.height), scale: scale)
+        // The picture is an overlay, so its zoomed size never stretches the area the circle is measured from.
+        Color.black
+            .overlay {
+                Image(uiImage: image)
+                    .resizable()
+                    .frame(width: image.size.width * scale, height: image.size.height * scale)
+                    .offset(shown)
             }
+            .overlay {
+                Rectangle()
+                    .fill(.black.opacity(0.6))
+                    .overlay { Circle().frame(width: side, height: side).blendMode(.destinationOut) }
+                    .compositingGroup()
+            }
+            .overlay {
+                Circle()
+                    .stroke(.white, lineWidth: 2)
+                    .frame(width: side, height: side)
+            }
+            .clipped()
+        .contentShape(Rectangle())
+        .onGeometryChange(for: CGSize.self) { $0.size } action: { area = $0 }
+        .gesture(
+            MagnifyGesture()
+                .updating($gestureZoom) { value, state, _ in state = value.magnification }
+                .onEnded { value in
+                    zoom = min(max(zoom * value.magnification, 1), Self.maxZoom)
+                    offset = clamp(offset, scale: cover * zoom)
+                }
+                .simultaneously(with: DragGesture()
+                    .updating($gestureOffset) { value, state, _ in state = value.translation }
+                    .onEnded { value in
+                        offset = clamp(
+                            CGSize(width: offset.width + value.translation.width, height: offset.height + value.translation.height),
+                            scale: cover * zoom
+                        )
+                    }
+                )
+        )
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: 12) {
+                Button { dismiss() } label: {
+                    Text("Cancel").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                Button {
+                    if let square = crop() { onChoose(square) }
+                    dismiss()
+                } label: {
+                    Text("Choose").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(area == .zero)
+            }
+            .controlSize(.large)
+            .padding()
         }
+        .background(.black)
+        .preferredColorScheme(.dark)
     }
 
     /// Keeps the picture covering the whole circle.

@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,6 +23,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -76,18 +78,12 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
-    Column(modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Text("Contacts", style = MaterialTheme.typography.headlineMedium)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(onClick = { model.refreshNow() }) { Text("Refresh") }
-                Button(onClick = { adding = "" }) { Text("Add") }
-            }
-        }
+    Column(modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Contacts", style = MaterialTheme.typography.headlineMedium)
         if (state.contacts.isEmpty()) {
             Text("Add a contact from the invite they sent you.", style = MaterialTheme.typography.bodyMedium)
         }
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(state.contacts, key = { it.id }) { contact ->
                 ContactRow(
                     contact = contact,
@@ -98,6 +94,10 @@ fun ContactsScreen(model: AppModel, modifier: Modifier = Modifier) {
                     onOpenMap = { openMap(context, contact) },
                 )
             }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
+            OutlinedButton(onClick = { model.refreshNow() }) { Text("Refresh") }
+            Button(onClick = { adding = "" }) { Text("Add") }
         }
     }
 

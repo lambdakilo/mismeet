@@ -28,10 +28,18 @@ struct ContactsView: View {
                 }
             }
             .navigationTitle("Contacts")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
+            .safeAreaInset(edge: .bottom) {
+                HStack(spacing: 12) {
+                    Spacer()
+                    Button("Refresh", systemImage: "arrow.clockwise") {
+                        Task { await model.refresh() }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(model.isRefreshing)
                     Button("Add", systemImage: "plus") { adding = AddRequest() }
+                        .buttonStyle(.borderedProminent)
                 }
+                .padding()
             }
             .refreshable { await model.refresh() }
             .sheet(item: $adding) { AddContactView(invite: $0.invite) }
@@ -163,31 +171,40 @@ struct AddContactView: View {
                         scanning = false
                     }
                     .ignoresSafeArea()
+                    .safeAreaInset(edge: .bottom) {
+                        Button("Cancel") { scanning = false }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.large)
+                            .padding()
+                    }
                     .navigationTitle("Scan the invite")
                     .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") { scanning = false }
-                        }
-                    }
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        do {
-                            try model.addContact(invite: invite, name: name)
-                            dismiss()
-                        } catch {
-                            self.error = error.localizedDescription
-                        }
+            .safeAreaInset(edge: .bottom) {
+                HStack(spacing: 12) {
+                    Button { dismiss() } label: {
+                        Text("Cancel").frame(maxWidth: .infinity)
                     }
+                    .buttonStyle(.bordered)
+                    Button { add() } label: {
+                        Text("Add").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
                     .disabled(invite.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+                .controlSize(.large)
+                .padding()
             }
+        }
+    }
+
+    private func add() {
+        do {
+            try model.addContact(invite: invite, name: name)
+            dismiss()
+        } catch {
+            self.error = error.localizedDescription
         }
     }
 }

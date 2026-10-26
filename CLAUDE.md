@@ -51,6 +51,10 @@ follows it, and a protocol change edits the spec first, in the same change.
   only watches its contacts, publishes nothing, not even its relay list, and needs no location
   permission. The "Share my location" switch on the Me screen turns it on. Keep every
   publishing path behind `sharingEnabled`.
+- Controls go at the bottom of the screen, where a thumb reaches them, or at least never in the
+  top bar: the map's framing button, the Contacts screen's Refresh and Add, and the buttons of
+  sheets and dialogs, such as Add contact and the photo crop, sit at the bottom, and only titles
+  stay at the top. New controls follow the same rule.
 - Never log a secret key, a decrypted payload or a contact's public key above debug level.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.

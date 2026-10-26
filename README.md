@@ -300,7 +300,7 @@ to fetch.
    then tap "Allow location" for "Always". The log on the same screen shows "Relay list:
    accepted by N of 3 relays".
 2. On the Android phone, open Me: its invite QR code is on screen. On the iPhone, Contacts >
-   "+" > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
+   Add > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
    "Location: accepted by N of 3 relays" within a few seconds.
 3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
    code", allow the camera, scan it, name the contact, Add. The row shows "Seen ... within N m"

@@ -5,9 +5,21 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Drop the relay list from the Me screen
+## Move Contacts' Refresh and Add and the sheet buttons down
 
 2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**51.**
+> contacts refresh and add button are in top of the screen. put them
+> and future interactable things bottom for a phone app like this or at
+> least not in top
+
+(Move the iOS sheets' top-bar buttons to the bottom too?)
+> Move them too (Recommended)
+
+## Drop the relay list from the Me screen
+
+2026-10-26, commit [0dbcb07](https://github.com/lambdakilo/mismeet/commit/0dbcb0797dc8c3c6076f4e0fa0ec6b13fff3d93c), model claude-opus-5-5, effort xhigh.
 
 **47.**
 > [pasted: 3 lines of terminal output with the phone's ABI list]
