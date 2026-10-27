@@ -5,9 +5,26 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
-## Put the contact list in a sheet over the map, as in Find My
+## Fit Play's reviewer instructions in 500 characters
 
 2026-10-27, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**10.** (a reply button)
+> upload the new screenshots and review notes to app store connect and
+> play console
+
+(update Play's description along with the screenshots)
+> Update it too (Recommended)
+
+(App Store 0.1.0 is in review with the old build)
+> Next version (Recommended)
+
+(Play's new AI asset declaration for the listing's pictures)
+> Don't label assets (Recommended)
+
+## Put the contact list in a sheet over the map, as in Find My
+
+2026-10-27, commit [e9d1251](https://github.com/lambdakilo/mismeet/commit/e9d12514c4bb093979147d8544b50dcdc81a2a4c), model claude-opus-5-5, effort xhigh.
 
 **6.**
 > i hear the text and detail is too small on android in the map. fix
