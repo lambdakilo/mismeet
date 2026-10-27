@@ -78,7 +78,7 @@ internal fun fetchOverpass(context: Context, query: String, what: String): Strin
         connection.doOutput = true
         connection.connectTimeout = 10_000
         connection.readTimeout = 90_000
-        connection.setRequestProperty("User-Agent", "${context.packageName} (https://github.com/lambdakilo/mismeet)")
+        connection.setRequestProperty("User-Agent", "${context.packageName} (https://github.com/zululima/mismeet)")
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
         connection.outputStream.use { it.write("data=${URLEncoder.encode(query, "UTF-8")}".toByteArray()) }
         if (connection.responseCode == 200) {

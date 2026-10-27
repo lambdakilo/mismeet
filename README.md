@@ -12,7 +12,7 @@ its location to relays encrypted for each contact it shares with: no server, no 
 New here? Paste this into Claude Code:
 
 ```text
-clone github.com/lambdakilo/mismeet into ~/Projects and help me build and run it
+clone github.com/zululima/mismeet into ~/Projects and help me build and run it
 ```
 
 Code AGPL-3.0-or-later with an [app store exception](LICENSE-APP-STORE-EXCEPTION), prose

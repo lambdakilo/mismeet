@@ -54,7 +54,7 @@ A user shares their identity as an invite link, an `https` URL whose fragment is
 `nprofile`:
 
 ```
-https://lambdakilo.github.io/mismeet/i#nprofile1...
+https://zululima.github.io/mismeet/i#nprofile1...
 ```
 
 The `nprofile` carries the user's public key (TLV type 0) and up to four of the user's relays
@@ -65,8 +65,10 @@ adding a contact, with the invite filled in. Without the app, the page at that a
 the app stores and shows the invite to paste after installing. A browser never sends the
 fragment to the server, so the web host sees no key.
 
-The app MUST also accept the NIP-21 URI `nostr:nprofile1...`, which earlier versions shared, a
-bare `nprofile1...` and a bare or `nostr:` prefixed `npub1...`.
+The app MUST also accept the NIP-21 URI `nostr:nprofile1...`, which earlier versions shared, the
+link `https://lambdakilo.github.io/mismeet/i#nprofile1...`, which later ones shared, a bare
+`nprofile1...` and a bare or `nostr:` prefixed `npub1...`. The page at the earlier link's
+address forwards to the current one with the fragment kept.
 An invite without relays gets the app's default relay list until a kind `10002` is seen
 (section 7.1).
 
@@ -509,7 +511,8 @@ Other properties:
 | `OK` timeout | 10 seconds |
 | Whole publish timeout | 25 seconds |
 | Rate-limit backoff | 300 seconds |
-| Invite link | `https://lambdakilo.github.io/mismeet/i#` followed by the `nprofile` |
+| Invite link | `https://zululima.github.io/mismeet/i#` followed by the `nprofile` |
+| Earlier invite link, accepted only | `https://lambdakilo.github.io/mismeet/i#` followed by the `nprofile` |
 | Coordinate precision | 6 decimals |
 | Dummy filler length when no fix exists | 100 bytes |
 | Estimate minimum speed | 1 m/s |
@@ -550,7 +553,7 @@ platform, and the protocol constants live in a single constants file per platfor
    key or the wrong `v`.
 8. A reader sends each relay only the authors associated with that relay.
 9. Invites round-trip through the invite link and `nostr:nprofile` with up to four relays, and
-   `npub` input is accepted.
+   the earlier invite link and `npub` input are accepted.
 10. Nothing is ever published except kinds `31122` and `10002`.
 11. An estimate follows section 8.6: the mode from `spd`, the ways each mode may use, the
     snap, the least turn at each node, and the speed, span and age limits.

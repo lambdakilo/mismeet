@@ -244,7 +244,7 @@ To release a tested build on the App Store:
    `design/app-store/iphone-6.3`, which App Store Connect uses for every iPhone size (the
    `iphone-6.9` set is there for a large-display override), and fill in the description,
    keywords, the support URL (this repository works), the privacy policy URL
-   <https://github.com/lambdakilo/mismeet/blob/main/PRIVACY.md>, the App Privacy answers, the
+   <https://github.com/zululima/mismeet/blob/main/PRIVACY.md>, the App Privacy answers, the
    age rating and the category.
 2. Under Build, choose the TestFlight build you tested.
 3. In App Review Information, explain the "Always" location: the app publishes on significant

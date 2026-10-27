@@ -30,6 +30,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
+                <data android:host="zululima.github.io" />
                 <data android:host="lambdakilo.github.io" />
                 <data android:path="/mismeet/i" />
             </intent-filter>

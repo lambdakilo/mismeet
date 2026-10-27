@@ -33,7 +33,7 @@ Your phone publishes its location to Nostr relays, encrypted separately for each
 - Your location updates in the background as you move.
 - No sign-up, no email, no phone number. Your identity is a key that stays on your phone.
 
-Mismeet is free and open source under the GNU Affero General Public License. Its protocol and source code are at github.com/lambdakilo/mismeet.
+Mismeet is free and open source under the GNU Affero General Public License. Its protocol and source code are at github.com/zululima/mismeet.
 ```
 
 Keywords:
@@ -42,8 +42,8 @@ Keywords:
 location,sharing,friends,family,map,privacy,encrypted,nostr,find,where,meet
 ```
 
-- Support URL: https://github.com/lambdakilo/mismeet/issues
-- Marketing URL: https://github.com/lambdakilo/mismeet
+- Support URL: https://github.com/zululima/mismeet/issues
+- Marketing URL: https://github.com/zululima/mismeet
 - Copyright: 2026 Mismeet contributors
 - Screenshots: `iphone-6.9/` for the large display, `iphone-6.3/` for the medium one, in file
   order.
@@ -84,5 +84,5 @@ Regional differences
 The app works the same in every region where it is offered. It is not offered in France.
 
 Regulated industries and third-party material
-Not applicable. The app does not operate in a regulated industry and contains no protected third-party material. Its source code is public under the GNU Affero General Public License with an app store exception: https://github.com/lambdakilo/mismeet
+Not applicable. The app does not operate in a regulated industry and contains no protected third-party material. Its source code is public under the GNU Affero General Public License with an app store exception: https://github.com/zululima/mismeet
 ```

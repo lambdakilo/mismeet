@@ -50,9 +50,10 @@ address and those squares, but no position.
 The map opens on the people in your own country. Which country a position lies in is worked out
 on the phone from borders that come with the app, so no position is sent anywhere for it.
 
-An invite link opens a page on lambdakilo.github.io, hosted by GitHub Pages, when Mismeet is
-not installed. The invite sits after the `#` in the link, which browsers do not send, so GitHub
-sees your IP address and that the page was opened, but not the invite.
+An invite link opens a page on zululima.github.io, hosted by GitHub Pages, when Mismeet is
+not installed. An earlier link on lambdakilo.github.io first opens a page there, also on GitHub
+Pages, that forwards to it. The invite sits after the `#` in the link, which browsers do not
+send, so GitHub sees your IP address and that the page was opened, but not the invite.
 
 The camera is used only to scan invite QR codes; no image is stored or sent. A photo you choose
 for a contact is stored on your phone only and is never sent.
@@ -65,4 +66,4 @@ without them at once. Contacts keep what they already saw. Events left on relays
 
 ## Contact
 
-Questions go to the project's issue tracker: <https://github.com/lambdakilo/mismeet/issues>.
+Questions go to the project's issue tracker: <https://github.com/zululima/mismeet/issues>.

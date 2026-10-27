@@ -22,7 +22,8 @@ object ProtocolConstants {
     const val OK_TIMEOUT_SECONDS = 10L
     const val PUBLISH_TIMEOUT_SECONDS = 25L
     const val RATE_LIMIT_BACKOFF_SECONDS = 300L
-    const val INVITE_LINK_PREFIX = "https://lambdakilo.github.io/mismeet/i#"
+    const val INVITE_LINK_PREFIX = "https://zululima.github.io/mismeet/i#"
+    const val EARLIER_INVITE_LINK_PREFIX = "https://lambdakilo.github.io/mismeet/i#"
     const val COORDINATE_DECIMALS = 6
     const val REVOCATION_FILLER_LENGTH = 100
     const val ESTIMATE_MIN_SPEED = 1.0

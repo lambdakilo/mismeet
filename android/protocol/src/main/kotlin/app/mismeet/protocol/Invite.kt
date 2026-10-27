@@ -17,7 +17,9 @@ data class Invite(val publicKey: PublicKey, val relays: List<RelayUrl>) {
 
     companion object {
         fun parse(text: String): Invite {
-            val trimmed = text.trim().removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
+            val trimmed = text.trim()
+                .removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
+                .removePrefix(ProtocolConstants.EARLIER_INVITE_LINK_PREFIX)
             if (trimmed.startsWith("nostr:")) {
                 return when (val entity = Nip21.parse(trimmed).asEnum()) {
                     is Nip21Enum.Pubkey -> Invite(entity.publicKey, emptyList())

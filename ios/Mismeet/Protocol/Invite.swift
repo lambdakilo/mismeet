@@ -18,8 +18,9 @@ struct Invite: Equatable {
 
     static func parse(_ text: String) throws -> Invite {
         var trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.hasPrefix(ProtocolConstants.inviteLinkPrefix) {
-            trimmed.removeFirst(ProtocolConstants.inviteLinkPrefix.count)
+        for prefix in [ProtocolConstants.inviteLinkPrefix, ProtocolConstants.earlierInviteLinkPrefix]
+        where trimmed.hasPrefix(prefix) {
+            trimmed.removeFirst(prefix.count)
         }
         if trimmed.hasPrefix("nostr:") {
             switch try Nip21.parse(uri: trimmed).asEnum() {

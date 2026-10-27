@@ -8,13 +8,19 @@ final class InviteTests: XCTestCase {
     func testRoundTripsThroughLinkAndNprofileUri() throws {
         let relays = [try RelayUrl.parse(url: "wss://relay.example.com"), try RelayUrl.parse(url: "wss://nos.example.org")]
         let link = try Invite(publicKey: keys.publicKey(), relays: relays).link()
-        XCTAssertTrue(link.hasPrefix("https://lambdakilo.github.io/mismeet/i#nprofile1"))
+        XCTAssertTrue(link.hasPrefix("https://zululima.github.io/mismeet/i#nprofile1"))
         let parsed = try Invite.parse(link)
         XCTAssertEqual(parsed.publicKey, keys.publicKey())
         XCTAssertEqual(parsed.relays, relays)
         let nprofile = String(link.dropFirst(ProtocolConstants.inviteLinkPrefix.count))
         XCTAssertEqual(try Invite.parse(nprofile), parsed)
         XCTAssertEqual(try Invite.parse("nostr:\(nprofile)"), parsed)
+    }
+
+    func testAcceptsEarlierInviteLink() throws {
+        let invite = Invite(publicKey: keys.publicKey(), relays: [try RelayUrl.parse(url: "wss://relay.example.com")])
+        let nprofile = String(try invite.link().dropFirst(ProtocolConstants.inviteLinkPrefix.count))
+        XCTAssertEqual(try Invite.parse("https://lambdakilo.github.io/mismeet/i#\(nprofile)"), invite)
     }
 
     func testKeepsAtMostFourRelays() throws {

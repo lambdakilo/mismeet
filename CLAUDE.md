@@ -66,15 +66,20 @@ follows it, and a protocol change edits the spec first, in the same change.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.
 - Pipe every `xcodebuild` through `xcbeautify` with `pipefail` set, as in the commands below.
-- Invites are links, `https://lambdakilo.github.io/mismeet/i#<nprofile>` (spec section 4.1),
+- Invites are links, `https://zululima.github.io/mismeet/i#<nprofile>` (spec section 4.1),
   opened as an iOS universal link (Associated Domains in `project.yml`) and an Android verified
   app link (the intent filter on `MainActivity`). The site repository
-  `lambdakilo/lambdakilo.github.io`, the user's own, pushed to `main`, serves what they need:
+  `zululima/zululima.github.io`, the user's own, pushed to `main`, serves what they need:
   `.well-known/apple-app-site-association` for `VXSNWDR5MY.app.mismeet.ios`,
   `.well-known/assetlinks.json` with the SHA-256 of the Play App Signing certificate and of the
   upload key, and `mismeet/i.html`, the page shown without the app. A new team, bundle id,
   package or signing key changes those files in the same change. A GitHub Pages site for the
   `mismeet` repository would take over `/mismeet/` and break every link.
+- Earlier builds shared `https://lambdakilo.github.io/mismeet/i#<nprofile>`. The apps still
+  accept it and list `lambdakilo.github.io` for app links, served by
+  `lambdakilo/lambdakilo.github.io` from the user's second account `lambdakilo`, which forwards
+  every path to `zululima.github.io` with the fragment kept and carries copies of the two
+  `.well-known` files. A change to those files goes to both sites.
 - The app icon is generated from `design/icon-sketch.png` by `design/make-icon.py` into the
   iOS asset catalog, the Android adaptive icon foreground, `design/icon-512.png`, the store
   icon for Google Play and Zapstore, and `design/play-store/feature-graphic.png`; change the

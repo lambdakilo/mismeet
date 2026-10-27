@@ -13,7 +13,7 @@ packages:
 settings:
   base:
     MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "14"
+    CURRENT_PROJECT_VERSION: "15"
     SWIFT_VERSION: "6.0"
     CODE_SIGN_STYLE: Automatic
     TARGETED_DEVICE_FAMILY: "1"
@@ -43,7 +43,7 @@ targets:
     entitlements:
       path: Mismeet/Mismeet.entitlements
       properties:
-        com.apple.developer.associated-domains: [applinks:lambdakilo.github.io]
+        com.apple.developer.associated-domains: [applinks:zululima.github.io, applinks:lambdakilo.github.io]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.mismeet.ios

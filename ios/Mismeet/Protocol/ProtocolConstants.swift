@@ -21,7 +21,8 @@ enum ProtocolConstants {
     static let okTimeoutSeconds: TimeInterval = 10
     static let publishTimeoutSeconds: TimeInterval = 25
     static let rateLimitBackoffSeconds: TimeInterval = 300
-    static let inviteLinkPrefix = "https://lambdakilo.github.io/mismeet/i#"
+    static let inviteLinkPrefix = "https://zululima.github.io/mismeet/i#"
+    static let earlierInviteLinkPrefix = "https://lambdakilo.github.io/mismeet/i#"
     static let coordinateDecimals = 6
     static let revocationFillerLength = 100
     static let estimateMinSpeed = 1.0

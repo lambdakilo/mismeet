@@ -16,13 +16,22 @@ class InviteTest {
     fun roundTripsThroughLinkAndNprofileUri() {
         val relays = listOf(RelayUrl.parse("wss://relay.example.com"), RelayUrl.parse("wss://nos.example.org"))
         val link = Invite(keys.publicKey(), relays).link()
-        assertTrue(link, link.startsWith("https://lambdakilo.github.io/mismeet/i#nprofile1"))
+        assertTrue(link, link.startsWith("https://zululima.github.io/mismeet/i#nprofile1"))
         val parsed = Invite.parse(link)
         assertEquals(keys.publicKey().toHex(), parsed.publicKey.toHex())
         assertEquals(relays.map { it.toString() }, urls(parsed))
         val nprofile = link.removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
         assertEquals(urls(parsed), urls(Invite.parse(nprofile)))
         assertEquals(urls(parsed), urls(Invite.parse("nostr:$nprofile")))
+    }
+
+    @Test
+    fun acceptsEarlierInviteLink() {
+        val relays = listOf(RelayUrl.parse("wss://relay.example.com"))
+        val nprofile = Invite(keys.publicKey(), relays).link().removePrefix(ProtocolConstants.INVITE_LINK_PREFIX)
+        val parsed = Invite.parse("https://lambdakilo.github.io/mismeet/i#$nprofile")
+        assertEquals(keys.publicKey().toHex(), parsed.publicKey.toHex())
+        assertEquals(relays.map { it.toString() }, urls(parsed))
     }
 
     @Test

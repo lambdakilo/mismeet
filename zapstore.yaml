@@ -6,7 +6,7 @@
 # The publisher's npub. Fill it in and commit before the first publish.
 # pubkey: npub1...
 
-repository: https://github.com/lambdakilo/mismeet
+repository: https://github.com/zululima/mismeet
 release_source: ./android/app/build/outputs/apk/release/app-release.apk
 
 name: Mismeet
@@ -26,7 +26,7 @@ tags:
   - privacy
   - maps
 license: AGPL-3.0-or-later
-website: https://github.com/lambdakilo/mismeet
+website: https://github.com/zululima/mismeet
 
 icon: ./design/icon-512.png
 images:

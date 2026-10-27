@@ -8,8 +8,8 @@ disclosure in the description too, so the description repeats what the app's own
 
 - App name: Mismeet
 - Category: Maps & Navigation
-- Website: https://github.com/lambdakilo/mismeet
-- Privacy policy: https://github.com/lambdakilo/mismeet/blob/main/PRIVACY.md
+- Website: https://github.com/zululima/mismeet
+- Privacy policy: https://github.com/zululima/mismeet/blob/main/PRIVACY.md
 - App icon: `design/icon-512.png`
 - Feature graphic: `design/play-store/feature-graphic.png`
 - Phone screenshots: `design/play-store/phone/`, in file order
@@ -38,7 +38,7 @@ Your phone publishes its location to Nostr relays, encrypted separately for each
 
 When you turn sharing on, Mismeet collects location data to share your position with the contacts you choose, even when the app is closed or not in use. While sharing is on, a notification shows that it is running, and the switch on the Me screen stops it.
 
-Mismeet is free and open source under the GNU Affero General Public License. Its protocol and source code are at github.com/lambdakilo/mismeet.
+Mismeet is free and open source under the GNU Affero General Public License. Its protocol and source code are at github.com/zululima/mismeet.
 ```
 
 ## Release notes

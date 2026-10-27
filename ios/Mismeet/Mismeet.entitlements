@@ -4,6 +4,7 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
+		<string>applinks:zululima.github.io</string>
 		<string>applinks:lambdakilo.github.io</string>
 	</array>
 </dict>

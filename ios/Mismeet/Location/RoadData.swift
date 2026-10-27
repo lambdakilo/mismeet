@@ -71,7 +71,7 @@ extension Overpass {
     static func fetch(_ query: String) async -> Data? {
         var request = URLRequest(url: url, timeoutInterval: 90)
         request.httpMethod = "POST"
-        request.setValue("app.mismeet.ios (https://github.com/lambdakilo/mismeet)", forHTTPHeaderField: "User-Agent")
+        request.setValue("app.mismeet.ios (https://github.com/zululima/mismeet)", forHTTPHeaderField: "User-Agent")
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         var allowed = CharacterSet.alphanumerics
         allowed.insert(charactersIn: "-._~")

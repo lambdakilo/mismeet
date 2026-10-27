@@ -131,7 +131,7 @@ adb exec-out screencap -p > emulator.png
 ## Testing without a second phone
 
 A fake publisher on the Mac stands in for the iPhone. The watching app prints its own invite
-at launch, `Invite: https://lambdakilo.github.io/mismeet/i#nprofile1...`, to logcat on Android and to the simulator's log on iOS,
+at launch, `Invite: https://zululima.github.io/mismeet/i#nprofile1...`, to logcat on Android and to the simulator's log on iOS,
 and shows it on the Me screen:
 
 ```bash

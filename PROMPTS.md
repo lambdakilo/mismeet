@@ -5,9 +5,43 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Move invite links to zululima.github.io, keep accepting old ones
+
+2026-10-27, [the commit that last changed this file](https://github.com/zululima/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**1.**
+> should i rename my lambdakilo to limakilo in github would something
+> break and how to fix
+
+**2.**
+> what other radio alphabet two letter combos are open on github
+
+**3.**
+> whats the shortest combo char wise? also i think xray is x-ray
+
+**4.**
+> ight and what should i fix once i put my zululima account name in
+> github
+
+**5.** (answer to the proposal of a lambdakilo organization)
+> i wont create that org. well create zululima.github.io instead
+
+**6.**
+> ill create a new github account with the name lambdakilo like i did
+> with akirataguchi115
+
+**7.** (answer to whether to prepare both now)
+> prep the lambdakilo redirect site and the mismeet branch now, dont
+> push or release yet
+
+**8.** (answer to whether the rename and the account are done)
+> i renamed to zululima, made the lambdakilo account, created
+> lambdakilo.github.io there and added zululima as collaborator. do the
+> rest
+
 ## Fit Play's reviewer instructions in 500 characters
 
-2026-10-27, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-27, commit [df52984](https://github.com/zululima/mismeet/commit/df52984071fbb99175d72115f39dfe24b27fe55e), model claude-opus-5-5, effort xhigh.
 
 **10.** (a reply button)
 > upload the new screenshots and review notes to app store connect and
@@ -24,7 +58,7 @@ so a change by hand is lost at the next commit.
 
 ## Put the contact list in a sheet over the map, as in Find My
 
-2026-10-27, commit [e9d1251](https://github.com/lambdakilo/mismeet/commit/e9d12514c4bb093979147d8544b50dcdc81a2a4c), model claude-opus-5-5, effort xhigh.
+2026-10-27, commit [e9d1251](https://github.com/zululima/mismeet/commit/e9d12514c4bb093979147d8544b50dcdc81a2a4c), model claude-opus-5-5, effort xhigh.
 
 **6.**
 > i hear the text and detail is too small on android in the map. fix
@@ -52,7 +86,7 @@ so a change by hand is lost at the next commit.
 
 ## Show the distance to each contact instead of speed and accuracy
 
-2026-10-26, commit [b67edc2](https://github.com/lambdakilo/mismeet/commit/b67edc215334e788b775c300949661191d5a00bd), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [b67edc2](https://github.com/zululima/mismeet/commit/b67edc215334e788b775c300949661191d5a00bd), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > remove the by bike thingy by car etc. kmh. only use the information
@@ -65,14 +99,14 @@ so a change by hand is lost at the next commit.
 
 ## Redo the Contacts screenshots with the district names
 
-2026-10-26, commit [a65790c](https://github.com/lambdakilo/mismeet/commit/a65790cecc2ebe25c984446c15aab6121046099e), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [a65790c](https://github.com/zululima/mismeet/commit/a65790cecc2ebe25c984446c15aab6121046099e), model claude-opus-5-5, effort xhigh.
 
 **3.** (answering whether to redo the README and store screenshots now)
 > redo the readme and store screenshots for the district names
 
 ## Name contacts' districts and focus a contact from the list
 
-2026-10-26, commit [e74969b](https://github.com/lambdakilo/mismeet/commit/e74969be74e9372cf330ab741f8d8e33f38334f7), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [e74969b](https://github.com/zululima/mismeet/commit/e74969be74e9372cf330ab741f8d8e33f38334f7), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > i wanna concentrate a person from a list like on find me. instead of
@@ -88,7 +122,7 @@ so a change by hand is lost at the next commit.
 
 ## Cut the README to one screen and move the rest to docs
 
-2026-10-26, commit [92728bc](https://github.com/lambdakilo/mismeet/commit/92728bc55b0b105459840bc248a0aa85032748d9), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [92728bc](https://github.com/zululima/mismeet/commit/92728bc55b0b105459840bc248a0aa85032748d9), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > fix the mismeet repo too to have oneliner description, oneliner
@@ -96,7 +130,7 @@ so a change by hand is lost at the next commit.
 
 ## Move Contacts' Refresh and Add and the sheet buttons down
 
-2026-10-26, commit [99f0f99](https://github.com/lambdakilo/mismeet/commit/99f0f998fddbae4a4cac0937382d4bb887e56608), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [99f0f99](https://github.com/zululima/mismeet/commit/99f0f998fddbae4a4cac0937382d4bb887e56608), model claude-opus-5-5, effort xhigh.
 
 **51.**
 > contacts refresh and add button are in top of the screen. put them
@@ -108,7 +142,7 @@ so a change by hand is lost at the next commit.
 
 ## Drop the relay list from the Me screen
 
-2026-10-26, commit [0dbcb07](https://github.com/lambdakilo/mismeet/commit/0dbcb0797dc8c3c6076f4e0fa0ec6b13fff3d93c), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [0dbcb07](https://github.com/zululima/mismeet/commit/0dbcb0797dc8c3c6076f4e0fa0ec6b13fff3d93c), model claude-opus-5-5, effort xhigh.
 
 **47.**
 > [pasted: 3 lines of terminal output with the phone's ABI list]
@@ -126,7 +160,7 @@ so a change by hand is lost at the next commit.
 
 ## Watch without sharing on iOS too, run on Android 10, drop Share invite
 
-2026-10-26, commit [f8f0b8f](https://github.com/lambdakilo/mismeet/commit/f8f0b8fab269ccb56c87295f41ddf0f57722240f), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [f8f0b8f](https://github.com/zululima/mismeet/commit/f8f0b8fab269ccb56c87295f41ddf0f57722240f), model claude-opus-5-5, effort xhigh.
 
 **44.**
 > can you make the most simple post or some info to the mismeet testers
@@ -149,14 +183,14 @@ screenshots)
 
 ## Drop the npub prefix comparison from spec 4.1
 
-2026-10-25, commit [d2d0a98](https://github.com/lambdakilo/mismeet/commit/d2d0a98cc74116d109b3e04a7422ba69d4764132), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [d2d0a98](https://github.com/zululima/mismeet/commit/d2d0a98cc74116d109b3e04a7422ba69d4764132), model claude-opus-5-5, effort xhigh.
 
 **43.** (answering whether the apps should show the prefix or the spec should drop it)
 > drop the npub prefix sentence from spec 4.1 instead
 
 ## Name the App Store Connect API labels in the key setup step
 
-2026-10-25, commit [61c1559](https://github.com/lambdakilo/mismeet/commit/61c1559f08f53e4eedc729779cd0c921b87e6732), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [61c1559](https://github.com/zululima/mismeet/commit/61c1559f08f53e4eedc729779cd0c921b87e6732), model claude-opus-5-5, effort xhigh.
 
 **41.**
 > can you find teh team key in the builtin browser
@@ -166,7 +200,7 @@ screenshots)
 
 ## Redo the 6.9-inch App Store Me screenshot
 
-2026-10-25, commit [b68945b](https://github.com/lambdakilo/mismeet/commit/b68945b1359ca0e4a103569cdf3849da8bd81e4f), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [b68945b](https://github.com/zululima/mismeet/commit/b68945b1359ca0e4a103569cdf3849da8bd81e4f), model claude-opus-5-5, effort xhigh.
 
 **40.**
 > research if i need to do the xcode thingy. [a note on how Claude Code
@@ -177,7 +211,7 @@ screenshots)
 
 ## Share invites as links that open the app
 
-2026-10-25, commit [e5eb22b](https://github.com/lambdakilo/mismeet/commit/e5eb22bbcddd10736524a9ecb9ff991d01e2a02f), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [e5eb22b](https://github.com/zululima/mismeet/commit/e5eb22bbcddd10736524a9ecb9ff991d01e2a02f), model claude-opus-5-5, effort xhigh.
 
 **38.**
 > signed in can you explain why i need to sign in so much to xcode
@@ -202,7 +236,7 @@ screenshots)
 
 ## Tell the user why an action did not happen
 
-2026-10-25, commit [c036b03](https://github.com/lambdakilo/mismeet/commit/c036b03d9d087d07671e61d18345ab67c606dcaa), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [c036b03](https://github.com/zululima/mismeet/commit/c036b03d9d087d07671e61d18345ab67c606dcaa), model claude-opus-5-5, effort xhigh.
 
 **37.**
 > yes, show those log-only errors (bad relay url, too many relays, too
@@ -215,7 +249,7 @@ alert)
 
 ## Show the log only in test builds
 
-2026-10-25, commit [5e08112](https://github.com/lambdakilo/mismeet/commit/5e08112bc2ac060da86a28a19b31857c82c79852), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [5e08112](https://github.com/zululima/mismeet/commit/5e08112bc2ac060da86a28a19b31857c82c79852), model claude-opus-5-5, effort xhigh.
 
 **31.**
 > wait so what was the situation with the app store publishing? i know
@@ -243,7 +277,7 @@ alert)
 
 ## Follow dark mode, crop contact photos, open the map on home
 
-2026-10-25, commit [340d9b7](https://github.com/lambdakilo/mismeet/commit/340d9b79c0723ae7a7ef744881af531d34be54b7), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [340d9b7](https://github.com/zululima/mismeet/commit/340d9b79c0723ae7a7ef744881af531d34be54b7), model claude-opus-5-5, effort xhigh.
 
 **24.**
 > also can you implement mismeet to respect dark mode / light mode
@@ -290,7 +324,7 @@ alert)
 
 ## Keep an unreadable state file instead of wiping it
 
-2026-10-25, commit [38af3b6](https://github.com/lambdakilo/mismeet/commit/38af3b6ab99b0ef1553433f7cf4dbede4e8bfc69), model claude-opus-5-5, effort xhigh.
+2026-10-25, commit [38af3b6](https://github.com/zululima/mismeet/commit/38af3b6ab99b0ef1553433f7cf4dbede4e8bfc69), model claude-opus-5-5, effort xhigh.
 
 **19.**
 > signed in to my apple account again in xcode settings, retry the
@@ -313,7 +347,7 @@ alert)
 
 ## Declare the iOS export answer in the Info.plist
 
-2026-10-24, commit [f14fda1](https://github.com/lambdakilo/mismeet/commit/f14fda1f1b12ccab8f04290b42b1380200791b31), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [f14fda1](https://github.com/zululima/mismeet/commit/f14fda1f1b12ccab8f04290b42b1380200791b31), model claude-opus-5-5, effort xhigh.
 
 **16.**
 > signed in to app store connect in the pane, answer build 3's export
@@ -329,7 +363,7 @@ alert)
 
 ## Let a plain release pick its own version
 
-2026-10-24, commit [6761df9](https://github.com/lambdakilo/mismeet/commit/6761df920d5464b448fc1f616f2627019beb7f5b), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [6761df9](https://github.com/zululima/mismeet/commit/6761df920d5464b448fc1f616f2627019beb7f5b), model claude-opus-5-5, effort xhigh.
 
 **15.**
 > actually nevermind i just say in the future release or new release
@@ -337,7 +371,7 @@ alert)
 
 ## Ship a test build on every app-changing push
 
-2026-10-24, commit [fe9adf1](https://github.com/lambdakilo/mismeet/commit/fe9adf12681afa6670cbf0aec35903f02490fee6), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [fe9adf1](https://github.com/zululima/mismeet/commit/fe9adf12681afa6670cbf0aec35903f02490fee6), model claude-opus-5-5, effort xhigh.
 
 **11.**
 > submitted the 15 changes for review in publishing overview
@@ -376,7 +410,7 @@ alert)
 
 ## Record the Play closed test and permission declarations
 
-2026-10-24, commit [2b2c046](https://github.com/lambdakilo/mismeet/commit/2b2c04676e2b66e88fb7410217dfd2e5adf5eb85), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [2b2c046](https://github.com/zululima/mismeet/commit/2b2c04676e2b66e88fb7410217dfd2e5adf5eb85), model claude-opus-5-5, effort xhigh.
 
 **9.**
 > go for the android tag. also can i just get random gmail accounts
@@ -401,27 +435,27 @@ video?)
 
 ## Link the background location video in the Play listing
 
-2026-10-24, commit [cfd6a51](https://github.com/lambdakilo/mismeet/commit/cfd6a51ba88a526f615f5de206eb0f1b77a9f440), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [cfd6a51](https://github.com/zululima/mismeet/commit/cfd6a51ba88a526f615f5de206eb0f1b77a9f440), model claude-opus-5-5, effort xhigh.
 
 **8.**
 > [pasted: the YouTube link of the background location video]
 
 ## Drop the instrumented test command; there are no such tests
 
-2026-10-24, commit [3a60e77](https://github.com/lambdakilo/mismeet/commit/3a60e7792c88e9a20d51beddf5cfdb0a8d3fb3a8), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [3a60e77](https://github.com/zululima/mismeet/commit/3a60e7792c88e9a20d51beddf5cfdb0a8d3fb3a8), model claude-opus-5-5, effort xhigh.
 
-**4.** Quoted under [1902d6a](https://github.com/lambdakilo/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6).
+**4.** Quoted under [1902d6a](https://github.com/zululima/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6).
 
 ## Point CLAUDE.md at the README's fake publisher commands
 
-2026-10-24, commit [1902d6a](https://github.com/lambdakilo/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [1902d6a](https://github.com/zululima/mismeet/commit/1902d6a2e76c8fb2154437e16cb4844c82f47eb6), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > [a request to review Claude Code's dream proposals left out]
 
 ## Record the answers given in Play Console
 
-2026-10-24, commit [6eff6aa](https://github.com/lambdakilo/mismeet/commit/6eff6aa89071e42af4e5b737f31e88bafc22eb22), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [6eff6aa](https://github.com/zululima/mismeet/commit/6eff6aa89071e42af4e5b737f31e88bafc22eb22), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > erm does my nokia 3.1 have android 10
@@ -457,7 +491,7 @@ declarations?)
 
 ## Name listing.md as the source of the App Store text
 
-2026-10-24, commit [e74446d](https://github.com/lambdakilo/mismeet/commit/e74446da12dd6e21458790193870edfe29878afb), model claude-opus-5-5, effort xhigh.
+2026-10-24, commit [e74446d](https://github.com/zululima/mismeet/commit/e74446da12dd6e21458790193870edfe29878afb), model claude-opus-5-5, effort xhigh.
 
 **4.**
 > [a request to review Claude Code's dream proposals left out]
@@ -468,7 +502,7 @@ text in CLAUDE.md?)
 
 ## Add contact photos and road estimates, fix two Android races
 
-2026-10-23, commit [8318779](https://github.com/lambdakilo/mismeet/commit/8318779a226477e28c5bf0f0687d352820b78665), model claude-opus-5-5, effort xhigh.
+2026-10-23, commit [8318779](https://github.com/zululima/mismeet/commit/8318779a226477e28c5bf0f0687d352820b78665), model claude-opus-5-5, effort xhigh.
 
 **3.**
 > can you make it so that people can set images to their contacts
@@ -482,7 +516,7 @@ text in CLAUDE.md?)
 
 ## Prepare the Android app for Google Play
 
-2026-10-23, commit [829010d](https://github.com/lambdakilo/mismeet/commit/829010dbe0a6eebb07b83b9bb12a41a5a0d956c3), model claude-opus-5-5, effort xhigh.
+2026-10-23, commit [829010d](https://github.com/zululima/mismeet/commit/829010dbe0a6eebb07b83b9bb12a41a5a0d956c3), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > lets publish to play store too
@@ -491,7 +525,7 @@ text in CLAUDE.md?)
 
 ## Let the fake publisher create its key and QR code without publishing
 
-2026-10-22, commit [96628d0](https://github.com/lambdakilo/mismeet/commit/96628d09df2c07d7125e94b302d9aabc458f7302), model claude-opus-5-5, effort xhigh.
+2026-10-22, commit [96628d0](https://github.com/zululima/mismeet/commit/96628d09df2c07d7125e94b302d9aabc458f7302), model claude-opus-5-5, effort xhigh.
 
 **28.**
 > [a request about the global Claude Code rules left out] also ive
@@ -503,7 +537,7 @@ text in CLAUDE.md?)
 
 ## Prepare the App Review recording and answers
 
-2026-10-20, commit [0e6ca81](https://github.com/lambdakilo/mismeet/commit/0e6ca81d022da611bf59618ab025d9856f717b26), model claude-opus-5-5, effort xhigh.
+2026-10-20, commit [0e6ca81](https://github.com/zululima/mismeet/commit/0e6ca81d022da611bf59618ab025d9856f717b26), model claude-opus-5-5, effort xhigh.
 
 **27.**
 > [pasted: App Review's request for more information about the app,
@@ -514,15 +548,15 @@ text in CLAUDE.md?)
 
 ## Drop the sign-off from the PROMPTS.md abbreviations
 
-2026-10-17, commit [8456db7](https://github.com/lambdakilo/mismeet/commit/8456db72192d56497b2c20f27727f2be2a849c1f), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [8456db7](https://github.com/zululima/mismeet/commit/8456db72192d56497b2c20f27727f2be2a849c1f), model claude-opus-5-5, effort xhigh.
 
-**3.** Quoted under [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
+**3.** Quoted under [38f216a](https://github.com/zululima/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
 
-**4.** Quoted under [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
+**4.** Quoted under [38f216a](https://github.com/zululima/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2).
 
 ## Add PROMPTS.md with the prompts behind every commit
 
-2026-10-17, commit [38f216a](https://github.com/lambdakilo/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [38f216a](https://github.com/zululima/mismeet/commit/38f216a4f9eef8461f0b3839ca1fbab8061588d2), model claude-opus-5-5, effort xhigh.
 
 **3.**
 > not bad. list all my repos that i have used llms in that could use
@@ -534,7 +568,7 @@ text in CLAUDE.md?)
 
 ## Make the iOS app iPhone only and raise its build to 2
 
-2026-10-17, commit [2a0e0ac](https://github.com/lambdakilo/mismeet/commit/2a0e0acf176cc0cbb7c77a8603034d15c40c55d8), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [2a0e0ac](https://github.com/zululima/mismeet/commit/2a0e0acf176cc0cbb7c77a8603034d15c40c55d8), model claude-opus-5-5, effort xhigh.
 
 **25.**
 > contact info saved. [a request about the global Claude Code rules
@@ -542,7 +576,7 @@ text in CLAUDE.md?)
 
 ## Keep the App Store listing text in the repository
 
-2026-10-17, commit [d409c07](https://github.com/lambdakilo/mismeet/commit/d409c07b2bf21418850b582830f7fb36a614a14f), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [d409c07](https://github.com/zululima/mismeet/commit/d409c07b2bf21418850b582830f7fb36a614a14f), model claude-opus-5-5, effort xhigh.
 
 **23.**
 > nvm lets skip the testflight for now i just wanna publish to app
@@ -550,16 +584,16 @@ text in CLAUDE.md?)
 
 ## Run the iOS upload on the user's go
 
-2026-10-17, commit [2919451](https://github.com/lambdakilo/mismeet/commit/29194514de38d3f55b6b3fab2438b2fc7f6b029e), model claude-opus-5-5, effort xhigh.
+2026-10-17, commit [2919451](https://github.com/zululima/mismeet/commit/29194514de38d3f55b6b3fab2438b2fc7f6b029e), model claude-opus-5-5, effort xhigh.
 
-**20.** Quoted under [b5f1016](https://github.com/lambdakilo/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9).
+**20.** Quoted under [b5f1016](https://github.com/zululima/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9).
 
 **22.**
 > take the new wording, app record created, go
 
 ## Correct the paid team setup and say where README commands run
 
-2026-10-17, commit [b5f1016](https://github.com/lambdakilo/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9), model claude-opus-5-5.
+2026-10-17, commit [b5f1016](https://github.com/zululima/mismeet/commit/b5f101601c91535c2ae50a92bbb0aa14d09431c9), model claude-opus-5-5.
 
 **20.**
 > upload the first testflight build
@@ -571,38 +605,38 @@ text in CLAUDE.md?)
 
 ## Document the ruleset that requires the sign-off check on main
 
-2026-10-14, commit [473e945](https://github.com/lambdakilo/mismeet/commit/473e945eb1a770f94a16affd5b6bd1b5e2a57d0c), model claude-opus-5-5.
+2026-10-14, commit [473e945](https://github.com/zululima/mismeet/commit/473e945eb1a770f94a16affd5b6bd1b5e2a57d0c), model claude-opus-5-5.
 
 **19.**
 > make the sign-off check required on main
 
 ## Check DCO sign-offs in CI
 
-2026-10-14, commit [e96d8dd](https://github.com/lambdakilo/mismeet/commit/e96d8ddee6e369f058918332a353a4687741dab2), model claude-opus-5-5.
+2026-10-14, commit [e96d8dd](https://github.com/zululima/mismeet/commit/e96d8ddee6e369f058918332a353a4687741dab2), model claude-opus-5-5.
 
 **18.**
 > add a dco sign-off check to ci
 
 ## Add the app store exception, CONTRIBUTING.md and a privacy policy
 
-2026-10-14, commit [b62c419](https://github.com/lambdakilo/mismeet/commit/b62c419ca302df8a8780616ee6de50ee13e60fa6), model claude-opus-5-5.
+2026-10-14, commit [b62c419](https://github.com/zululima/mismeet/commit/b62c419ca302df8a8780616ee6de50ee13e60fa6), model claude-opus-5-5.
 
-**15.** Quoted under [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
+**15.** Quoted under [5b23249](https://github.com/zululima/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
 
-**16.** Quoted under [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02).
+**16.** Quoted under [9c90a17](https://github.com/zululima/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02).
 
 **17.**
 > commit the licence, contributing and privacy files
 
 ## Say how zsp installs here and how a browser extension signs
 
-2026-10-14, commit [002eb50](https://github.com/lambdakilo/mismeet/commit/002eb50461628a14596b120f5c40406a37ad6b8f), model claude-opus-5-5.
+2026-10-14, commit [002eb50](https://github.com/zululima/mismeet/commit/002eb50461628a14596b120f5c40406a37ad6b8f), model claude-opus-5-5.
 
-**16.** Quoted under [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02).
+**16.** Quoted under [9c90a17](https://github.com/zululima/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02).
 
 ## Upload iOS builds for TestFlight and add App Store screenshots
 
-2026-10-14, commit [9c90a17](https://github.com/lambdakilo/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02), model claude-opus-5-5.
+2026-10-14, commit [9c90a17](https://github.com/zululima/mismeet/commit/9c90a171a6260a881627560449fc4c7513587e02), model claude-opus-5-5.
 
 **16.**
 > should i use my primal npub or some separate for software publishing?
@@ -612,13 +646,13 @@ text in CLAUDE.md?)
 
 ## Commit the Info.plist XcodeGen generated from the new project.yml
 
-2026-10-14, commit [0b3cf99](https://github.com/lambdakilo/mismeet/commit/0b3cf99a2ad1859ec1339ac03a789febee3386d1), model claude-opus-5-5.
+2026-10-14, commit [0b3cf99](https://github.com/zululima/mismeet/commit/0b3cf99a2ad1859ec1339ac03a789febee3386d1), model claude-opus-5-5.
 
-**15.** Quoted under [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
+**15.** Quoted under [5b23249](https://github.com/zululima/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb).
 
 ## Prepare store releases: tagged builds, Zapstore, App Store archive
 
-2026-10-14, commit [5b23249](https://github.com/lambdakilo/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb), model claude-opus-5-5.
+2026-10-14, commit [5b23249](https://github.com/zululima/mismeet/commit/5b2324998b864988ab49dbbc61631dc07823e9eb), model claude-opus-5-5.
 
 **15.**
 > [pasted: the user's notes on licensing and distribution: keep
@@ -631,7 +665,7 @@ text in CLAUDE.md?)
 
 ## Add screenshots of both apps to the README
 
-2026-10-12, commit [5e26e04](https://github.com/lambdakilo/mismeet/commit/5e26e04b8f065b7f9cda47b144835d9751fc68b0), model claude-fable-5-1, effort xhigh.
+2026-10-12, commit [5e26e04](https://github.com/zululima/mismeet/commit/5e26e04b8f065b7f9cda47b144835d9751fc68b0), model claude-fable-5-1, effort xhigh.
 
 **14.**
 > create screenshots of the app probably via simulators of ios and
@@ -639,7 +673,7 @@ text in CLAUDE.md?)
 
 ## Say in the refresh log what was new, unchanged or missing
 
-2026-10-10, commit [2f99f87](https://github.com/lambdakilo/mismeet/commit/2f99f8725c05e699b773d49f5d9c032c386b46d4), model claude-fable-5-1, effort xhigh.
+2026-10-10, commit [2f99f87](https://github.com/zululima/mismeet/commit/2f99f8725c05e699b773d49f5d9c032c386b46d4), model claude-fable-5-1, effort xhigh.
 
 **13.**
 > it works. when does my iphone resend the location to nostr? why does
@@ -647,7 +681,7 @@ text in CLAUDE.md?)
 
 ## Spell out the USB steps for connecting an Android phone
 
-2026-10-10, commit [9ab6179](https://github.com/lambdakilo/mismeet/commit/9ab6179975d669ce9b7f292c96486b70bb520c5b), model claude-fable-5-1, effort xhigh.
+2026-10-10, commit [9ab6179](https://github.com/zululima/mismeet/commit/9ab6179975d669ce9b7f292c96486b70bb520c5b), model claude-fable-5-1, effort xhigh.
 
 **12.**
 > when android asks tiedostonsiirto or somethign esle what to dpick.
@@ -658,7 +692,7 @@ text in CLAUDE.md?)
 
 ## Add the app icon from the hand-drawn pin sketch
 
-2026-10-10, commit [5b57e9b](https://github.com/lambdakilo/mismeet/commit/5b57e9bb903c4909581880d132b34091d3eaedb2), model claude-fable-5-1, effort xhigh.
+2026-10-10, commit [5b57e9b](https://github.com/zululima/mismeet/commit/5b57e9bb903c4909581880d132b34091d3eaedb2), model claude-fable-5-1, effort xhigh.
 
 **11.**
 > [pasted: a photo of a hand-drawn magenta map pin with "MIS" inside
@@ -667,7 +701,7 @@ text in CLAUDE.md?)
 
 ## Open on the map framed around everyone, add emulator and test tools
 
-2026-10-10, commit [1f981c8](https://github.com/lambdakilo/mismeet/commit/1f981c8b073fcf96fbc1fa9511845c1f6103b628), model claude-fable-5-1, effort xhigh.
+2026-10-10, commit [1f981c8](https://github.com/zululima/mismeet/commit/1f981c8b073fcf96fbc1fa9511845c1f6103b628), model claude-fable-5-1, effort xhigh.
 
 **10.**
 > i want the app to open first the map view like Find My does,
@@ -677,7 +711,7 @@ text in CLAUDE.md?)
 
 ## Make Android publishing opt-in so watching needs no permission
 
-2026-10-09, commit [20d8edd](https://github.com/lambdakilo/mismeet/commit/20d8edd332db7853712b1d45c004c3d36c9d242a), model claude-fable-5-1, effort xhigh.
+2026-10-09, commit [20d8edd](https://github.com/zululima/mismeet/commit/20d8edd332db7853712b1d45c004c3d36c9d242a), model claude-fable-5-1, effort xhigh.
 
 **9.**
 > can you make it so that the android user doesnt have to give their
@@ -688,14 +722,14 @@ text in CLAUDE.md?)
 
 ## Print the iOS log to stderr in debug builds, arm64-only Android APK
 
-2026-10-08, commit [c590655](https://github.com/lambdakilo/mismeet/commit/c59065503a9c9e8ac96860595f2798b674fce4b8), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [c590655](https://github.com/zululima/mismeet/commit/c59065503a9c9e8ac96860595f2798b674fce4b8), model claude-fable-5-1, effort xhigh.
 
 **8.**
 > trusted. continue
 
 ## Build for the connected iPhone by id and document the simulator run
 
-2026-10-08, commit [178a527](https://github.com/lambdakilo/mismeet/commit/178a52792f0ab3f367abbc781310977f4a213524), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [178a527](https://github.com/zululima/mismeet/commit/178a52792f0ab3f367abbc781310977f4a213524), model claude-fable-5-1, effort xhigh.
 
 **7.**
 > device id is there now but building for device or launching for
@@ -704,7 +738,7 @@ text in CLAUDE.md?)
 
 ## Fix the free Apple ID setup steps in the README
 
-2026-10-08, commit [a0184d0](https://github.com/lambdakilo/mismeet/commit/a0184d06d7711ec28ee0d388a7ab2bf411417ce6), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [a0184d0](https://github.com/zululima/mismeet/commit/a0184d06d7711ec28ee0d388a7ab2bf411417ce6), model claude-fable-5-1, effort xhigh.
 
 **6.**
 > first instruction was under settings - Apple Accounts. also security
@@ -712,7 +746,7 @@ text in CLAUDE.md?)
 
 ## Support stock Android 12 and move the manual setup to the README
 
-2026-10-08, commit [dbcb984](https://github.com/lambdakilo/mismeet/commit/dbcb9840a3b6d590012d43d817ee73fc14bbe353), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [dbcb984](https://github.com/zululima/mismeet/commit/dbcb9840a3b6d590012d43d817ee73fc14bbe353), model claude-fable-5-1, effort xhigh.
 
 **5.**
 > ok so target non graphene i.e. motorola g200 5g with android 12 also
@@ -721,39 +755,39 @@ text in CLAUDE.md?)
 
 ## Add a map tab and a boot receiver to the Android app
 
-2026-10-08, commit [c681ed1](https://github.com/lambdakilo/mismeet/commit/c681ed125b7114a38295ad94daadda6931f52b0a), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [c681ed1](https://github.com/zululima/mismeet/commit/c681ed125b7114a38295ad94daadda6931f52b0a), model claude-fable-5-1, effort xhigh.
 
-**4.** Quoted under [8617901](https://github.com/lambdakilo/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
+**4.** Quoted under [8617901](https://github.com/zululima/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
 
 ## Scan invite QR codes on both platforms
 
-2026-10-08, commit [8656e39](https://github.com/lambdakilo/mismeet/commit/8656e39d4640d52c14eedb05414ca52233e0d4b5), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [8656e39](https://github.com/zululima/mismeet/commit/8656e39d4640d52c14eedb05414ca52233e0d4b5), model claude-fable-5-1, effort xhigh.
 
-**4.** Quoted under [8617901](https://github.com/lambdakilo/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
+**4.** Quoted under [8617901](https://github.com/zululima/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
 
 ## Add an opt-in integration test against public relays
 
-2026-10-08, commit [ffae401](https://github.com/lambdakilo/mismeet/commit/ffae401b1fed99ec8e8d43e43e7f15ac18435919), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [ffae401](https://github.com/zululima/mismeet/commit/ffae401b1fed99ec8e8d43e43e7f15ac18435919), model claude-fable-5-1, effort xhigh.
 
-**4.** Quoted under [8617901](https://github.com/lambdakilo/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
+**4.** Quoted under [8617901](https://github.com/zululima/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4).
 
 ## Add the app layers: keys, state, relays, location and screens
 
-2026-10-08, commit [8617901](https://github.com/lambdakilo/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [8617901](https://github.com/zululima/mismeet/commit/861790191921a45828fb34e26b22b6fbd6c22ed4), model claude-fable-5-1, effort xhigh.
 
 **4.**
 > on this project you can just push to main directly. continue coding
 
 ## Scaffold both apps and implement the protocol core with tests
 
-2026-10-08, commit [e44d1f6](https://github.com/lambdakilo/mismeet/commit/e44d1f68e2a58573f79e87a2e9e4f94f5588d6f5), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [e44d1f6](https://github.com/zululima/mismeet/commit/e44d1f68e2a58573f79e87a2e9e4f94f5588d6f5), model claude-fable-5-1, effort xhigh.
 
 **3.**
 > continue
 
 ## Add the protocol spec, build commands, README and licences
 
-2026-10-08, commit [fe6df13](https://github.com/lambdakilo/mismeet/commit/fe6df13dffaa2e3229a06d31633b79f73b40e12a), model claude-fable-5-1, effort xhigh.
+2026-10-08, commit [fe6df13](https://github.com/zululima/mismeet/commit/fe6df13dffaa2e3229a06d31633b79f73b40e12a), model claude-fable-5-1, effort xhigh.
 
 **1.**
 > [pasted: a project brief for a Nostr-based location sharing app for
@@ -773,11 +807,13 @@ text in CLAUDE.md?)
 - APK: Android application package
 - btw: by the way
 - ccbysa4.0: Creative Commons Attribution-ShareAlike 4.0 International
+- char: character
 - ci: continuous integration
 - CLA: Contributor License Agreement
 - DCO: Developer Certificate of Origin
 - etc: et cetera
 - i.e.: that is
+- ight: alright
 - kmh: kilometres per hour
 - llms: large language models
 - npub: a Nostr public key in its NIP-19 text form
