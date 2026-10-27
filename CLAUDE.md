@@ -28,9 +28,10 @@ follows it, and a protocol change edits the spec first, in the same change.
   `identity/` (a Keystore wrapped secret key), `store/` (JSON state in the files directory),
   `nostr/`, `location/` (the provider, the foreground service, the boot receiver and the road
   cells for estimates), `ui/`.
-  The map tab opens first, framed around everyone with a known position, and draws
-  OpenStreetMap tiles through osmdroid, which needs the package name as user agent and has to
-  be clipped inside Compose; a contact row also opens the position in whatever map app
+  The map tab opens first, framed around everyone with a known position above the contact
+  sheet, and draws OpenStreetMap tiles through osmdroid, which needs the package name as user
+  agent, has to be clipped inside Compose and scales its tiles to the screen density, or their
+  labels are too small to read; a contact row also opens the position in whatever map app
   handles `geo:` URIs.
 
 ## Shared rules
@@ -56,9 +57,11 @@ follows it, and a protocol change edits the spec first, in the same change.
   permission. The "Share my location" switch on the Me screen turns it on. Keep every
   publishing path behind `sharingEnabled`.
 - Controls go at the bottom of the screen, where a thumb reaches them, or at least never in the
-  top bar: the map's framing button, the Contacts screen's Refresh and Add, and the buttons of
-  sheets and dialogs, such as Add contact and the photo crop, sit at the bottom, and only titles
-  stay at the top. New controls follow the same rule.
+  top bar: the map's framing button and the buttons of sheets and dialogs, such as Add contact
+  and the photo crop, sit at the bottom, and only titles stay at the top. The contact list is a
+  sheet over the map, as Find My's people are, with Refresh and Add in its header beside the
+  title; tapping a contact turns the sheet into that contact's card. Both apps have only the
+  Map and Me tabs. New controls follow the same rule.
 - Never log a secret key, a decrypted payload or a contact's public key above debug level.
 - Bundle identifier `app.mismeet.ios`, Android `applicationId` `app.mismeet.android`. Changing
   one means changing it here and in the project files in the same commit.
@@ -333,7 +336,8 @@ MISMEET_FAKE_SPEED=12 MISMEET_FAKE_HEADING=316 MISMEET_FAKE_AGE=120 \
 ```
 
 Add contacts at launch, semicolon separated, and `Name|<invite>` names one. On the simulator,
-`SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in front of the launch opens that tab:
+`SIMCTL_CHILD_MISMEET_TEST_TAB=me` in front of the launch opens the Me tab, and `contacts` the
+map with the contact list pulled up:
 
 ```bash
 SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted app.mismeet.ios

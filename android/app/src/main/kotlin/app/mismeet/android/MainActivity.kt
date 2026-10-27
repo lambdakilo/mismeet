@@ -9,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -32,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mismeet.android.ui.ContactsScreen
 import app.mismeet.android.ui.MapScreen
 import app.mismeet.android.ui.MeScreen
 import app.mismeet.protocol.ProtocolConstants
@@ -81,7 +79,10 @@ private fun MismeetScreen(model: AppModel) {
     val snackbar = remember { SnackbarHostState() }
     val openedInvite by model.openedInvite.collectAsState()
     LaunchedEffect(openedInvite) {
-        if (openedInvite != null) tab = 1
+        if (openedInvite != null) {
+            tab = 0
+            focused = null
+        }
     }
     LaunchedEffect(Unit) {
         model.notices.collect { snackbar.showSnackbar(it) }
@@ -111,12 +112,6 @@ private fun MismeetScreen(model: AppModel) {
                 NavigationBarItem(
                     selected = tab == 1,
                     onClick = { tab = 1 },
-                    icon = { Icon(Icons.Filled.Person, contentDescription = null) },
-                    label = { Text("Contacts") },
-                )
-                NavigationBarItem(
-                    selected = tab == 2,
-                    onClick = { tab = 2 },
                     icon = { Icon(Icons.Filled.Settings, contentDescription = null) },
                     label = { Text("Me") },
                 )
@@ -125,11 +120,7 @@ private fun MismeetScreen(model: AppModel) {
     ) { padding ->
         val content = Modifier.padding(padding)
         when (tab) {
-            0 -> MapScreen(model, focused, onUnfocus = { focused = null }, content)
-            1 -> ContactsScreen(model, onFocus = {
-                focused = it
-                tab = 0
-            }, content)
+            0 -> MapScreen(model, focused, onFocus = { focused = it }, onUnfocus = { focused = null }, content)
             else -> MeScreen(model, content)
         }
     }

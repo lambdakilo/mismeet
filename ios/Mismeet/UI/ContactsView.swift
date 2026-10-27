@@ -2,7 +2,9 @@ import CoreLocation
 import PhotosUI
 import SwiftUI
 
-struct ContactsView: View {
+/// The contacts in a panel at the bottom of the map, like Find My's people: the header stays in
+/// view, and pulling it up or tapping it shows the list.
+struct ContactList: View {
     private struct AddRequest: Identifiable {
         let id = UUID()
         var invite = ""
@@ -10,29 +12,18 @@ struct ContactsView: View {
 
     @Environment(AppModel.self) private var model
     @State private var adding: AddRequest?
+    @Binding var expanded: Bool
     /// Shows a contact on the map.
     let focus: (String) -> Void
 
     var body: some View {
-        NavigationStack {
-            List {
-                if model.state.contacts.isEmpty {
-                    ContentUnavailableView(
-                        "No contacts",
-                        systemImage: "person.2",
-                        description: Text("Add a contact from the invite they sent you.")
-                    )
-                }
-                ForEach(model.state.contacts) { contact in
-                    ContactRow(contact: contact, focus: focus)
-                }
-                .onDelete { offsets in
-                    model.removeContacts(at: offsets)
-                }
-            }
-            .navigationTitle("Contacts")
-            .safeAreaInset(edge: .bottom) {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                Capsule()
+                    .fill(.secondary.opacity(0.5))
+                    .frame(width: 36, height: 5)
                 HStack(spacing: 12) {
+                    Text("Contacts").font(.title2.bold())
                     Spacer()
                     Button("Refresh", systemImage: "arrow.clockwise") {
                         Task { await model.refresh() }
@@ -42,15 +33,46 @@ struct ContactsView: View {
                     Button("Add", systemImage: "plus") { adding = AddRequest() }
                         .buttonStyle(.borderedProminent)
                 }
-                .padding()
+                .labelStyle(.iconOnly)
+                .buttonBorderShape(.circle)
+                .controlSize(.large)
             }
-            .refreshable { await model.refresh() }
-            .sheet(item: $adding) { AddContactView(invite: $0.invite) }
-            .onChange(of: model.openedInvite, initial: true) { _, link in
-                guard let link else { return }
-                adding = AddRequest(invite: link)
-                model.openedInvite = nil
+            .padding([.horizontal, .top])
+            .padding(.bottom, 12)
+            .contentShape(Rectangle())
+            .onTapGesture { withAnimation(.snappy) { expanded.toggle() } }
+            .gesture(DragGesture(minimumDistance: 10).onEnded { drag in
+                withAnimation(.snappy) { expanded = drag.translation.height < 0 }
+            })
+            if expanded {
+                List {
+                    if model.state.contacts.isEmpty {
+                        ContentUnavailableView(
+                            "No contacts",
+                            systemImage: "person.2",
+                            description: Text("Add a contact from the invite they sent you.")
+                        )
+                        .listRowBackground(Color.clear)
+                    }
+                    ForEach(model.state.contacts) { contact in
+                        ContactRow(contact: contact, focus: focus)
+                            .listRowBackground(Color.clear)
+                    }
+                    .onDelete { offsets in
+                        model.removeContacts(at: offsets)
+                    }
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .containerRelativeFrame(.vertical) { length, _ in length * 0.5 }
+                .refreshable { await model.refresh() }
             }
+        }
+        .sheet(item: $adding) { AddContactView(invite: $0.invite) }
+        .onChange(of: model.openedInvite, initial: true) { _, link in
+            guard let link else { return }
+            adding = AddRequest(invite: link)
+            model.openedInvite = nil
         }
     }
 }

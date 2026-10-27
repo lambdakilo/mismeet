@@ -169,8 +169,9 @@ SIMCTL_CHILD_MISMEET_TEST_INVITES="<invite>;<invite>" xcrun simctl launch booted
 ```
 
 An entry may carry a name, `Aino|<invite>`; without one the contact is named Test 1, Test 2 and
-so on. On the simulator, `SIMCTL_CHILD_MISMEET_TEST_TAB=contacts` or `me` in the same way
-opens that tab instead of the map, which is how the README's screenshots were taken.
+so on. On the simulator, `SIMCTL_CHILD_MISMEET_TEST_TAB=me` in the same way opens the Me tab
+instead of the map, and `contacts` pulls the contact list up over the map, which is how the
+README's screenshots were taken.
 
 ```bash
 adb shell "am start -n app.mismeet.android/.MainActivity --es invites '<invite>;<invite>'"
@@ -270,17 +271,19 @@ to fetch.
 1. On the iPhone, open Me, turn on "Share my location" and grant location while using the app,
    then tap "Allow location" for "Always". The log on the same screen shows "Relay list:
    accepted by N of 3 relays".
-2. On the Android phone, open Me: its invite QR code is on screen. On the iPhone, Contacts >
-   Add > "Scan QR code", scan it, give the contact a name and tap Add. The iPhone log shows
-   "Location: accepted by N of 3 relays" within a few seconds.
-3. On the iPhone, open Me to show its QR code. On the Android phone, Contacts > Add > "Scan QR
-   code", allow the camera, scan it, name the contact, Add. The row shows the district, "seen ...",
-   and the distance after the next refresh, within a minute, or at once with Refresh. Both apps open on the map,
-   framed around everyone with a known position in the phone's own country. After panning, the
-   button at the bottom frames that view again; with someone abroad, "Everyone" in that view
-   widens it to them too.
+2. On the Android phone, open Me: its invite QR code is on screen. On the iPhone, tap + beside
+   Contacts at the bottom of the map, then "Scan QR code", scan it, give the contact a name and
+   tap Add. The iPhone log shows "Location: accepted by N of 3 relays" within a few seconds.
+3. On the iPhone, open Me to show its QR code. On the Android phone, tap Add beside Contacts at
+   the bottom of the map, then "Scan QR code", allow the camera, scan it, name the contact, Add.
+   Pulled up, the contact list shows the district, "seen ..." and the distance after the next
+   refresh, within a minute, or at once with Refresh. Both apps open on the map, framed around
+   everyone with a known position in the phone's own country. After panning, the button at the
+   bottom frames that view again; with someone abroad, "Everyone" in that view widens it to
+   them too.
 4. Walk a few hundred metres with the iPhone, or drive. Significant location changes wake the
-   app and the Android row's "Seen" time moves. Pulling the Contacts list down on the iPhone
-   refreshes its own view; the "Publish now" button on its Me screen forces a publish.
+   app and the Android row's "Seen" time moves. Pulling the contact list down on the iPhone, once
+   it is pulled up over the map, refreshes its own view; the "Publish now" button on its Me
+   screen forces a publish.
 5. To check revocation, switch "Share my location" off for the contact on the iPhone: the next
    refresh on the Android phone shows "no longer sharing", with the last position kept.

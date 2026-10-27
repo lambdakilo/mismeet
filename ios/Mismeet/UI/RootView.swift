@@ -3,22 +3,20 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.scenePhase) private var scenePhase
-    @State private var screen = Screen.initial
+    @State private var screen: Screen = Screen.testTab == "me" ? .me : .map
     @State private var focused: String?
+    @State private var listUp = Screen.testTab == "contacts"
 
     enum Screen: Hashable {
-        case map, contacts, me
+        case map, me
 
-        // Test hook: MISMEET_TEST_TAB=contacts or me in the launch environment of a debug build.
-        static var initial: Screen {
+        // Test hook: MISMEET_TEST_TAB=contacts or me in the launch environment of a debug build;
+        // contacts opens the map with the contact list pulled up.
+        static var testTab: String? {
             #if DEBUG
-            switch ProcessInfo.processInfo.environment["MISMEET_TEST_TAB"] {
-            case "contacts": return .contacts
-            case "me": return .me
-            default: return .map
-            }
+            ProcessInfo.processInfo.environment["MISMEET_TEST_TAB"]
             #else
-            return .map
+            nil
             #endif
         }
     }
@@ -26,13 +24,7 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $screen) {
             Tab("Map", systemImage: "map", value: .map) {
-                ContactsMapView(focused: $focused)
-            }
-            Tab("Contacts", systemImage: "person.2", value: .contacts) {
-                ContactsView { id in
-                    focused = id
-                    screen = .map
-                }
+                ContactsMapView(focused: $focused, listUp: $listUp)
             }
             Tab("Me", systemImage: "person.crop.circle", value: .me) {
                 MeView()
@@ -44,7 +36,8 @@ struct RootView: View {
         )) {}
         .onOpenURL { url in
             model.openedInvite = url.absoluteString
-            screen = .contacts
+            focused = nil
+            screen = .map
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { model.becameActive() }

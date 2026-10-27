@@ -13,8 +13,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -56,8 +56,9 @@ import java.util.Locale
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
+/** The contacts in the map's sheet, like Find My's people: the header stays in view, and pulling it up shows the list. */
 @Composable
-fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifier = Modifier) {
+fun ContactList(model: AppModel, onFocus: (String) -> Unit, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     val placeNames by model.placeNames.collectAsState()
     // The invite the Add contact dialog opens with; null while it is closed.
@@ -84,12 +85,28 @@ fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifie
         picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
-    Column(modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Contacts", style = MaterialTheme.typography.headlineMedium)
-        if (state.contacts.isEmpty()) {
-            Text("Add a contact from the invite they sent you.", style = MaterialTheme.typography.bodyMedium)
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("Contacts", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+            OutlinedButton(onClick = { model.refreshNow() }) { Text("Refresh") }
+            Button(onClick = { adding = "" }) { Text("Add") }
         }
-        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (state.contacts.isEmpty()) {
+            Text(
+                "Add a contact from the invite they sent you.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+        }
+        LazyColumn(
+            Modifier.weight(1f),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             items(state.contacts, key = { it.id }) { contact ->
                 ContactRow(
                     contact = contact,
@@ -103,10 +120,6 @@ fun ContactsScreen(model: AppModel, onFocus: (String) -> Unit, modifier: Modifie
                     onOpenMap = { openMap(context, contact) },
                 )
             }
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
-            OutlinedButton(onClick = { model.refreshNow() }) { Text("Refresh") }
-            Button(onClick = { adding = "" }) { Text("Add") }
         }
     }
 

@@ -2,8 +2,9 @@ import MapKit
 import SwiftUI
 
 /// Opens framed around the people in this phone's country, the user included, like Find My. The
-/// button at the bottom returns there, and a second tap widens to everyone, abroad included. A
-/// contact tapped in the list is focused, with a card at the bottom until it is closed.
+/// button at the bottom returns there, and a second tap widens to everyone, abroad included. The
+/// contact list is a panel at the bottom, and a contact tapped in it is focused, with its card in
+/// the panel until it is closed.
 struct ContactsMapView: View {
     private struct Estimate {
         var path: [CLLocationCoordinate2D]
@@ -21,6 +22,7 @@ struct ContactsMapView: View {
     @State private var estimates: [String: Estimate] = [:]
     @State private var countries: Countries?
     @Binding var focused: String?
+    @Binding var listUp: Bool
 
     private var located: [Contact] {
         model.state.contacts.filter { $0.lastPayload != nil }
@@ -95,34 +97,45 @@ struct ContactsMapView: View {
             }
             .padding()
         }
-        .safeAreaInset(edge: .bottom) {
-            if let contact = focusedContact {
-                HStack(alignment: .top, spacing: 12) {
-                    ContactAvatar(contact: contact)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(contact.name).font(.headline)
-                        Text(ContactRow.status(of: contact, place: model.placeNames[contact.id]))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Group {
+                if let contact = focusedContact {
+                    HStack(alignment: .top, spacing: 12) {
+                        ContactAvatar(contact: contact)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(contact.name).font(.headline)
+                            Text(ContactRow.status(of: contact, place: model.placeNames[contact.id]))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        if let distance = ContactRow.distance(to: contact, in: model.state) {
+                            Text(distance).font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        Button("Close", systemImage: "xmark") {
+                            focused = nil
+                            show(.nearby)
+                        }
+                        .labelStyle(.iconOnly)
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.circle)
                     }
-                    Spacer()
-                    if let distance = ContactRow.distance(to: contact, in: model.state) {
-                        Text(distance).font(.subheadline).foregroundStyle(.secondary)
-                    }
-                    Button("Close", systemImage: "xmark") {
-                        focused = nil
-                        show(.nearby)
-                    }
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.bordered)
-                    .buttonBorderShape(.circle)
+                    .padding()
+                } else {
+                    ContactList(expanded: $listUp) { focused = $0 }
                 }
-                .padding()
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
-                .padding([.horizontal, .bottom])
+            }
+            .background {
+                UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20)
+                    .fill(.regularMaterial)
+                    .shadow(color: .black.opacity(0.15), radius: 8)
+                    .ignoresSafeArea(edges: .bottom)
             }
         }
         .mapScope(mapScope)
+        .onAppear {
+            if model.state.contacts.isEmpty { listUp = true }
+        }
         .task {
             countries = await Task.detached { Countries.bundled() }.value
         }

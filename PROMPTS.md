@@ -5,9 +5,50 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Put the contact list in a sheet over the map, as in Find My
+
+2026-10-27, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**6.**
+> i hear the text and detail is too small on android in the map. fix
+> and show me diff. also add the contacts thingy there in map like its
+> on find me instead
+
+(which apps get the contact list on the map)
+> Both apps (Recommended)
+
+(how the contact list sits on the map)
+> Sheet, no Contacts tab (Recommended)
+
+(where Add and Refresh go in the sheet)
+> Sheet header (Recommended)
+
+**7.**
+> by diff i meant visual diff
+
+**8.** (a reply button)
+> make android refit the map above the pulled up list like ios does
+
+**9.** (answering whether to redo the screenshots, commit, push and ship)
+> yes all of it. [a remark about how Claude's replies are read left
+> out]
+
+## Show the distance to each contact instead of speed and accuracy
+
+2026-10-26, commit [b67edc2](https://github.com/lambdakilo/mismeet/commit/b67edc215334e788b775c300949661191d5a00bd), model claude-opus-5-5, effort xhigh.
+
+**4.**
+> remove the by bike thingy by car etc. kmh. only use the information
+> when checking the circle moving. also no need for the within x
+> meters. my distance to them should be used tho in the map like on
+> find me
+
+**5.** (answering whether to commit, push to main and ship the test builds)
+> commit and push to main and ship the test builds
+
 ## Redo the Contacts screenshots with the district names
 
-2026-10-26, [the commit that last changed this file](https://github.com/lambdakilo/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-26, commit [a65790c](https://github.com/lambdakilo/mismeet/commit/a65790cecc2ebe25c984446c15aab6121046099e), model claude-opus-5-5, effort xhigh.
 
 **3.** (answering whether to redo the README and store screenshots now)
 > redo the readme and store screenshots for the district names
@@ -720,6 +761,7 @@ text in CLAUDE.md?)
 - DCO: Developer Certificate of Origin
 - etc: et cetera
 - i.e.: that is
+- kmh: kilometres per hour
 - llms: large language models
 - npub: a Nostr public key in its NIP-19 text form
 - npub: Nostr public key, bech32 encoded

@@ -9,22 +9,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -33,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -45,7 +53,11 @@ import app.mismeet.protocol.LatLon
 import java.io.File
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.atan
 import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.sinh
+import kotlin.math.tan
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -64,11 +76,13 @@ import org.osmdroid.views.overlay.Polyline
 /**
  * OpenStreetMap tiles through osmdroid: no Google dependency, and the tile policy wants a user
  * agent. Opens framed around the people in this phone's country, like Find My; the button at the
- * bottom returns there, and a second tap widens to everyone, abroad included. The [focused]
- * contact, tapped in the list, is framed with a card at the bottom until it is closed.
+ * bottom returns there, and a second tap widens to everyone, abroad included. The contact list is
+ * a sheet over the map, and the [focused] contact, tapped in it, is framed with its card in the
+ * sheet until it is closed.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier: Modifier = Modifier) {
+fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUnfocus: () -> Unit, modifier: Modifier = Modifier) {
     val state by model.state.collectAsState()
     val placeNames by model.placeNames.collectAsState()
     val context = LocalContext.current
@@ -93,6 +107,16 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
     val someoneAbroad = nearby.size != everyone.size
     val focusedContact = located.firstOrNull { it.id == focused }
     val focusKey = focusedContact?.lastPayload?.let { "${focusedContact.id}:${it.latitude},${it.longitude},${it.accuracy}" }
+    val peek = if (focusedContact != null) CARD_PEEK else LIST_PEEK
+    val sheet = rememberStandardBottomSheetState(
+        initialValue = if (state.contacts.isEmpty()) SheetValue.Expanded else SheetValue.PartiallyExpanded,
+        skipHiddenState = true,
+    )
+    var handlePixels by remember { mutableIntStateOf(0) }
+    var listPixels by remember { mutableIntStateOf(0) }
+    // Pulled up, the list covers the lower part of the map, so the framing fits above it, as on iOS.
+    val listUp = focusedContact == null && sheet.targetValue == SheetValue.Expanded
+    val sheetPixels = if (listUp) handlePixels + listPixels else with(LocalDensity.current) { peek.roundToPx() }
 
     var framing by remember { mutableStateOf(Framing.NEARBY) }
     var framedAt by remember { mutableStateOf<Pair<GeoPoint, Double>?>(null) }
@@ -100,10 +124,11 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
     val frameKey = focusKey
         ?: (located.joinToString(",") { it.id } + ":" + estimates.keys.sorted().joinToString(",") + ":" + (own != null) + ":" + home)
     val framedKey = remember { arrayOf("") }
+    val framedListUp = remember { booleanArrayOf(false) }
     val map = remember { arrayOfNulls<MapView>(1) }
     val show by rememberUpdatedState { view: MapView, target: Framing ->
         framing = target
-        frame(view, if (target == Framing.NEARBY) nearby else everyone)
+        frame(view, if (target == Framing.NEARBY) nearby else everyone, sheetPixels)
         framedAt = GeoPoint(view.mapCenter.latitude, view.mapCenter.longitude) to view.zoomLevelDouble
         moved = false
         if (target == Framing.NEARBY) framedKey[0] = frameKey
@@ -113,7 +138,7 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
         if (payload == null) {
             show(view, Framing.NEARBY)
         } else {
-            frameAround(view, GeoPoint(payload.latitude, payload.longitude), payload.accuracy)
+            frameAround(view, GeoPoint(payload.latitude, payload.longitude), payload.accuracy, sheetPixels)
             framedAt = GeoPoint(view.mapCenter.latitude, view.mapCenter.longitude) to view.zoomLevelDouble
             moved = false
             framedKey[0] = frameKey
@@ -130,109 +155,129 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
         }
     }
     val markerSize = with(LocalDensity.current) { 44.dp.roundToPx() }
+    LaunchedEffect(focused) {
+        if (focused != null) sheet.partialExpand()
+    }
 
-    Box(modifier.fillMaxSize()) {
-        // osmdroid draws the partial tiles at its edges outside its bounds; Compose does not clip a hosted view.
-        AndroidView(
-            modifier = Modifier.fillMaxSize().clipToBounds(),
-            factory = { ctx ->
-                MapView(ctx).apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setMultiTouchControls(true)
-                    controller.setZoom(12.0)
-                    controller.setCenter(nearby.firstOrNull() ?: GeoPoint(60.17, 24.94))
-                    addOnFirstLayoutListener { _, _, _, _, _ -> reframe(this) }
-                    addMapListener(object : MapListener {
-                        override fun onScroll(event: ScrollEvent?) = noteMove(this@apply)
-                        override fun onZoom(event: ZoomEvent?) = noteMove(this@apply)
-
-                        private fun noteMove(view: MapView): Boolean {
-                            val (center, zoom) = framedAt ?: return false
-                            moved = abs(view.mapCenter.latitude - center.latitude) > 1e-5 ||
-                                abs(view.mapCenter.longitude - center.longitude) > 1e-5 ||
-                                abs(view.zoomLevelDouble - zoom) > 1e-3
-                            return false
-                        }
-                    })
-                    onResume()
-                    map[0] = this
-                }
-            },
-            update = { view ->
-                view.overlayManager.tilesOverlay.setColorFilter(if (dark) DARK_TILES else null)
-                view.overlayManager.tilesOverlay.loadingBackgroundColor = if (dark) DARK_LOADING else LIGHT_LOADING
-                view.overlays.clear()
-                focusedContact?.lastPayload?.let { payload ->
-                    view.overlays += Polygon(view).apply {
-                        setPoints(Polygon.pointsAsCircle(GeoPoint(payload.latitude, payload.longitude), payload.accuracy.toDouble()))
-                        fillPaint.color = FOCUS_FILL
-                        outlinePaint.color = Color.WHITE
-                        outlinePaint.strokeWidth = markerSize / 14f
-                        infoWindow = null
+    BottomSheetScaffold(
+        modifier = modifier,
+        scaffoldState = rememberBottomSheetScaffoldState(sheet),
+        sheetPeekHeight = peek,
+        sheetDragHandle = { BottomSheetDefaults.DragHandle(Modifier.onSizeChanged { handlePixels = it.height }) },
+        sheetContent = {
+            val contact = focusedContact
+            if (contact == null) {
+                ContactList(model, onFocus, Modifier.fillMaxHeight(LIST_HEIGHT).onSizeChanged { listPixels = it.height })
+            } else {
+                Row(
+                    Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp, bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Avatar(contact, model.photo(contact), 44.dp, Modifier.size(44.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(contact.name, style = MaterialTheme.typography.titleMedium)
+                        Text(status(contact, placeNames[contact.id]), style = MaterialTheme.typography.bodySmall)
                     }
+                    distance(contact, state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    IconButton(onClick = onUnfocus) { Icon(Icons.Filled.Close, contentDescription = "Close") }
                 }
-                located.forEach { contact ->
-                    val payload = contact.lastPayload ?: return@forEach
-                    val avatar = avatarBitmap(contact, model.photo(contact), markerSize)
-                    estimates[contact.id]?.let { estimate ->
-                        view.overlays += Polyline(view).apply {
-                            setPoints(estimate.path.map { GeoPoint(it.latitude, it.longitude) })
-                            outlinePaint.color = ESTIMATE_COLOUR
-                            outlinePaint.strokeWidth = markerSize / 8f
-                            outlinePaint.pathEffect = DashPathEffect(floatArrayOf(markerSize / 4f, markerSize / 5f), 0f)
+            }
+        },
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            // osmdroid draws the partial tiles at its edges outside its bounds; Compose does not clip a hosted view.
+            AndroidView(
+                modifier = Modifier.fillMaxSize().clipToBounds(),
+                factory = { ctx ->
+                    MapView(ctx).apply {
+                        setTileSource(TileSourceFactory.MAPNIK)
+                        // At 256 px a tile's labels are unreadably small on a dense screen.
+                        isTilesScaledToDpi = true
+                        setMultiTouchControls(true)
+                        controller.setZoom(12.0)
+                        controller.setCenter(nearby.firstOrNull() ?: GeoPoint(60.17, 24.94))
+                        addOnFirstLayoutListener { _, _, _, _, _ -> reframe(this) }
+                        addMapListener(object : MapListener {
+                            override fun onScroll(event: ScrollEvent?) = noteMove(this@apply)
+                            override fun onZoom(event: ZoomEvent?) = noteMove(this@apply)
+
+                            private fun noteMove(view: MapView): Boolean {
+                                val (center, zoom) = framedAt ?: return false
+                                moved = abs(view.mapCenter.latitude - center.latitude) > 1e-5 ||
+                                    abs(view.mapCenter.longitude - center.longitude) > 1e-5 ||
+                                    abs(view.zoomLevelDouble - zoom) > 1e-3
+                                return false
+                            }
+                        })
+                        onResume()
+                        map[0] = this
+                    }
+                },
+                update = { view ->
+                    view.overlayManager.tilesOverlay.setColorFilter(if (dark) DARK_TILES else null)
+                    view.overlayManager.tilesOverlay.loadingBackgroundColor = if (dark) DARK_LOADING else LIGHT_LOADING
+                    view.overlays.clear()
+                    focusedContact?.lastPayload?.let { payload ->
+                        view.overlays += Polygon(view).apply {
+                            setPoints(Polygon.pointsAsCircle(GeoPoint(payload.latitude, payload.longitude), payload.accuracy.toDouble()))
+                            fillPaint.color = FOCUS_FILL
+                            outlinePaint.color = Color.WHITE
+                            outlinePaint.strokeWidth = markerSize / 14f
+                            infoWindow = null
+                        }
+                    }
+                    located.forEach { contact ->
+                        val payload = contact.lastPayload ?: return@forEach
+                        val avatar = avatarBitmap(contact, model.photo(contact), markerSize)
+                        estimates[contact.id]?.let { estimate ->
+                            view.overlays += Polyline(view).apply {
+                                setPoints(estimate.path.map { GeoPoint(it.latitude, it.longitude) })
+                                outlinePaint.color = ESTIMATE_COLOUR
+                                outlinePaint.strokeWidth = markerSize / 8f
+                                outlinePaint.pathEffect = DashPathEffect(floatArrayOf(markerSize / 4f, markerSize / 5f), 0f)
+                            }
+                            view.overlays += Marker(view).apply {
+                                position = GeoPoint(estimate.point.latitude, estimate.point.longitude)
+                                icon = BitmapDrawable(view.resources, avatar)
+                                alpha = 0.45f
+                                title = "${contact.name}, estimated"
+                                snippet = "Guessed along the road from the last fix, ${movement(payload)}"
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                            }
                         }
                         view.overlays += Marker(view).apply {
-                            position = GeoPoint(estimate.point.latitude, estimate.point.longitude)
+                            position = GeoPoint(payload.latitude, payload.longitude)
                             icon = BitmapDrawable(view.resources, avatar)
-                            alpha = 0.45f
-                            title = "${contact.name}, estimated"
-                            snippet = "Guessed along the road from the last fix, ${movement(payload)}"
+                            title = contact.name
+                            snippet = status(contact, placeNames[contact.id])
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         }
                     }
-                    view.overlays += Marker(view).apply {
-                        position = GeoPoint(payload.latitude, payload.longitude)
-                        icon = BitmapDrawable(view.resources, avatar)
-                        title = contact.name
-                        snippet = status(contact, placeNames[contact.id])
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    state.lastFix?.let { fix ->
+                        view.overlays += Marker(view).apply {
+                            position = GeoPoint(fix.latitude, fix.longitude)
+                            icon = BitmapDrawable(view.resources, ownPositionBitmap(markerSize / 2))
+                            title = "You"
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        }
                     }
-                }
-                state.lastFix?.let { fix ->
-                    view.overlays += Marker(view).apply {
-                        position = GeoPoint(fix.latitude, fix.longitude)
-                        icon = BitmapDrawable(view.resources, ownPositionBitmap(markerSize / 2))
-                        title = "You"
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    view.invalidate()
+                    if (framedKey[0] != frameKey && view.width > 0) {
+                        reframe(view)
+                    } else if (framedListUp[0] != listUp && !moved && view.width > 0) {
+                        show(view, framing)
                     }
-                }
-                view.invalidate()
-                if (framedKey[0] != frameKey && view.width > 0) reframe(view)
-            },
-            onRelease = { view -> view.onDetach() },
-        )
-        val widen = focusedContact == null && someoneAbroad && framing == Framing.NEARBY && !moved
-        Column(
-            Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.End,
-        ) {
+                    framedListUp[0] = listUp
+                },
+                onRelease = { view -> view.onDetach() },
+            )
+            val widen = focusedContact == null && someoneAbroad && framing == Framing.NEARBY && !moved
             Button(
                 onClick = { if (focusedContact != null) onUnfocus() else map[0]?.let { show(it, if (widen) Framing.EVERYONE else Framing.NEARBY) } },
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = with(LocalDensity.current) { sheetPixels.toDp() } + 16.dp),
             ) { Text(if (someoneAbroad && !widen) countryName(home) else "Everyone") }
-            focusedContact?.let { contact ->
-                Card(Modifier.fillMaxWidth()) {
-                    Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Avatar(contact, model.photo(contact), 44.dp, Modifier.size(44.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(contact.name, style = MaterialTheme.typography.titleMedium)
-                            Text(status(contact, placeNames[contact.id]), style = MaterialTheme.typography.bodySmall)
-                        }
-                        distance(contact, state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-                        IconButton(onClick = onUnfocus) { Icon(Icons.Filled.Close, contentDescription = "Close") }
-                    }
-                }
-            }
         }
     }
 }
@@ -240,6 +285,9 @@ fun MapScreen(model: AppModel, focused: String?, onUnfocus: () -> Unit, modifier
 private enum class Framing { NEARBY, EVERYONE }
 
 private const val ESTIMATE_REFRESH_MILLIS = 10_000L
+private const val LIST_HEIGHT = 0.6f
+private val LIST_PEEK = 100.dp
+private val CARD_PEEK = 124.dp
 private const val ESTIMATE_COLOUR = 0xCC5E35B1.toInt()
 private const val FOCUS_FILL = 0x402979FF
 private const val LIGHT_LOADING = 0xFFD8D0D0.toInt()
@@ -271,20 +319,45 @@ private fun countryName(code: String?): String =
     code?.let { runCatching { Locale.Builder().setRegion(it).build().displayCountry }.getOrNull() }?.ifBlank { null } ?: "Home"
 
 /** Frames a focused contact with the circle of its accuracy, and at least 800 m across. */
-private fun frameAround(map: MapView, point: GeoPoint, accuracy: Int) {
+private fun frameAround(map: MapView, point: GeoPoint, accuracy: Int, sheetPixels: Int) {
     val half = maxOf(accuracy * 1.5, 400.0)
     val dLat = half / 110_574.0
     val dLon = half / (cos(Math.toRadians(point.latitude)) * 111_320.0)
-    map.zoomToBoundingBox(BoundingBox(point.latitude + dLat, point.longitude + dLon, point.latitude - dLat, point.longitude - dLon), false)
+    fit(map, BoundingBox(point.latitude + dLat, point.longitude + dLon, point.latitude - dLat, point.longitude - dLon), 0, sheetPixels)
 }
 
-private fun frame(map: MapView, points: List<GeoPoint>) {
+private fun frame(map: MapView, points: List<GeoPoint>, sheetPixels: Int) {
     when (points.size) {
         0 -> return
         1 -> {
-            map.controller.setZoom(15.0)
+            map.controller.setZoom(14.0)
             map.controller.setCenter(points.first())
+            liftAbove(map, sheetPixels)
         }
-        else -> map.zoomToBoundingBox(BoundingBox.fromGeoPoints(points), false, 96)
+        else -> fit(map, BoundingBox.fromGeoPoints(points), 96, sheetPixels)
     }
+}
+
+/**
+ * Zooms [box] into the part of the map above the sheet, [border] pixels in from its edges.
+ * zoomToBoundingBox puts its border on every side, which leaves no width once the sheet is up.
+ */
+private fun fit(map: MapView, box: BoundingBox, border: Int, sheetPixels: Int) {
+    val width = (map.width - 2 * border).coerceAtLeast(1)
+    val height = (map.height - sheetPixels - 2 * border).coerceAtLeast(1)
+    val zoom = MapView.getTileSystem().getBoundingBoxZoom(box, width, height)
+    map.controller.setZoom(if (zoom == Double.MIN_VALUE) map.maxZoomLevel else zoom.coerceIn(map.minZoomLevel, map.maxZoomLevel))
+    map.controller.setCenter(GeoPoint(mercatorMiddle(box.latNorth, box.latSouth), box.centerWithDateLine.longitude))
+    liftAbove(map, sheetPixels)
+}
+
+/** The latitude halfway between two others on the map, which is not their average. */
+private fun mercatorMiddle(north: Double, south: Double): Double {
+    fun y(latitude: Double) = ln(tan(Math.PI / 4 + Math.toRadians(latitude) / 2))
+    return Math.toDegrees(atan(sinh((y(north) + y(south)) / 2)))
+}
+
+/** Moves what is centred into the middle of the part of the map above the sheet. */
+private fun liftAbove(map: MapView, sheetPixels: Int) {
+    map.controller.setCenter(map.projection.fromPixels(map.width / 2, map.height / 2 + sheetPixels / 2))
 }
