@@ -5,9 +5,24 @@ with its commit and pull request. Square brackets mark what was left out or reda
 commit without a prompts section is left out. This file is generated from the commit messages,
 so a change by hand is lost at the next commit.
 
+## Reframe the map on everyone when the app comes back
+
+2026-10-31, [the commit that last changed this file](https://github.com/zululima/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+
+**2.**
+> also this happened yesterday when i opened mismeet. debug and fix. it
+> should always show the everyone zoom
+> [attached: a screenshot of the map]
+
+**3.**
+> [a request about how Claude Code words its replies left out]
+
+**4.** (answer to whether to commit, push and ship the test builds)
+> Yes, go ahead
+
 ## Move invite links to zululima.github.io, keep accepting old ones
 
-2026-10-27, [the commit that last changed this file](https://github.com/zululima/mismeet/commits/main/PROMPTS.md), model claude-opus-5-5, effort xhigh.
+2026-10-27, commit [fac8a3d](https://github.com/zululima/mismeet/commit/fac8a3dc028fd43a65e8b609508e22b07f91a6df), model claude-opus-5-5, effort xhigh.
 
 **1.**
 > should i rename my lambdakilo to limakilo in github would something

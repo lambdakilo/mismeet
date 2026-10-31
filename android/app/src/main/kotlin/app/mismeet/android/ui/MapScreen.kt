@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LifecycleStartEffect
 import app.mismeet.android.AppModel
 import app.mismeet.android.location.Countries
 import app.mismeet.android.store.Contact
@@ -75,7 +76,8 @@ import org.osmdroid.views.overlay.Polyline
 
 /**
  * OpenStreetMap tiles through osmdroid: no Google dependency, and the tile policy wants a user
- * agent. Opens framed around the people in this phone's country, like Find My; the button at the
+ * agent. Opens framed around the people in this phone's country, like Find My, again each time the
+ * app comes back, and follows them as they move until the map is moved by hand; the button at the
  * bottom returns there, and a second tap widens to everyone, abroad included. The contact list is
  * a sheet over the map, and the [focused] contact, tapped in it, is framed with its card in the
  * sheet until it is closed.
@@ -99,7 +101,8 @@ fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUn
     val countries by produceState<Countries?>(null) { value = withContext(Dispatchers.Default) { model.countries } }
 
     val located = state.contacts.filter { it.lastPayload != null }
-    val own = state.lastFix?.let { LatLon(it.latitude, it.longitude) }
+    // The last fix stops updating once sharing is off, so it would pull the framing to an old place.
+    val own = state.lastFix?.takeIf { state.sharingEnabled }?.let { LatLon(it.latitude, it.longitude) }
     val home = countries?.home(own, located.map { it.position() })
     val inHome = { point: LatLon -> home == null || countries?.code(point) == home }
     val everyone = points(located, own, estimates) { true }
@@ -125,6 +128,9 @@ fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUn
         ?: (located.joinToString(",") { it.id } + ":" + estimates.keys.sorted().joinToString(",") + ":" + (own != null) + ":" + home)
     val framedKey = remember { arrayOf("") }
     val framedListUp = remember { booleanArrayOf(false) }
+    // Positions stored at launch are replaced by the first fetch a moment later.
+    val positionKey = located.joinToString(",") { "${it.id}:${it.lastEventId}" } + ":" + own
+    val framedPositions = remember { arrayOf("") }
     val map = remember { arrayOfNulls<MapView>(1) }
     val show by rememberUpdatedState { view: MapView, target: Framing ->
         framing = target
@@ -157,6 +163,10 @@ fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUn
     val markerSize = with(LocalDensity.current) { 44.dp.roundToPx() }
     LaunchedEffect(focused) {
         if (focused != null) sheet.partialExpand()
+    }
+    LifecycleStartEffect(Unit) {
+        map[0]?.takeIf { it.width > 0 }?.let { reframe(it) }
+        onStopOrDispose {}
     }
 
     BottomSheetScaffold(
@@ -254,7 +264,7 @@ fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUn
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         }
                     }
-                    state.lastFix?.let { fix ->
+                    own?.let { fix ->
                         view.overlays += Marker(view).apply {
                             position = GeoPoint(fix.latitude, fix.longitude)
                             icon = BitmapDrawable(view.resources, ownPositionBitmap(markerSize / 2))
@@ -265,10 +275,13 @@ fun MapScreen(model: AppModel, focused: String?, onFocus: (String) -> Unit, onUn
                     view.invalidate()
                     if (framedKey[0] != frameKey && view.width > 0) {
                         reframe(view)
-                    } else if (framedListUp[0] != listUp && !moved && view.width > 0) {
+                    } else if ((framedListUp[0] != listUp || framedPositions[0] != positionKey) &&
+                        focusedContact == null && !moved && view.width > 0
+                    ) {
                         show(view, framing)
                     }
                     framedListUp[0] = listUp
+                    framedPositions[0] = positionKey
                 },
                 onRelease = { view -> view.onDetach() },
             )

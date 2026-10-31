@@ -1,7 +1,8 @@
 import MapKit
 import SwiftUI
 
-/// Opens framed around the people in this phone's country, the user included, like Find My. The
+/// Opens framed around the people in this phone's country, the user included, like Find My, again
+/// each time the app comes back, and follows them as they move until the map is moved by hand. The
 /// button at the bottom returns there, and a second tap widens to everyone, abroad included. The
 /// contact list is a panel at the bottom, and a contact tapped in it is focused, with its card in
 /// the panel until it is closed.
@@ -16,11 +17,13 @@ struct ContactsMapView: View {
     }
 
     @Environment(AppModel.self) private var model
+    @Environment(\.scenePhase) private var scenePhase
     @Namespace private var mapScope
     @State private var position = MapCameraPosition.automatic
     @State private var framing = Framing.nearby
     @State private var estimates: [String: Estimate] = [:]
     @State private var countries: Countries?
+    @State private var wasInBackground = false
     @Binding var focused: String?
     @Binding var listUp: Bool
 
@@ -28,8 +31,10 @@ struct ContactsMapView: View {
         model.state.contacts.filter { $0.lastPayload != nil }
     }
 
+    /// The last fix stops updating once sharing is off, so it would pull the framing to an old place.
     private var own: LatLon? {
-        model.state.lastFix.map { LatLon(latitude: $0.latitude, longitude: $0.longitude) }
+        guard model.state.sharingEnabled else { return nil }
+        return model.state.lastFix.map { LatLon(latitude: $0.latitude, longitude: $0.longitude) }
     }
 
     private var home: String? {
@@ -50,6 +55,10 @@ struct ContactsMapView: View {
 
     private var frameKey: String {
         located.map(\.id).joined(separator: ",") + ":" + estimates.keys.sorted().joined(separator: ",") + ":\(own != nil):\(home ?? "")"
+    }
+
+    private var positionKey: String {
+        located.map { "\($0.id):\($0.lastEventId ?? "")" }.joined(separator: ",") + ":\(own.map { "\($0.latitude),\($0.longitude)" } ?? "")"
     }
 
     var body: some View {
@@ -142,13 +151,18 @@ struct ContactsMapView: View {
         .onChange(of: frameKey, initial: true) { _, _ in
             if focusedContact == nil { show(.nearby) }
         }
+        // Positions stored at launch are replaced by the first fetch a moment later.
+        .onChange(of: positionKey) { _, _ in
+            if focusedContact == nil, !position.positionedByUser { show(framing) }
+        }
         .onChange(of: focusKey, initial: true) { _, _ in
-            guard let payload = focusedContact?.lastPayload else { return }
-            let span = max(Double(payload.accuracy) * 3, 800)
-            position = .region(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: payload.latitude, longitude: payload.longitude),
-                latitudinalMeters: span, longitudinalMeters: span
-            ))
+            frameFocused()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { wasInBackground = true }
+            guard phase == .active, wasInBackground else { return }
+            wasInBackground = false
+            if focusedContact == nil { show(.nearby) } else { frameFocused() }
         }
         .task(id: located.map { "\($0.id):\($0.lastEventId ?? "")" }) {
             while !Task.isCancelled {
@@ -189,6 +203,15 @@ struct ContactsMapView: View {
             points.append(CLLocationCoordinate2D(latitude: own.latitude, longitude: own.longitude))
         }
         return points.isEmpty && framing == .nearby ? self.points(.everyone) : points
+    }
+
+    private func frameFocused() {
+        guard let payload = focusedContact?.lastPayload else { return }
+        let span = max(Double(payload.accuracy) * 3, 800)
+        position = .region(MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: payload.latitude, longitude: payload.longitude),
+            latitudinalMeters: span, longitudinalMeters: span
+        ))
     }
 
     private func show(_ target: Framing) {
